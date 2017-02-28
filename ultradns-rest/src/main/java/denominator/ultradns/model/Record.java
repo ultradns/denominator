@@ -10,12 +10,11 @@ public class Record {
     public String name;
     public int typeCode;
     public int ttl;
+    public List<String> rdata = new ArrayList<String>();
 
     public RRSet buildRRSet(){
         return new RRSet(getTtl(), getRdata());
     }
-
-    public List<String> rdata = new ArrayList<String>();
 
     public String getId() {
         return id;

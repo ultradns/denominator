@@ -21,13 +21,13 @@ import denominator.config.ConcatBasicAndQualifiedResourceRecordSets;
 import denominator.config.NothingToClose;
 import denominator.config.WeightedUnsupported;
 import denominator.profile.GeoResourceRecordSetApi;
-//import UltraDNSRestErrorDecoder.UltraDNSError;
 import feign.Feign;
 import feign.Logger;
 import feign.Request.Options;
 import feign.form.FormEncoder;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
+import feign.httpclient.ApacheHttpClient;
 
 import static dagger.Provides.Type.SET;
 
@@ -174,6 +174,7 @@ public class UltraDNSRestProvider extends BasicProvider {
       Options options = new Options(10 * 1000, 10 * 60 * 1000);
 
       return Feign.builder()
+              .client(new ApacheHttpClient())
               .logger(logger)
               .logLevel(logLevel)
               .options(options)

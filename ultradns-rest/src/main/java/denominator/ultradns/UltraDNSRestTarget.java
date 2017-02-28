@@ -40,7 +40,6 @@ class UltraDNSRestTarget implements Target<UltraDNSRest> {
 
   @Override
   public Request apply(RequestTemplate in) {
-    logger.info("AccessToken in Request Header: " + "Bearer " + lazyToken.get());
     in.header("Authorization", "Bearer " + lazyToken.get());
     in.insert(0, url());
     return in.request();

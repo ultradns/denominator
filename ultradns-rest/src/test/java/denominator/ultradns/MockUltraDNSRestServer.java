@@ -79,6 +79,13 @@ final class MockUltraDNSRestServer extends UltraDNSRestProvider implements TestR
             .hasPath("/authorization/token");
   }
 
+  public RecordedRequestAssert assertRequest(String requestType, String path, String body) throws InterruptedException {
+    return assertThat(delegate.takeRequest())
+            .hasMethod(requestType)
+            .hasPath(path)
+            .hasBody(format(body));
+  }
+
   void shutdown() throws IOException {
     delegate.shutdown();
   }

@@ -1,6 +1,6 @@
 package denominator.ultradns.model;
 
-public class NetworkStatus {
+public class Status {
 
     private String message;
 

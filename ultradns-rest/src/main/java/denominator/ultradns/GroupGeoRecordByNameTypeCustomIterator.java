@@ -10,7 +10,8 @@ import denominator.common.PeekingIterator;
 import denominator.model.ResourceRecordSet;
 import denominator.model.ResourceRecordSet.Builder;
 import denominator.model.profile.Geo;
-import denominator.ultradns.UltraDNSRest.DirectionalRecord;
+import denominator.ultradns.model.DirectionalRecord;
+import denominator.ultradns.model.DirectionalGroup;
 
 import static denominator.common.Util.peekingIterator;
 import static denominator.common.Util.toMap;
@@ -34,8 +35,8 @@ class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordS
   }
 
   static boolean typeTTLAndGeoGroupEquals(DirectionalRecord actual, DirectionalRecord expected) {
-    return actual.type.equals(expected.type) && actual.ttl == expected.ttl
-           && actual.geoGroupId.equals(expected.geoGroupId);
+    return actual.getType().equals(expected.getType()) && actual.ttl == expected.ttl
+           && actual.getGeoGroupId().equals(expected.getGeoGroupId());
   }
 
   /**
@@ -47,7 +48,7 @@ class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordS
       return false;
     }
     DirectionalRecord record = peekingIterator.peek();
-    if (record.noResponseRecord) {
+    if (record.isNoResponseRecord()) {
       // TODO: log as this is unsupported
       peekingIterator.next();
     }
@@ -60,24 +61,22 @@ class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordS
 
     Builder<Map<String, Object>>
         builder =
-        ResourceRecordSet.builder().name(record.name).type(record.type)
-            .qualifier(record.geoGroupName).ttl(record.ttl);
+        ResourceRecordSet.builder().name(record.name).type(record.getType())
+            .qualifier(record.getGeoGroupName()).ttl(record.ttl);
 
-    builder.add(toMap(record.type, record.rdata));
+    builder.add(toMap(record.getType(), record.rdata));
 
-    if (!cache.containsKey(record.geoGroupId)) {
-      Geo
-          profile =
-          Geo.create(api.getDirectionalDNSGroupDetails(record.geoGroupId).regionToTerritories);
-      cache.put(record.geoGroupId, profile);
+    if (!cache.containsKey(record.getGeoGroupId())) {
+      /*Geo profile = Geo.create(api.getDirectionalDNSGroupDetails(record.getGeoGroupId()).getRegionToTerritories());
+      cache.put(record.getGeoGroupId(), profile);*/
     }
 
-    builder.geo(cache.get(record.geoGroupId));
+    builder.geo(cache.get(record.getGeoGroupId()));
     while (hasNext()) {
       DirectionalRecord next = peekingIterator.peek();
       if (typeTTLAndGeoGroupEquals(next, record)) {
         peekingIterator.next();
-        builder.add(toMap(record.type, next.rdata));
+        builder.add(toMap(record.getType(), next.rdata));
       } else {
         break;
       }

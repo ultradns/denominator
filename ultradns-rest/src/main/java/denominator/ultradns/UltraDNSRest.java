@@ -1,11 +1,6 @@
 package denominator.ultradns;
 
-import denominator.ultradns.model.RRSet;
-import denominator.ultradns.model.NetworkStatus;
-import denominator.ultradns.model.AccountList;
-import denominator.ultradns.model.ZoneList;
-import denominator.ultradns.model.RRSetList;
-import denominator.ultradns.model.Record;
+import denominator.ultradns.model.*;
 
 import feign.Body;
 import feign.Headers;
@@ -18,7 +13,7 @@ import java.util.*;
 interface UltraDNSRest {
 
   @RequestLine("GET /status")
-  NetworkStatus getNeustarNetworkStatus();
+  Status getNeustarNetworkStatus();
 
   @RequestLine("GET /accounts")
   AccountList getAccountsListOfUser();
@@ -65,12 +60,18 @@ interface UltraDNSRest {
                             @Param("hostName") String hostName,
                             RRSet rrSet);
 
-  /**
-   * @throws UltraDNSRestException with code {@link UltraDNSRestException#RESOURCE_RECORD_NOT_FOUND} .
-   */
-  @RequestLine("POST")
-  @Body("<v01:deleteResourceRecord><transactionID /><guid>{guid}</guid></v01:deleteResourceRecord>")
-  void deleteResourceRecord(@Param("guid") String guid);
+  @RequestLine("DELETE /zones/{zoneName}/rrsets/{rrType}/{hostName}")
+  Status deleteResourceRecordByNameType(@Param("zoneName") String zoneName,
+                                      @Param("rrType") int rrType,
+                                      @Param("hostName") String hostName);
+
+  @RequestLine("PATCH /zones/{zoneName}/rrsets/{rrType}/{hostName}")
+  @Headers("Content-Type: application/json-patch+json")
+  @Body("%5B%7B\"op\": \"remove\",\"path\": \"/rdata/{index}\"%7D%5D")
+  Status deleteResourceRecord(@Param("zoneName") String zoneName,
+                              @Param("rrType") int rrType,
+                              @Param("hostName") String hostName,
+                              @Param("index") int index);
 
   @RequestLine("POST")
   @Body("<v01:getLoadBalancingPoolsByZone><zoneName>{zoneName}</zoneName><lbPoolType>RR</lbPoolType></v01:getLoadBalancingPoolsByZone>")
@@ -108,16 +109,13 @@ interface UltraDNSRest {
   @Body("<v01:getAvailableRegions />")
   Map<String, Collection<String>> getAvailableRegions();
 
+  /**
+   * This is kept in hold for migration
+   * Commenting & stubbing the method
+   */
   @RequestLine("POST")
   @Body("<v01:getDirectionalDNSGroupDetails><GroupId>{GroupId}</GroupId></v01:getDirectionalDNSGroupDetails>")
   DirectionalGroup getDirectionalDNSGroupDetails(@Param("GroupId") String groupId);
-
-  @RequestLine("POST")
-  @Body("<v01:getDirectionalDNSRecordsForGroup><groupName>{groupName}</groupName><hostName>{hostName}</hostName><zoneName>{zoneName}</zoneName><poolRecordType>{poolRecordType}</poolRecordType></v01:getDirectionalDNSRecordsForGroup>")
-  List<DirectionalRecord> getDirectionalDNSRecordsForGroup(@Param("zoneName") String zoneName,
-                                                           @Param("groupName") String groupName,
-                                                           @Param("hostName") String name,
-                                                           @Param("poolRecordType") int type);
 
   /**
    * @throws UltraDNSRestException with code {@link UltraDNSRestException#POOL_RECORD_ALREADY_EXISTS}.
@@ -134,19 +132,17 @@ interface UltraDNSRest {
   void updateDirectionalPoolRecord(@Param("record") DirectionalRecord update,
                                    @Param("group") DirectionalGroup group);
 
-  @RequestLine("POST")
-  @Body("<v01:getDirectionalPoolsOfZone><zoneName>{zoneName}</zoneName></v01:getDirectionalPoolsOfZone>")
-  Map<String, String> getDirectionalPoolsOfZone(@Param("zoneName") String zoneName);
+  @RequestLine("GET /zones/{zoneName}/rrsets/?q=kind:DIR_POOLS")
+  RRSetList getDirectionalPoolsOfZone(@Param("zoneName") String zoneName);
 
-  @RequestLine("POST")
-  @Body("<v01:getDirectionalDNSRecordsForHost><zoneName>{zoneName}</zoneName><hostName>{hostName}</hostName><poolRecordType>{poolRecordType}</poolRecordType></v01:getDirectionalDNSRecordsForHost>")
-  List<DirectionalRecord> getDirectionalDNSRecordsForHost(@Param("zoneName") String zoneName,
-                                                          @Param("hostName") String name,
-                                                          @Param("poolRecordType") int rrType);
+  @RequestLine("GET /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}?q=kind:DIR_POOLS")
+  RRSetList getDirectionalDNSRecordsForHost(@Param("zoneName") String zoneName,
+                                            @Param("hostName") String name,
+                                            @Param("poolRecordType") int rrType);
 
-  @RequestLine("POST")
-  @Body("<v01:addDirectionalPool><transactionID /><AddDirectionalPoolData dirPoolType=\"GEOLOCATION\" poolRecordType=\"{poolRecordType}\" zoneName=\"{zoneName}\" hostName=\"{hostName}\" description=\"{poolRecordType}\"/></v01:addDirectionalPool>")
-  String addDirectionalPool(@Param("zoneName") String zoneName, @Param("hostName") String name,
+  @RequestLine("POST /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
+  @Body("%7B\"profile\": %7B\"@context\": \"http://schemas.ultradns.com/DirPool.jsonschema\",\"description\": \"{poolRecordType}\"%7D%7D")
+  Status addDirectionalPool(@Param("zoneName") String zoneName, @Param("hostName") String name,
                             @Param("poolRecordType") String type);
 
   @RequestLine("POST")
@@ -183,20 +179,5 @@ interface UltraDNSRest {
     public String toString() {
       return "NameAndType(" + name + "," + type + ")";
     }
-  }
-
-  class DirectionalGroup {
-
-    String name;
-    Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
-  }
-
-  class DirectionalRecord extends Record {
-
-    String geoGroupId;
-    String geoGroupName;
-    boolean noResponseRecord;
-
-    String type;
   }
 }

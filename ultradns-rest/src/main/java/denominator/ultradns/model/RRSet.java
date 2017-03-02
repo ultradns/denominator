@@ -3,6 +3,7 @@ package denominator.ultradns.model;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,4 +77,25 @@ public class RRSet {
     public void setProfile(Profile profile) {
         this.profile = profile;
     }
+
+    public List<Record> recordsFromRdata() {
+        List<Record> records = new ArrayList<Record>();
+        if (getRdata() != null && !getRdata().isEmpty()) {
+            for (String rData : getRdata()) {
+                Record r = new Record();
+                r.setName(getOwnerName());
+                r.setTypeCode(intValueOfRrtype());
+                r.setTtl(getTtl());
+                if (rData != null){
+                    r.setRdata(Arrays.asList(rData.split("\\s")));
+                }
+                if (profile != null) {
+                    r.setProfile(profile);
+                }
+                records.add(r);
+            }
+        }
+        return records;
+    }
+
 }

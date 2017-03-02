@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 
+import static denominator.ResourceTypeToValue.lookup;
+
 public class RRSetList {
 
     private String zoneName;
@@ -153,5 +155,16 @@ public class RRSetList {
 
     public void setRrSets(List<RRSet> rrSets) {
         this.rrSets = rrSets;
+    }
+
+    public RRSet rrSetByNameAndType(final String name, final String type) {
+        final String typeWithTypeCode = type + " (" + lookup(type) + ")";
+        for (RRSet rrSet : getRrSets()) {
+            if ( rrSet.getOwnerName().equals(name) &&
+                 rrSet.getRrtype().equals(typeWithTypeCode) ) {
+                return rrSet;
+            }
+        }
+        return null;
     }
 }

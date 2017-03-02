@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import denominator.ultradns.UltraDNSRest.NameAndType;
+import denominator.ultradns.model.RRSet;
 
 import static denominator.ResourceTypeToValue.lookup;
 import static denominator.common.Preconditions.checkNotNull;
@@ -25,41 +26,42 @@ class UltraDNSRestRoundRobinPoolApi {
 
   void add(String name, String type, int ttl, List<Map<String, Object>> rdatas) {
     checkState(isPoolType(type), "%s not A or AAAA type", type);
-    String poolId = reuseOrCreatePoolForNameAndType(name, type);
+    // String poolId = reuseOrCreatePoolForNameAndType(name, type);
+    reuseOrCreatePoolForNameAndType(name, type);
+    final int typeCode = lookup(type);
     for (Map<String, Object> rdata : rdatas) {
       String address = rdata.get("address").toString();
-      int typeCode = lookup(type);
-      api.addRecordToRRPool(typeCode, ttl, address, poolId, zoneName);
+      api.addRecordToRRPool(typeCode, ttl, address, name, zoneName);
     }
   }
 
-  private String reuseOrCreatePoolForNameAndType(String name, String type) {
+  private void reuseOrCreatePoolForNameAndType(String name, String type) {
     try {
-      return api.addRRLBPool(zoneName, name, lookup(type));
+      api.addRRLBPool(zoneName, name, lookup(type));
     } catch (UltraDNSRestException e) {
       if (e.code() != UltraDNSRestException.POOL_ALREADY_EXISTS) {
         throw e;
       }
-      return getPoolByNameAndType(name, type);
     }
   }
 
-  String getPoolByNameAndType(String name, String type) {
+  RRSet getPoolByNameAndType(String name, String type) {
     NameAndType nameAndType = new NameAndType();
     nameAndType.name = name;
     nameAndType.type = type;
-    return api.getLoadBalancingPoolsByZone(zoneName).get(nameAndType);
+    return api.getLoadBalancingPoolsByZone(zoneName, lookup(type)).rrSetByNameAndType(name, type);
   }
 
   void deletePool(String name, String type) {
     NameAndType nameAndType = new NameAndType();
     nameAndType.name = checkNotNull(name, "pool name was null");
     nameAndType.type = checkNotNull(type, "pool record type was null");
-    String poolId = api.getLoadBalancingPoolsByZone(zoneName).get(nameAndType);
+    final int typeCode = lookup(type);
+    RRSet poolId = api.getLoadBalancingPoolsByZone(zoneName, typeCode).rrSetByNameAndType(name, type);
     if (poolId != null) {
-      if (api.getRRPoolRecords(poolId).isEmpty()) {
+      if (poolId.recordsFromRdata().isEmpty()) {
         try {
-          api.deleteLBPool(poolId);
+          api.deleteLBPool(zoneName, typeCode, name);
         } catch (UltraDNSRestException e) {
           switch (e.code()) {
             // lost race

@@ -13,7 +13,10 @@ import denominator.ultradns.InvalidatableTokenProvider.Session;
 import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static denominator.ultradns.UltraDNSMockResponse.*;
@@ -243,6 +246,134 @@ public class UltraDNSRestTest {
                 .hasPath("/zones/denominator.io./rrsets/1/denominator.io.");
     }
 
+    @Test
+    public void testGetLoadBalancingPoolsByZoneWhichIsPresent() throws Exception {
+        final String zoneName = "denominator.io.";
+        final int typeCode = 1;
+        final String expectedPath = "/zones/" + zoneName + "/rrsets/" + typeCode + "?q=kind%3ARD_POOLS";
+        server.enqueueSessionResponse();
+        server.enqueue(new MockResponse().setBody(GET_RESOURCE_RECORDS_PRESENT));
+        final RRSetList rrSetList = mockApi().getLoadBalancingPoolsByZone(zoneName, typeCode);
+        server.assertSessionRequest();
+        server.assertRequest()
+                .hasMethod("GET")
+                .hasPath(expectedPath);
+        assertThat(rrSetList.getRrSets().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void testGetLoadBalancingPoolsByZoneWhichDoesNotHavePools() throws Exception {
+        thrown.expect(UltraDNSRestException.class);
+        thrown.expectMessage("Data not found.");
+
+        final String zoneName = "denominator-2.io.";
+        final int typeCode = 1;
+        server.enqueueSessionResponse();
+        server.enqueue(new MockResponse().setResponseCode(404).setBody(UltraDNSMockResponse.getMockErrorResponse("" + UltraDNSRestException.DATA_NOT_FOUND, "Data not found.")));
+        mockApi().getLoadBalancingPoolsByZone(zoneName, typeCode);
+    }
+
+    @Test
+    public void testGetLoadBalancingPoolsByZoneWhichIsAbsent() throws Exception {
+        thrown.expect(UltraDNSRestException.class);
+        thrown.expectMessage("Zone does not exist in the system.");
+
+        final String zoneName = "denominator-3.io.";
+        final int typeCode = 1;
+        server.enqueueSessionResponse();
+        server.enqueue(new MockResponse().setResponseCode(404).setBody(UltraDNSMockResponse.getMockErrorResponse("" + UltraDNSRestException.ZONE_NOT_FOUND, "Zone does not exist in the system.")));
+        mockApi().getLoadBalancingPoolsByZone(zoneName, typeCode);
+    }
+
+    @Test
+    public void testAddRRLBPoolWithFQDNAsHostName() throws Exception {
+        final String zoneName = "denominator.io.";
+        final String hostName = "h1.denominator.io.";
+        final int typeCode = 1;
+        final String expectedPath = "/zones/" + zoneName + "/rrsets/" + typeCode + "/" + hostName;
+        final String expectedBody =
+                "%7B" +
+                    "\"ttl\": 300, " +
+                    "\"rrdata\": [], " +
+                    "\"profile\": %7B" +
+                        "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
+                        "\"order\": \"ROUND_ROBIN\", " +
+                        "\"description\": \"This is a great RD Pool\"" +
+                    "%7D" +
+                "%7D";
+        server.enqueueSessionResponse();
+        server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+        mockApi().addRRLBPool(zoneName, hostName, typeCode);
+        server.assertSessionRequest();
+        server.assertRequest()
+                .hasMethod("POST")
+                .hasPath(expectedPath)
+                .hasBody(expectedBody);
+    }
+
+    @Test
+    public void testAddRRLBPoolWithSubDomainAsHostName() throws Exception {
+        final String zoneName = "denominator.io.";
+        final String hostName = "h2";
+        final int typeCode = 1;
+        final String expectedPath = "/zones/" + zoneName + "/rrsets/" + typeCode + "/" + hostName;
+        final String expectedBody =
+                "%7B" +
+                    "\"ttl\": 300, " +
+                    "\"rrdata\": [], " +
+                    "\"profile\": %7B" +
+                        "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
+                        "\"order\": \"ROUND_ROBIN\", " +
+                        "\"description\": \"This is a great RD Pool\"" +
+                    "%7D" +
+                "%7D";
+        server.enqueueSessionResponse();
+        server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+        mockApi().addRRLBPool(zoneName, hostName, typeCode);
+        server.assertSessionRequest();
+        server.assertRequest()
+                .hasMethod("POST")
+                .hasPath(expectedPath)
+                .hasBody(expectedBody);
+    }
+
+    @Test
+    public void testAddRRLBPoolWhenPoolAlreadyExists() throws Exception {
+        thrown.expect(UltraDNSRestException.class);
+        thrown.expectMessage("Pool already created for this host name : h2.denominator.io.");
+
+        final String zoneName = "denominator.io.";
+        final String hostName = "h2";
+        final int typeCode = 1;
+        server.enqueueSessionResponse();
+        server.enqueue(new MockResponse().setResponseCode(400).setBody(UltraDNSMockResponse.getMockErrorResponse("" + UltraDNSRestException.POOL_ALREADY_EXISTS, "Pool already created for this host name : h2.denominator.io.")));
+        mockApi().addRRLBPool(zoneName, hostName, typeCode);
+    }
+
+    @Test
+    public void getRegionsByIdAndName() throws Exception {
+        server.enqueueSessionResponse();
+        server.enqueue(new MockResponse().setBody(getAvailableRegionsResponse));
+
+        UltraDNSRestGeoSupport.Region anonymousProxy = new UltraDNSRestGeoSupport().new Region("Anonymous Proxy", "A1", "Country", 315);
+        UltraDNSRestGeoSupport.Region satelliteProvider = new UltraDNSRestGeoSupport().new Region("Satellite Provider", "A2", "Country", 316);
+        UltraDNSRestGeoSupport.Region unknownOrUncategorizedIPs = new UltraDNSRestGeoSupport().new Region("Unknown / Uncategorized IPs", "A3", "Country", 331);
+        UltraDNSRestGeoSupport.Region northAmerica = new UltraDNSRestGeoSupport().new Region("North America", "NAM", "Region", 338);
+
+        Collection<Collection<UltraDNSRestGeoSupport.Region>> group = mockApi().getAvailableRegions("");
+        Collection<UltraDNSRestGeoSupport.Region> topLevelRegions = group.iterator().next();
+        Iterator<UltraDNSRestGeoSupport.Region> topLevelRegionIterator = topLevelRegions.iterator();
+
+        UltraDNSRestGeoSupport.Region firstRegion = topLevelRegionIterator.next();
+        assertThat(firstRegion).isEqualTo(anonymousProxy);
+        UltraDNSRestGeoSupport.Region secondRegion = topLevelRegionIterator.next();
+        assertThat(secondRegion).isEqualTo(satelliteProvider);
+        UltraDNSRestGeoSupport.Region thirdRegion = topLevelRegionIterator.next();
+        assertThat(thirdRegion).isEqualTo(unknownOrUncategorizedIPs);
+        UltraDNSRestGeoSupport.Region fourthRegion = topLevelRegionIterator.next();
+        assertThat(fourthRegion).isEqualTo(northAmerica);
+    }
+
     private RRSet getSampleRRSet(String ownerName, String rrtype, List<String> rdata){
         RRSet rrSet= new RRSet(86400, rdata);
         rrSet.setOwnerName(ownerName);
@@ -375,4 +506,71 @@ public class UltraDNSRestTest {
                 "/zones/test-zone-1.com./rrsets/1/pool_1.test-zone-1.com.",
                 "[{\"op\": \"remove\",\"path\": \"/rdata/0\"}]");
     }
+
+    static String getAvailableRegionsResponse =
+            "[\n" +
+                    "  [\n" +
+                    "    {\n" +
+                    "      \"name\": \"Anonymous Proxy\",\n" +
+                    "      \"code\": \"A1\",\n" +
+                    "      \"type\": \"Country\",\n" +
+                    "      \"id\": 315\n" +
+                    "    },\n" +
+                    "    {\n" +
+                    "      \"name\": \"Satellite Provider\",\n" +
+                    "      \"code\": \"A2\",\n" +
+                    "      \"type\": \"Country\",\n" +
+                    "      \"id\": 316\n" +
+                    "    },\n" +
+                    "    {\n" +
+                    "      \"name\": \"Unknown / Uncategorized IPs\",\n" +
+                    "      \"code\": \"A3\",\n" +
+                    "      \"type\": \"Country\",\n" +
+                    "      \"id\": 331\n" +
+                    "    },\n" +
+                    "    {\n" +
+                    "      \"name\": \"North America\",\n" +
+                    "      \"code\": \"NAM\",\n" +
+                    "      \"type\": \"Region\",\n" +
+                    "      \"id\": 338\n" +
+                    "    },\n" +
+                    "    {\n" +
+                    "      \"name\": \"South America\",\n" +
+                    "      \"code\": \"SAM\",\n" +
+                    "      \"type\": \"Region\",\n" +
+                    "      \"id\": 337\n" +
+                    "    },\n" +
+                    "    {\n" +
+                    "      \"name\": \"Europe\",\n" +
+                    "      \"code\": \"EUR\",\n" +
+                    "      \"type\": \"Region\",\n" +
+                    "      \"id\": 336\n" +
+                    "    },\n" +
+                    "    {\n" +
+                    "      \"name\": \"Africa\",\n" +
+                    "      \"code\": \"AFR\",\n" +
+                    "      \"type\": \"Region\",\n" +
+                    "      \"id\": 332\n" +
+                    "    },\n" +
+                    "    {\n" +
+                    "      \"name\": \"Asia\",\n" +
+                    "      \"code\": \"ASI\",\n" +
+                    "      \"type\": \"Region\",\n" +
+                    "      \"id\": 334\n" +
+                    "    },\n" +
+                    "    {\n" +
+                    "      \"name\": \"Australia / Oceania\",\n" +
+                    "      \"code\": \"OCN\",\n" +
+                    "      \"type\": \"Region\",\n" +
+                    "      \"id\": 335\n" +
+                    "    },\n" +
+                    "    {\n" +
+                    "      \"name\": \"Antarctica\",\n" +
+                    "      \"code\": \"ANT\",\n" +
+                    "      \"type\": \"Region\",\n" +
+                    "      \"id\": 333\n" +
+                    "    }\n" +
+                    "  ]\n" +
+                    "]";
+
 }

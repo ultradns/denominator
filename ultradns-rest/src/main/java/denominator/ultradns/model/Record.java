@@ -11,6 +11,7 @@ public class Record {
     public int typeCode;
     public int ttl;
     public List<String> rdata = new ArrayList<String>();
+    public Profile profile;
 
     public RRSet buildRRSet(){
         return new RRSet(getTtl(), getRdata());
@@ -63,4 +64,13 @@ public class Record {
     public void setRdata(List<String> rdata) {
         this.rdata = rdata;
     }
+
+    public Profile getProfile() {
+        return this.profile;
+    }
+
+    public void setProfile(Profile profile1) {
+        this.profile = profile1;
+    }
+
 }

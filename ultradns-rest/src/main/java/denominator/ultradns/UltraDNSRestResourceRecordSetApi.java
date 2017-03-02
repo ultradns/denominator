@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.google.gson.Gson;
 import denominator.ResourceRecordSetApi;
 import denominator.model.ResourceRecordSet;
 import denominator.ultradns.model.RRSet;
@@ -95,9 +96,11 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
 
   private void update(String name, String type, int ttlToApply, List<Record> toUpdate) {
     if (roundRobinPoolApi.isPoolType(type)) {
-      String lbPoolId = roundRobinPoolApi.getPoolByNameAndType(name, type);
+      // RRSet rrSet = roundRobinPoolApi.getPoolByNameAndType(name, type);
+      Gson gson = new Gson();
       for (Record record : toUpdate) {
-        api.updateRecordOfRRPool(record.id, lbPoolId, record.rdata.get(0), ttlToApply);
+        // api.updateRecordOfRRPool(record.id, lbPoolId, record.rdata.get(0), ttlToApply);
+        api.updateRecordOfRRPool(zoneName, lookup(type), name, ttlToApply, gson.toJson(record.getRdata()), gson.toJson(record.getProfile()));
       }
     } else {
       for (Record record : toUpdate) {

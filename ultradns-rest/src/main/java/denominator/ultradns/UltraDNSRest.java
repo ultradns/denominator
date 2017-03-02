@@ -73,41 +73,79 @@ interface UltraDNSRest {
                               @Param("hostName") String hostName,
                               @Param("index") int index);
 
-  @RequestLine("POST")
-  @Body("<v01:getLoadBalancingPoolsByZone><zoneName>{zoneName}</zoneName><lbPoolType>RR</lbPoolType></v01:getLoadBalancingPoolsByZone>")
-  Map<NameAndType, String> getLoadBalancingPoolsByZone(@Param("zoneName") String zoneName);
+  /**
+   * Returns the blah blah FIXME
+   *
+   * @param zoneName Typically ends with a period character (i.e, `.`).
+   * @param typeCode Should be an integer between 1 and 257.
+   * @return
+   */
+  @RequestLine("GET /zones/{zoneName}/rrsets/{typeCode}?q=kind:RD_POOLS")
+  RRSetList getLoadBalancingPoolsByZone(@Param("zoneName") String zoneName, @Param("typeCode") int typeCode);
 
-  @RequestLine("POST")
-  @Body("<v01:getRRPoolRecords><lbPoolId>{poolId}</lbPoolId></v01:getRRPoolRecords>")
-  List<Record> getRRPoolRecords(@Param("poolId") String poolId);
+  @RequestLine("POST /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
+  @Body("%7B" +
+          "\"ttl\": 300, " +
+          "\"rrdata\": [], " +
+          "\"profile\": %7B" +
+            "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
+            "\"order\": \"ROUND_ROBIN\", " +
+            "\"description\": \"This is a great RD Pool\"" +
+          "%7D" +
+        "%7D")
+  void addRRLBPool(@Param("zoneName") String zoneName,
+                   @Param("hostName") String name,
+                   @Param("typeCode") int typeCode);
 
-  @RequestLine("POST")
-  @Body("<v01:addRRLBPool><transactionID /><zoneName>{zoneName}</zoneName><hostName>{hostName}</hostName><description>{poolRecordType}</description><poolRecordType>{poolRecordType}</poolRecordType><rrGUID /></v01:addRRLBPool>")
-  String addRRLBPool(@Param("zoneName") String zoneName, @Param("hostName") String name,
-                     @Param("poolRecordType") int typeCode);
+  @RequestLine("PATCH /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
+  @Body("%7B" +
+          "\"ttl\": {ttl}, " +
+          "\"rdata\": {address}" +
+        "%7D")
+  void addRecordToRRPool(@Param("typeCode") int typeCode,
+                         @Param("ttl") int ttl,
+                         @Param("address") String address,
+                         @Param("hostName") String hostName,
+                         @Param("zoneName") String zoneName);
 
-  @RequestLine("POST")
-  @Body("<v01:addRecordToRRPool><transactionID /><roundRobinRecord lbPoolID=\"{lbPoolID}\" info1Value=\"{address}\" ZoneName=\"{zoneName}\" Type=\"{type}\" TTL=\"{ttl}\"/></v01:addRecordToRRPool>")
-  void addRecordToRRPool(@Param("type") int type, @Param("ttl") int ttl,
-                         @Param("address") String rdata,
-                         @Param("lbPoolID") String lbPoolID, @Param("zoneName") String zoneName);
-
-  @RequestLine("POST")
-  @Body("<v01:updateRecordOfRRPool><transactionID /><resourceRecord rrGuid=\"{rrGuid}\" lbPoolID=\"{lbPoolID}\" info1Value=\"{info1Value}\" TTL=\"{ttl}\"/></v01:updateRecordOfRRPool>")
-  void updateRecordOfRRPool(@Param("rrGuid") String rrGuid, @Param("lbPoolID") String lbPoolID,
-                            @Param("info1Value") String info1Value, @Param("ttl") int ttl);
+  @RequestLine("PUT /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
+  // @Body("<v01:updateRecordOfRRPool><transactionID /><resourceRecord rrGuid=\"{rrGuid}\" lbPoolID=\"{lbPoolID}\" info1Value=\"{info1Value}\" TTL=\"{ttl}\"/></v01:updateRecordOfRRPool>")
+  @Body("%7B" +
+          "\"ttl\": {ttlToApply}, " +
+          "\"rdata\": {rdata}, " +
+          "\"profile\": {profile}" +
+        "%7D")
+  // void updateRecordOfRRPool(@Param("rrGuid") String rrGuid, @Param("lbPoolID") String lbPoolID,
+  //                           @Param("info1Value") String info1Value, @Param("ttl") int ttl);
+  void updateRecordOfRRPool(@Param("zoneName") String zoneName,
+                            @Param("typeCode") int typeCode,
+                            @Param("hostName") String hostName,
+                            @Param("ttlToApply") int ttlToApply,
+                            @Param("rdata") String rdataJson,
+                            @Param("profile") String profileJson);
 
   /**
    * @throws UltraDNSRestException with code {@link UltraDNSRestException#POOL_NOT_FOUND} and {@link
    *                           UltraDNSRestException#RESOURCE_RECORD_NOT_FOUND}.
    */
-  @RequestLine("POST")
-  @Body("<v01:deleteLBPool><transactionID /><lbPoolID>{lbPoolID}</lbPoolID><DeleteAll>Yes</DeleteAll><retainRecordId /></v01:deleteLBPool>")
-  void deleteLBPool(@Param("lbPoolID") String id);
+  // @RequestLine("POST")
+  // @Body("<v01:deleteLBPool><transactionID /><lbPoolID>{lbPoolID}</lbPoolID><DeleteAll>Yes</DeleteAll><retainRecordId /></v01:deleteLBPool>")
+  // void deleteLBPool(@Param("lbPoolID") String id);
+  @RequestLine("DELETE /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
+  void deleteLBPool(@Param("zoneName") String zoneName,
+                    @Param("typeCode") int typeCode,
+                    @Param("hostName") String hostName);
 
-  @RequestLine("POST")
-  @Body("<v01:getAvailableRegions />")
-  Map<String, Collection<String>> getAvailableRegions();
+  /**
+   *
+   * @param codes Can be an empty string. Can be a comma-separated list of region codes.
+   * @return
+   */
+  // @RequestLine("POST")
+  // @Body("<v01:getAvailableRegions />")
+  // Map<String, Collection<String>> getAvailableRegions();
+  @RequestLine("GET /geoip/territories?codes={codes}")
+  Collection<Collection<UltraDNSRestGeoSupport.Region>> getAvailableRegions(@Param("codes") String codes);
 
   /**
    * This is kept in hold for migration

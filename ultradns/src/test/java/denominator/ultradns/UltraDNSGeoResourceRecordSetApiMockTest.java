@@ -64,7 +64,11 @@ public class UltraDNSGeoResourceRecordSetApiMockTest {
     GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
 
     Iterator<ResourceRecordSet<?>> iterator = api.iterator();
-    assertEurope(iterator.next());
+    System.out.println("in listWhenPresent(), iterator = " + iterator);
+    System.out.println("in listWhenPresent(), iterator.hasNext() = " + iterator.hasNext());
+    ResourceRecordSet<?> nextElement = iterator.next();
+    System.out.println("iterator.next() = " + nextElement);
+    assertEurope(nextElement);
     assertEverywhereElse(iterator.next());
     assertUS(iterator.next());
     assertThat(iterator).isEmpty();

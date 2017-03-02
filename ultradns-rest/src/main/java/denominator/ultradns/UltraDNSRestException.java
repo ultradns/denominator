@@ -58,6 +58,10 @@ class UltraDNSRestException extends FeignException {
    * Resource Record already exists.
    */
   static final int POOL_RECORD_ALREADY_EXISTS = 4009;
+  /**
+   * Data not found.
+   */
+  static final int DATA_NOT_FOUND = 70002;
   private static final long serialVersionUID = 1L;
   private final int code;
 

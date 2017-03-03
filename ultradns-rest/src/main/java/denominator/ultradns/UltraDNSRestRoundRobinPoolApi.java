@@ -45,17 +45,9 @@ class UltraDNSRestRoundRobinPoolApi {
     }
   }
 
-  RRSet getPoolByNameAndType(String name, String type) {
-    NameAndType nameAndType = new NameAndType();
-    nameAndType.name = name;
-    nameAndType.type = type;
-    return api.getLoadBalancingPoolsByZone(zoneName, lookup(type)).rrSetByNameAndType(name, type);
-  }
-
   void deletePool(String name, String type) {
-    NameAndType nameAndType = new NameAndType();
-    nameAndType.name = checkNotNull(name, "pool name was null");
-    nameAndType.type = checkNotNull(type, "pool record type was null");
+    name = checkNotNull(name, "pool name was null");
+    type = checkNotNull(type, "pool record type was null");
     final int typeCode = lookup(type);
     RRSet poolId = api.getLoadBalancingPoolsByZone(zoneName, typeCode).rrSetByNameAndType(name, type);
     if (poolId != null) {

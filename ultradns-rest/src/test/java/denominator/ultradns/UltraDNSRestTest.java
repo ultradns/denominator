@@ -294,7 +294,7 @@ public class UltraDNSRestTest {
         final String expectedBody =
                 "%7B" +
                     "\"ttl\": 300, " +
-                    "\"rrdata\": [], " +
+                    "\"rdata\": [], " +
                     "\"profile\": %7B" +
                         "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
                         "\"order\": \"ROUND_ROBIN\", " +
@@ -320,7 +320,7 @@ public class UltraDNSRestTest {
         final String expectedBody =
                 "%7B" +
                     "\"ttl\": 300, " +
-                    "\"rrdata\": [], " +
+                    "\"rdata\": [], " +
                     "\"profile\": %7B" +
                         "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
                         "\"order\": \"ROUND_ROBIN\", " +
@@ -351,7 +351,7 @@ public class UltraDNSRestTest {
     }
 
     @Test
-    public void getRegionsByIdAndName() throws Exception {
+    public void testGetRegionsByIdAndName() throws Exception {
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse().setBody(getAvailableRegionsResponse));
 
@@ -372,6 +372,81 @@ public class UltraDNSRestTest {
         assertThat(thirdRegion).isEqualTo(unknownOrUncategorizedIPs);
         UltraDNSRestGeoSupport.Region fourthRegion = topLevelRegionIterator.next();
         assertThat(fourthRegion).isEqualTo(northAmerica);
+    }
+
+    @Test
+    public void testAddRecordIntoRRPoolInZoneWhenRecordIsProper() throws Exception {
+        final String zoneName = "denominator.io.";
+        final String hostName = "h2";
+        final String address = "1.1.1.1";
+        final int ttl = 300;
+        final int typeCode = 1;
+
+        final String expectedPath = "/zones/" + zoneName + "/rrsets/" + typeCode + "/" + hostName;
+        final String expectedBody =
+                "{" +
+                    "\"ttl\": " + ttl + ", " +
+                    "\"rdata\": [" + address + "]" +
+                "}";
+
+        server.enqueueSessionResponse();
+        server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+
+        mockApi().addRecordToRRPool(typeCode, ttl, address, hostName, zoneName);
+
+        server.assertSessionRequest();
+        server.assertRequest()
+                .hasMethod("PATCH")
+                .hasPath(expectedPath)
+                .hasBody(expectedBody);
+    }
+
+    @Test
+    public void testAddRecordIntoRRPoolInZoneWhenRecordIsNotProper() throws Exception {
+        final String address = "blah";
+        final String expectedErrorMessage = String.format("Invalid input: record data - Invalid address: %s", address);
+        thrown.expect(UltraDNSRestException.class);
+        thrown.expectMessage(expectedErrorMessage);
+
+        final String zoneName = "denominator.io.";
+        final String hostName = "h2";
+        final int ttl = 300;
+        final int typeCode = 1;
+
+        server.enqueueSessionResponse();
+        final String actualErrorMessage = String.format("Invalid input: record data - Invalid address: %s", address);
+        server.enqueue(new MockResponse().setResponseCode(400).setBody(UltraDNSMockResponse.getMockErrorResponse("" + UltraDNSRestException.INVALID_ADDRESS_IN_RECORD_DATA, actualErrorMessage)));
+
+        mockApi().addRecordToRRPool(typeCode, ttl, address, hostName, zoneName);
+    }
+
+    @Test
+    public void testDeleteRRPoolWhenPoolExists() throws Exception {
+        final String zoneName = "denominator.io.";
+        final String hostName = "h2";
+        final int typeCode = 1;
+
+        final String expectedPath = "/zones/" + zoneName + "/rrsets/" + typeCode + "/" + hostName;
+
+        server.enqueueSessionResponse();
+        server.enqueue(new MockResponse().setResponseCode(204));
+        mockApi().deleteLBPool(zoneName, typeCode, hostName);
+        server.assertSessionRequest();
+        server.assertRequest()
+                .hasMethod("DELETE")
+                .hasPath(expectedPath);
+    }
+
+    @Test
+    public void testDeleteRRPoolWhenPoolNotFound() throws Exception {
+        thrown.expect(UltraDNSRestException.class);
+        thrown.expectMessage("Cannot find resource record data for the input zone, record type and owner combination.");
+
+        final String zoneName = "denominator.io.";
+        final String hostName = "h2";
+        final int typeCode = 1;
+        server.enqueue(new MockResponse().setResponseCode(404).setBody(UltraDNSMockResponse.getMockErrorResponse("" + UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND, "Cannot find resource record data for the input zone, record type and owner combination.")));
+        mockApi().deleteLBPool(zoneName, typeCode, hostName);
     }
 
     private RRSet getSampleRRSet(String ownerName, String rrtype, List<String> rdata){

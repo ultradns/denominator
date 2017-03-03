@@ -86,7 +86,7 @@ interface UltraDNSRest {
   @RequestLine("POST /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
   @Body("%7B" +
           "\"ttl\": 300, " +
-          "\"rrdata\": [], " +
+          "\"rdata\": [], " +
           "\"profile\": %7B" +
             "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
             "\"order\": \"ROUND_ROBIN\", " +
@@ -100,7 +100,7 @@ interface UltraDNSRest {
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
   @Body("%7B" +
           "\"ttl\": {ttl}, " +
-          "\"rdata\": {address}" +
+          "\"rdata\": [{address}]" +
         "%7D")
   void addRecordToRRPool(@Param("typeCode") int typeCode,
                          @Param("ttl") int ttl,
@@ -108,7 +108,7 @@ interface UltraDNSRest {
                          @Param("hostName") String hostName,
                          @Param("zoneName") String zoneName);
 
-  @RequestLine("PUT /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
+  @RequestLine("PATCH /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
   // @Body("<v01:updateRecordOfRRPool><transactionID /><resourceRecord rrGuid=\"{rrGuid}\" lbPoolID=\"{lbPoolID}\" info1Value=\"{info1Value}\" TTL=\"{ttl}\"/></v01:updateRecordOfRRPool>")
   @Body("%7B" +
           "\"ttl\": {ttlToApply}, " +

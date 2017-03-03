@@ -62,6 +62,14 @@ class UltraDNSRestException extends FeignException {
    * Data not found.
    */
   static final int DATA_NOT_FOUND = 70002;
+  /**
+   * Invalid input: record data - Invalid address: <address>
+   */
+  static final int INVALID_ADDRESS_IN_RECORD_DATA = 53005;
+  /**
+   * Cannot find resource record data for the input zone, record type and owner combination.
+   */
+  static final int RESOURCE_RECORD_POOL_NOT_FOUND = 56001;
   private static final long serialVersionUID = 1L;
   private final int code;
 

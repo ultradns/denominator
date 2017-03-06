@@ -109,14 +109,11 @@ interface UltraDNSRest {
                          @Param("zoneName") String zoneName);
 
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
-  // @Body("<v01:updateRecordOfRRPool><transactionID /><resourceRecord rrGuid=\"{rrGuid}\" lbPoolID=\"{lbPoolID}\" info1Value=\"{info1Value}\" TTL=\"{ttl}\"/></v01:updateRecordOfRRPool>")
   @Body("%7B" +
           "\"ttl\": {ttlToApply}, " +
           "\"rdata\": {rdata}, " +
           "\"profile\": {profile}" +
         "%7D")
-  // void updateRecordOfRRPool(@Param("rrGuid") String rrGuid, @Param("lbPoolID") String lbPoolID,
-  //                           @Param("info1Value") String info1Value, @Param("ttl") int ttl);
   void updateRecordOfRRPool(@Param("zoneName") String zoneName,
                             @Param("typeCode") int typeCode,
                             @Param("hostName") String hostName,
@@ -128,9 +125,6 @@ interface UltraDNSRest {
    * @throws UltraDNSRestException with code {@link UltraDNSRestException#POOL_NOT_FOUND} and {@link
    *                           UltraDNSRestException#RESOURCE_RECORD_NOT_FOUND}.
    */
-  // @RequestLine("POST")
-  // @Body("<v01:deleteLBPool><transactionID /><lbPoolID>{lbPoolID}</lbPoolID><DeleteAll>Yes</DeleteAll><retainRecordId /></v01:deleteLBPool>")
-  // void deleteLBPool(@Param("lbPoolID") String id);
   @RequestLine("DELETE /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
   void deleteLBPool(@Param("zoneName") String zoneName,
                     @Param("typeCode") int typeCode,
@@ -141,9 +135,6 @@ interface UltraDNSRest {
    * @param codes Can be an empty string. Can be a comma-separated list of region codes.
    * @return
    */
-  // @RequestLine("POST")
-  // @Body("<v01:getAvailableRegions />")
-  // Map<String, Collection<String>> getAvailableRegions();
   @RequestLine("GET /geoip/territories?codes={codes}")
   Collection<Collection<UltraDNSRestGeoSupport.Region>> getAvailableRegions(@Param("codes") String codes);
 

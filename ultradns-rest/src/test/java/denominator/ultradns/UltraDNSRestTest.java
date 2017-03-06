@@ -5,6 +5,7 @@ import denominator.Credentials;
 import denominator.ultradns.model.DirectionalRecord;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.RRSetList;
+import denominator.ultradns.model.Region;
 import feign.Feign;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static denominator.ultradns.UltraDNSMockResponse.*;
@@ -355,22 +355,22 @@ public class UltraDNSRestTest {
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse().setBody(getAvailableRegionsResponse));
 
-        UltraDNSRestGeoSupport.Region anonymousProxy = new UltraDNSRestGeoSupport().new Region("Anonymous Proxy", "A1", "Country", 315);
-        UltraDNSRestGeoSupport.Region satelliteProvider = new UltraDNSRestGeoSupport().new Region("Satellite Provider", "A2", "Country", 316);
-        UltraDNSRestGeoSupport.Region unknownOrUncategorizedIPs = new UltraDNSRestGeoSupport().new Region("Unknown / Uncategorized IPs", "A3", "Country", 331);
-        UltraDNSRestGeoSupport.Region northAmerica = new UltraDNSRestGeoSupport().new Region("North America", "NAM", "Region", 338);
+        Region anonymousProxy = new Region("Anonymous Proxy", "A1", "Country", 315);
+        Region satelliteProvider = new Region("Satellite Provider", "A2", "Country", 316);
+        Region unknownOrUncategorizedIPs = new Region("Unknown / Uncategorized IPs", "A3", "Country", 331);
+        Region northAmerica = new Region("North America", "NAM", "Region", 338);
 
-        Collection<Collection<UltraDNSRestGeoSupport.Region>> group = mockApi().getAvailableRegions("");
-        Collection<UltraDNSRestGeoSupport.Region> topLevelRegions = group.iterator().next();
-        Iterator<UltraDNSRestGeoSupport.Region> topLevelRegionIterator = topLevelRegions.iterator();
+        Collection<Collection<Region>> group = mockApi().getAvailableRegions("");
+        Collection<Region> topLevelRegions = group.iterator().next();
+        Iterator<Region> topLevelRegionIterator = topLevelRegions.iterator();
 
-        UltraDNSRestGeoSupport.Region firstRegion = topLevelRegionIterator.next();
+        Region firstRegion = topLevelRegionIterator.next();
         assertThat(firstRegion).isEqualTo(anonymousProxy);
-        UltraDNSRestGeoSupport.Region secondRegion = topLevelRegionIterator.next();
+        Region secondRegion = topLevelRegionIterator.next();
         assertThat(secondRegion).isEqualTo(satelliteProvider);
-        UltraDNSRestGeoSupport.Region thirdRegion = topLevelRegionIterator.next();
+        Region thirdRegion = topLevelRegionIterator.next();
         assertThat(thirdRegion).isEqualTo(unknownOrUncategorizedIPs);
-        UltraDNSRestGeoSupport.Region fourthRegion = topLevelRegionIterator.next();
+        Region fourthRegion = topLevelRegionIterator.next();
         assertThat(fourthRegion).isEqualTo(northAmerica);
     }
 

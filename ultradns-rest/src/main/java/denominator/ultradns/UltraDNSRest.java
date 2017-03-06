@@ -136,7 +136,7 @@ interface UltraDNSRest {
    * @return
    */
   @RequestLine("GET /geoip/territories?codes={codes}")
-  Collection<Collection<UltraDNSRestGeoSupport.Region>> getAvailableRegions(@Param("codes") String codes);
+  Collection<Collection<Region>> getAvailableRegions(@Param("codes") String codes);
 
   /**
    * This is kept in hold for migration

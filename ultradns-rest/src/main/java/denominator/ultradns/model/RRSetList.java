@@ -117,8 +117,10 @@ public class RRSetList {
 
     public Map<String, Integer> getNameAndType() {
         Map<String, Integer> nameAndType = new HashMap<String, Integer>();
-        for (RRSet rrSet : getRrSets()) {
-            nameAndType.put(rrSet.getOwnerName(), rrSet.intValueOfRrtype());
+        if (getRrSets() != null && !getRrSets().isEmpty()) {
+            for (RRSet rrSet : getRrSets()) {
+                nameAndType.put(rrSet.getOwnerName(), rrSet.intValueOfRrtype());
+            }
         }
         return nameAndType;
     }
@@ -159,10 +161,12 @@ public class RRSetList {
 
     public RRSet rrSetByNameAndType(final String name, final String type) {
         final String typeWithTypeCode = type + " (" + lookup(type) + ")";
-        for (RRSet rrSet : getRrSets()) {
-            if ( rrSet.getOwnerName().equals(name) &&
-                 rrSet.getRrtype().equals(typeWithTypeCode) ) {
-                return rrSet;
+        if (getRrSets() != null && !getRrSets().isEmpty()) {
+            for (RRSet rrSet : getRrSets()) {
+                if (rrSet.getOwnerName().equals(name) &&
+                        rrSet.getRrtype().equals(typeWithTypeCode)) {
+                    return rrSet;
+                }
             }
         }
         return null;

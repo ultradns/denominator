@@ -152,12 +152,17 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
       rData = StringUtils.join(record.getRdata(), " ");
     }
 
-    List<RRSet> rrSets = api.getResourceRecordsOfDNameByType(zoneName, name,
-            intType).getRrSets();
-    if (rrSets != null && !rrSets.isEmpty()) {
-      RRSet rrSet = rrSets.get(0);
-      if (rrSet != null & rrSet.getRdata() != null) {
-        indexToDelete = rrSet.getRdata().indexOf(rData);
+    try {
+      List<RRSet> rrSets = api.getResourceRecordsOfDNameByType(zoneName, name, intType).getRrSets();
+      if (rrSets != null && !rrSets.isEmpty()) {
+        RRSet rrSet = rrSets.get(0);
+        if (rrSet != null & rrSet.getRdata() != null) {
+          indexToDelete = rrSet.getRdata().indexOf(rData);
+        }
+      }
+    } catch (UltraDNSRestException e) {
+      if (e.code() != UltraDNSRestException.DATA_NOT_FOUND) {
+        throw e;
       }
     }
 
@@ -165,7 +170,9 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
       try {
         api.deleteResourceRecord(zoneName, intType, name, indexToDelete);
       } catch (UltraDNSRestException e) {
+        if (e.code() != UltraDNSRestException.PATH_NOT_FOUND_TO_PATCH) {
           throw e;
+        }
       }
     }
     if (roundRobinPoolApi.isPoolType(type)) {

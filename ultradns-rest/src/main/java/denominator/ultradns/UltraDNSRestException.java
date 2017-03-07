@@ -70,6 +70,11 @@ class UltraDNSRestException extends FeignException {
    * Cannot find resource record data for the input zone, record type and owner combination.
    */
   static final int RESOURCE_RECORD_POOL_NOT_FOUND = 56001;
+  /**
+   * No such path in target JSON document
+   */
+  static final int PATH_NOT_FOUND_TO_PATCH = 17001;
+
   private static final long serialVersionUID = 1L;
   private final int code;
 

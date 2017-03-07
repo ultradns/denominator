@@ -269,7 +269,8 @@ public class UltraDNSRestTest {
         final String zoneName = "denominator-2.io.";
         final int typeCode = 1;
         server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setResponseCode(404).setBody(UltraDNSMockResponse.getMockErrorResponse("" + UltraDNSRestException.DATA_NOT_FOUND, "Data not found.")));
+        server.enqueue(new MockResponse().setResponseCode(404).setBody(UltraDNSMockResponse
+                .getMockErrorResponse(UltraDNSRestException.DATA_NOT_FOUND, "Data not found.")));
         mockApi().getLoadBalancingPoolsByZone(zoneName, typeCode);
     }
 
@@ -281,7 +282,8 @@ public class UltraDNSRestTest {
         final String zoneName = "denominator-3.io.";
         final int typeCode = 1;
         server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setResponseCode(404).setBody(UltraDNSMockResponse.getMockErrorResponse("" + UltraDNSRestException.ZONE_NOT_FOUND, "Zone does not exist in the system.")));
+        server.enqueue(new MockResponse().setResponseCode(404).setBody(UltraDNSMockResponse
+                .getMockErrorResponse(UltraDNSRestException.ZONE_NOT_FOUND, "Zone does not exist in the system.")));
         mockApi().getLoadBalancingPoolsByZone(zoneName, typeCode);
     }
 
@@ -346,7 +348,7 @@ public class UltraDNSRestTest {
         final String hostName = "h2";
         final int typeCode = 1;
         server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setResponseCode(400).setBody(UltraDNSMockResponse.getMockErrorResponse("" + UltraDNSRestException.POOL_ALREADY_EXISTS, "Pool already created for this host name : h2.denominator.io.")));
+        server.enqueue(new MockResponse().setResponseCode(400).setBody(UltraDNSMockResponse.getMockErrorResponse(UltraDNSRestException.POOL_ALREADY_EXISTS, "Pool already created for this host name : h2.denominator.io.")));
         mockApi().addRRLBPool(zoneName, hostName, typeCode);
     }
 
@@ -415,7 +417,8 @@ public class UltraDNSRestTest {
 
         server.enqueueSessionResponse();
         final String actualErrorMessage = String.format("Invalid input: record data - Invalid address: %s", address);
-        server.enqueue(new MockResponse().setResponseCode(400).setBody(UltraDNSMockResponse.getMockErrorResponse("" + UltraDNSRestException.INVALID_ADDRESS_IN_RECORD_DATA, actualErrorMessage)));
+        server.enqueue(new MockResponse().setResponseCode(400).setBody(UltraDNSMockResponse
+                .getMockErrorResponse(UltraDNSRestException.INVALID_ADDRESS_IN_RECORD_DATA, actualErrorMessage)));
 
         mockApi().addRecordToRRPool(typeCode, ttl, address, hostName, zoneName);
     }
@@ -445,7 +448,9 @@ public class UltraDNSRestTest {
         final String zoneName = "denominator.io.";
         final String hostName = "h2";
         final int typeCode = 1;
-        server.enqueue(new MockResponse().setResponseCode(404).setBody(UltraDNSMockResponse.getMockErrorResponse("" + UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND, "Cannot find resource record data for the input zone, record type and owner combination.")));
+        server.enqueue(new MockResponse().setResponseCode(404).setBody(UltraDNSMockResponse
+                .getMockErrorResponse(UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND,
+                        "Cannot find resource record data for the input zone, record type and owner combination.")));
         mockApi().deleteLBPool(zoneName, typeCode, hostName);
     }
 
@@ -547,7 +552,7 @@ public class UltraDNSRestTest {
 
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse().setResponseCode(400).setBody(UltraDNSMockResponse.
-                getMockErrorResponse("2912", "Pool already created for this host name  :  dir_pool_2.test-zone-1.com.")));
+                getMockErrorResponse(UltraDNSRestException.POOL_ALREADY_EXISTS, "Pool already created for this host name  :  dir_pool_2.test-zone-1.com.")));
 
         mockApi().addDirectionalPool("test-zone-1.com.", "dir_pool_1.test-zone-1.com.", "A");
     }

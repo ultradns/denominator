@@ -54,7 +54,9 @@ public class UltraDNSRestRestZoneApiMockTest {
     Zone zone = Zone.create(null, "denominator.io.", 3601, "nil@denominator.io");
     assertThat(api.put(zone)).isEqualTo(zone.name());
 
-    server.enqueue(new MockResponse().setResponseCode(400).setBody(UltraDNSMockResponse.getMockErrorResponse("1802", "Zone already exists in the system.")));
+    server.enqueue(new MockResponse().setResponseCode(400).setBody(UltraDNSMockResponse
+            .getMockErrorResponse(UltraDNSRestException.ZONE_ALREADY_EXISTS,
+                    "Zone already exists in the system.")));
 
     server.assertSessionRequest();
     server.assertRequest()
@@ -85,7 +87,9 @@ public class UltraDNSRestRestZoneApiMockTest {
   @Test
   public void deleteWhenAbsent() throws Exception {
     server.enqueueSessionResponse();
-    server.enqueue(new MockResponse().setResponseCode(404).setBody(UltraDNSMockResponse.getMockErrorResponse("1801", "Zone does not exist in the system.")));
+    server.enqueue(new MockResponse().setResponseCode(404).setBody(UltraDNSMockResponse
+            .getMockErrorResponse(UltraDNSRestException.ZONE_NOT_FOUND,
+                    "Zone does not exist in the system.")));
 
     ZoneApi api = server.connect().api().zones();
     api.delete("denominator.io.");

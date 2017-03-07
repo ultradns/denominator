@@ -99,7 +99,7 @@ public class UltraDNSRestProvider extends BasicProvider {
   public static final class Module {
 
     @Provides
-    CheckConnection checkConnection(InvalidatableTokenProvider checkConnection) {
+    CheckConnection checkConnection(NetworkConnection checkConnection) {
       return checkConnection;
     }
 

@@ -181,32 +181,4 @@ interface UltraDNSRest {
   @RequestLine("POST")
   @Body("<v01:deleteDirectionalPool><transactionID /><dirPoolID>{dirPoolID}</dirPoolID><retainRecordID /></v01:deleteDirectionalPool>")
   void deleteDirectionalPool(@Param("dirPoolID") String dirPoolID);
-
-  class NameAndType {
-
-    String name;
-    String type;
-
-    @Override
-    public int hashCode() {
-      return 37 * name.hashCode() + type.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (obj == null || !(obj instanceof NameAndType)) {
-        return false;
-      }
-      NameAndType that = NameAndType.class.cast(obj);
-      return this.name.equals(that.name) && this.type.equals(that.type);
-    }
-
-    @Override
-    public String toString() {
-      return "NameAndType(" + name + "," + type + ")";
-    }
-  }
 }

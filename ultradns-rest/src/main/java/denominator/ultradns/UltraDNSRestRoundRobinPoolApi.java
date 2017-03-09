@@ -3,7 +3,6 @@ package denominator.ultradns;
 import java.util.List;
 import java.util.Map;
 
-import denominator.ultradns.UltraDNSRest.NameAndType;
 import denominator.ultradns.model.RRSet;
 
 import static denominator.ResourceTypeToValue.lookup;

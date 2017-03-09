@@ -72,36 +72,6 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
     return regions.get();
   }
 
-  private void remove(String name, String type, Record record) {
-    int indexToDelete = -1;
-    String rData = "";
-    int intType = lookup(type);
-
-    if (record.getRdata() != null && !record.getRdata().isEmpty()) {
-      rData = StringUtils.join(record.getRdata(), " ");
-    }
-
-    List<RRSet> rrSets = api.getResourceRecordsOfDNameByType(zoneName, name,
-            intType).getRrSets();
-    if (rrSets != null && !rrSets.isEmpty()) {
-      RRSet rrSet = rrSets.get(0);
-      if (rrSet != null & rrSet.getRdata() != null) {
-        indexToDelete = rrSet.getRdata().indexOf(rData);
-      }
-    }
-
-    if (indexToDelete > 0 ) {
-      try {
-        api.deleteResourceRecord(zoneName, intType, name, indexToDelete);
-      } catch (UltraDNSRestException e) {
-        throw e;
-      }
-      /*if (roundRobinPoolApi.isPoolType(type)) {
-        roundRobinPoolApi.deletePool(name, type);
-      }*/
-    }
-  }
-
   @Override
   public Iterator<ResourceRecordSet<?>> iterator() {
     List<Iterable<ResourceRecordSet<?>>> eachPool = new ArrayList<Iterable<ResourceRecordSet<?>>>();
@@ -247,7 +217,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
             indexToDelete = rrSet.getRdata().indexOf(rData);
           }
         }
-        if (indexToDelete > 0 ) {
+        if (indexToDelete >= 0 ) {
           try {
             api.deleteResourceRecord(zoneName, intType, record.getName(), indexToDelete);
           } catch (UltraDNSRestException e) {

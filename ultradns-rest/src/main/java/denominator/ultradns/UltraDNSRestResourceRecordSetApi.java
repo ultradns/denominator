@@ -166,7 +166,7 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
       }
     }
 
-    if (indexToDelete > 0 ) {
+    if (indexToDelete >= 0 ) {
       try {
         api.deleteResourceRecord(zoneName, intType, name, indexToDelete);
       } catch (UltraDNSRestException e) {

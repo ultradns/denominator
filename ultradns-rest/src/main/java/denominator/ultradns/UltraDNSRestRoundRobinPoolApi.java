@@ -36,7 +36,19 @@ class UltraDNSRestRoundRobinPoolApi {
 
   private void reuseOrCreatePoolForNameAndType(String name, String type) {
     try {
-      api.addRRLBPool(zoneName, name, lookup(type));
+      // Somehow Feign does not convert %7B to { and %7D to }. Need to
+      // investigate. For now, work around is to pass the body as a
+      // parameter. Ugly but works.
+      String requestBody = "{" +
+          "\"ttl\": 300, " +
+          "\"rdata\": [], " +
+          "\"profile\": {" +
+            "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
+            "\"order\": \"ROUND_ROBIN\", " +
+            "\"description\": \"This is a great RD Pool\"" +
+          "}" +
+        "}";
+      api.addRRLBPool(zoneName, name, lookup(type), requestBody);
     } catch (UltraDNSRestException e) {
       if (e.code() != UltraDNSRestException.POOL_ALREADY_EXISTS) {
         throw e;

@@ -294,18 +294,18 @@ public class UltraDNSRestTest {
         final int typeCode = 1;
         final String expectedPath = "/zones/" + zoneName + "/rrsets/" + typeCode + "/" + hostName;
         final String expectedBody =
-                "%7B" +
+                "{" +
                     "\"ttl\": 300, " +
                     "\"rdata\": [], " +
-                    "\"profile\": %7B" +
+                    "\"profile\": {" +
                         "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
                         "\"order\": \"ROUND_ROBIN\", " +
                         "\"description\": \"This is a great RD Pool\"" +
-                    "%7D" +
-                "%7D";
+                    "}" +
+                "}";
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-        mockApi().addRRLBPool(zoneName, hostName, typeCode);
+        mockApi().addRRLBPool(zoneName, hostName, typeCode, expectedBody);
         server.assertSessionRequest();
         server.assertRequest()
                 .hasMethod("POST")
@@ -320,18 +320,18 @@ public class UltraDNSRestTest {
         final int typeCode = 1;
         final String expectedPath = "/zones/" + zoneName + "/rrsets/" + typeCode + "/" + hostName;
         final String expectedBody =
-                "%7B" +
+                "{" +
                     "\"ttl\": 300, " +
                     "\"rdata\": [], " +
-                    "\"profile\": %7B" +
+                    "\"profile\": {" +
                         "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
                         "\"order\": \"ROUND_ROBIN\", " +
                         "\"description\": \"This is a great RD Pool\"" +
-                    "%7D" +
-                "%7D";
+                    "}" +
+                "}";
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-        mockApi().addRRLBPool(zoneName, hostName, typeCode);
+        mockApi().addRRLBPool(zoneName, hostName, typeCode, expectedBody);
         server.assertSessionRequest();
         server.assertRequest()
                 .hasMethod("POST")
@@ -347,9 +347,19 @@ public class UltraDNSRestTest {
         final String zoneName = "denominator.io.";
         final String hostName = "h2";
         final int typeCode = 1;
+        final String expectedBody =
+                "{" +
+                    "\"ttl\": 300, " +
+                    "\"rdata\": [], " +
+                    "\"profile\": {" +
+                    "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
+                        "\"order\": \"ROUND_ROBIN\", " +
+                        "\"description\": \"This is a great RD Pool\"" +
+                    "}" +
+                "}";
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse().setResponseCode(400).setBody(UltraDNSMockResponse.getMockErrorResponse(UltraDNSRestException.POOL_ALREADY_EXISTS, "Pool already created for this host name : h2.denominator.io.")));
-        mockApi().addRRLBPool(zoneName, hostName, typeCode);
+        mockApi().addRRLBPool(zoneName, hostName, typeCode, expectedBody);
     }
 
     @Test

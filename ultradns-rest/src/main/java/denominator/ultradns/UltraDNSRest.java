@@ -100,7 +100,7 @@ interface UltraDNSRest {
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
   @Body("%7B" +
           "\"ttl\": {ttl}, " +
-          "\"rdata\": [{address}]" +
+          "\"rdata\": [\"{address}\"]" +
         "%7D")
   void addRecordToRRPool(@Param("typeCode") int typeCode,
                          @Param("ttl") int ttl,

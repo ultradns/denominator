@@ -388,7 +388,7 @@ public class UltraDNSRestTest {
         final String expectedBody =
                 "{" +
                     "\"ttl\": " + ttl + ", " +
-                    "\"rdata\": [" + address + "]" +
+                    "\"rdata\": [\"" + address + "\"]" +
                 "}";
 
         server.enqueueSessionResponse();

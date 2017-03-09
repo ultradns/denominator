@@ -61,7 +61,19 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
     checkNotNull(name, "name");
     checkNotNull(type, "type");
     int typeValue = checkNotNull(lookup(type), "typeValue for %s", type);
-    return api.getResourceRecordsOfDNameByType(zoneName, name, typeValue).buildRecords();
+    List<Record> records = null;
+    try {
+      records = api
+              .getResourceRecordsOfDNameByType(zoneName, name, typeValue)
+              .buildRecords();
+    } catch (UltraDNSRestException e) {
+      if (e.code() == UltraDNSRestException.DATA_NOT_FOUND) {
+        records = new ArrayList<Record>();
+      } else {
+        throw e;
+      }
+    }
+    return records;
   }
 
   @Override

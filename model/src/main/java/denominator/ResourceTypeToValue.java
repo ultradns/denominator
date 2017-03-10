@@ -56,7 +56,7 @@ public class ResourceTypeToValue {
    * >iana types</a>.
    */
   // enum only to look and format prettier than fluent bimap builder calls
-  enum ResourceTypes {
+  public enum ResourceTypes {
     /**
      * a host address
      */
@@ -135,7 +135,17 @@ public class ResourceTypeToValue {
     /**
      * Server Selection
      */
-    SRV(33);
+    SRV(33),
+
+    /**
+     * host information
+     */
+    HINFO(13),
+
+    /**
+     * for Responsible Person
+     */
+    RP(17);
 
     private final int value;
 

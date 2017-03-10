@@ -28,6 +28,8 @@ import feign.Request.Options;
 import feign.form.FormEncoder;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
+import org.apache.commons.lang.StringUtils;
+import denominator.ResourceTypeToValue.ResourceTypes;
 
 import static dagger.Provides.Type.SET;
 
@@ -43,8 +45,7 @@ public class UltraDNSRestProvider extends BasicProvider {
    * @param url if empty or null use default
    */
   public UltraDNSRestProvider(String url) {
-    this.url =
-            url == null || url.isEmpty() ? "https://test-restapi.ultradns.com/v2" : url;
+    this.url = StringUtils.isEmpty(url) ? UltraDNSRestPropertyLoader.getProperty("ultradns.rest.cte") : url;
   }
 
   @Override
@@ -59,9 +60,23 @@ public class UltraDNSRestProvider extends BasicProvider {
   @Override
   public Set<String> basicRecordTypes() {
     Set<String> types = new LinkedHashSet<String>();
-    types.addAll(
-            Arrays.asList("A", "AAAA", "CNAME", "HINFO", "MX", "NAPTR", "NS", "PTR", "RP", "SOA", "SPF",
-                    "SRV", "TXT"));
+
+    types.addAll(Arrays.asList(
+            ResourceTypes.A.name(),
+            ResourceTypes.AAAA.name(),
+            ResourceTypes.CNAME.name(),
+            ResourceTypes.HINFO.name(),
+            ResourceTypes.MX.name(),
+            ResourceTypes.NAPTR.name(),
+            ResourceTypes.NS.name(),
+            ResourceTypes.PTR.name(),
+            ResourceTypes.RP.name(),
+            ResourceTypes.SOA.name(),
+            ResourceTypes.SPF.name(),
+            ResourceTypes.SRV.name(),
+            ResourceTypes.TXT.name()
+            ));
+
     return types;
   }
 
@@ -71,16 +86,35 @@ public class UltraDNSRestProvider extends BasicProvider {
    */
   @Override
   public Map<String, Collection<String>> profileToRecordTypes() {
-    Map<String, Collection<String>>
-            profileToRecordTypes =
-            new LinkedHashMap<String, Collection<String>>();
-    profileToRecordTypes.put("geo",
-            Arrays
-                    .asList("A", "AAAA", "CNAME", "HINFO", "MX", "NAPTR", "PTR", "RP",
-                            "SRV", "TXT"));
-    profileToRecordTypes.put("roundRobin",
-            Arrays.asList("A", "AAAA", "HINFO", "MX", "NAPTR", "NS", "PTR", "RP",
-                    "SPF", "SRV", "TXT"));
+    Map<String, Collection<String>> profileToRecordTypes = new LinkedHashMap<String, Collection<String>>();
+
+    profileToRecordTypes.put("geo", Arrays.asList(
+            ResourceTypes.A.name(),
+            ResourceTypes.AAAA.name(),
+            ResourceTypes.CNAME.name(),
+            ResourceTypes.HINFO.name(),
+            ResourceTypes.MX.name(),
+            ResourceTypes.NAPTR.name(),
+            ResourceTypes.PTR.name(),
+            ResourceTypes.RP.name(),
+            ResourceTypes.SRV.name(),
+            ResourceTypes.TXT.name()
+    ));
+
+    profileToRecordTypes.put("roundRobin", Arrays.asList(
+            ResourceTypes.A.name(),
+            ResourceTypes.AAAA.name(),
+            ResourceTypes.HINFO.name(),
+            ResourceTypes.MX.name(),
+            ResourceTypes.NAPTR.name(),
+            ResourceTypes.NS.name(),
+            ResourceTypes.PTR.name(),
+            ResourceTypes.RP.name(),
+            ResourceTypes.SPF.name(),
+            ResourceTypes.SRV.name(),
+            ResourceTypes.TXT.name()
+    ));
+
     return profileToRecordTypes;
   }
 
@@ -171,7 +205,10 @@ public class UltraDNSRestProvider extends BasicProvider {
        * UltraDNSRest#addDirectionalPoolRecord(UltraDNSRest.DirectionalRecord, UltraDNSRest.DirectionalGroup, String)} can take up
        * to 10 minutes to complete.
        */
-      Options options = new Options(10 * 1000, 10 * 60 * 1000);
+      Options options = new Options(
+              Integer.parseInt(UltraDNSRestPropertyLoader.getProperty("feign.connect.timeout.millis")),
+              Integer.parseInt(UltraDNSRestPropertyLoader.getProperty("feign.read.timeout.millis"))
+      );
 
       return Feign.builder()
               .logger(logger)

@@ -154,4 +154,54 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
   }
 
+  @Test
+  public void putFirstACreatesRoundRobinPoolThenAddsRecordToIt() throws Exception {
+    server.enqueueSessionResponse();
+    // Response to the request to get the RR Sets in the pool.
+    server.enqueue(new MockResponse()
+            .setResponseCode(404)
+            .setBody(UltraDNSMockResponse.getMockErrorResponse(
+                    "" + UltraDNSRestException.DATA_NOT_FOUND,
+                    "Data not found.")));
+    // Response to the request to create the pool.
+    server.enqueue(new MockResponse().setBody(PUT_NEW_RR_SET_RESPONSE));
+    // Response to the request to add a record to the pool.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+
+    ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
+    api.put(a("www.denominator.io.", 3600, "192.0.2.1"));
+
+    server.assertSessionRequest();
+
+    // Assert request to get the RR Sets in the pool.
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.");
+
+    // Assert request to create the pool.
+    String addRRLBPoolRequestBody = "{" +
+              "\"ttl\": 300, " +
+              "\"rdata\": [], " +
+              "\"profile\": {" +
+                "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
+                "\"order\": \"ROUND_ROBIN\", " +
+                "\"description\": \"This is a great RD Pool\"" +
+              "}" +
+            "}";
+    server.assertRequest()
+            .hasMethod("POST")
+            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.")
+            .hasBody(addRRLBPoolRequestBody);
+
+    // Assert request to add a record to the pool.
+    String addRecordToRRPoolRequestBody = "{" +
+              "\"ttl\": 3600, " +
+              "\"rdata\": [\"192.0.2.1\"]" +
+            "}";
+    server.assertRequest()
+            .hasMethod("PATCH")
+            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.")
+            .hasBody(addRecordToRRPoolRequestBody);
+  }
+
 }

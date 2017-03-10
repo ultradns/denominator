@@ -72,4 +72,22 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     api.iterator();
   }
 
+  @Test
+  public void iterateByNameWhenNoneMatch() throws Exception {
+    thrown.expect(UltraDNSRestException.class);
+    thrown.expectMessage("Data not found.");
+
+    server.enqueueSessionResponse();
+    server.enqueue(new MockResponse()
+            .setResponseCode(404)
+            .setBody(UltraDNSMockResponse.getMockErrorResponse(
+                    "" + UltraDNSRestException.DATA_NOT_FOUND,
+                    "Data not found.")));
+
+    ResourceRecordSetApi api = server.connect().api()
+            .basicRecordSetsInZone("denominator.io.");
+    // This calls the UltraDNS#getResourceRecordsOfDNameByType().
+    api.iterateByName("non-existent-subdomain.denominator.io.");
+  }
+
 }

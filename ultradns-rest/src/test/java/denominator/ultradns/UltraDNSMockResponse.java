@@ -78,7 +78,7 @@ public class UltraDNSMockResponse {
             "    \"zoneName\": \"denominator.io.\",\n" +
             "    \"rrSets\": [\n" +
             "        {\n" +
-            "            \"ownerName\": \"pool_2.denominator.io.\",\n" +
+            "            \"ownerName\": \"www.denominator.io.\",\n" +
             "            \"rrtype\": \"A (1)\",\n" +
             "            \"ttl\": 86400,\n" +
             "            \"profile\": {\n" +

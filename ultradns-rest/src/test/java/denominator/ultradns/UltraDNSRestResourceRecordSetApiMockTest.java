@@ -121,8 +121,10 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueueSessionResponse();
     server.enqueue(new MockResponse().setBody(GET_RESOURCE_RECORDS_PRESENT));
 
-    ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    ResourceRecordSet<AData> aDataResourceRecordSet = a("pool_2.denominator.io.", 86400,
+    ResourceRecordSetApi api = server.connect().api()
+            .basicRecordSetsInZone("denominator.io.");
+    ResourceRecordSet<AData> aDataResourceRecordSet = a(
+            "pool_2.denominator.io.", 86400,
             Arrays.asList("1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4",
                     "5.5.5.5", "6.6.6.6", "7.7.7.7"));
     assertThat(api.getByNameAndType("pool_2.denominator.io.", "A"))

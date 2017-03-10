@@ -32,7 +32,6 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
 
   /**
    * Mock API to call UltraDNSRest Endpoint
-   * @return UltraDNSRest object
    */
   @Before
   public void mockServer() {

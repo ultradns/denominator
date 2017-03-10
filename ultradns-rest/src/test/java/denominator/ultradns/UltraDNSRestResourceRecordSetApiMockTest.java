@@ -132,8 +132,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.assertSessionRequest();
     server.assertRequest()
             .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.")
-            .hasBody("");
+            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.");
   }
 
   @Test

@@ -38,7 +38,10 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
   public Iterator<ResourceRecordSet<?>> iterator() {
     // this will list all basic or RR pool records.
     // In Progress - Arghya 31/01/17
-    Iterator<Record> orderedRecords = api.getResourceRecordsOfZone(zoneName).buildRecords().iterator();
+    Iterator<Record> orderedRecords = api
+            .getResourceRecordsOfZone(zoneName)
+            .buildRecords()
+            .iterator();
     return new GroupByRecordNameAndTypeCustomIterator(orderedRecords);
   }
 
@@ -57,8 +60,10 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
   public ResourceRecordSet<?> getByNameAndType(String name, String type) {
     checkNotNull(name, "name");
     checkNotNull(type, "type");
-    Iterator<Record> orderedRecords = recordsByNameAndType(name, type).iterator();
-    return nextOrNull(new GroupByRecordNameAndTypeCustomIterator(orderedRecords));
+    Iterator<Record> orderedRecords = recordsByNameAndType(name, type)
+            .iterator();
+    return nextOrNull(new GroupByRecordNameAndTypeCustomIterator(
+            orderedRecords));
   }
 
   private List<Record> recordsByNameAndType(String name, String type) {

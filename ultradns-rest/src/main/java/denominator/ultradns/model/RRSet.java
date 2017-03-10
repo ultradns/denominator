@@ -78,24 +78,4 @@ public class RRSet {
         this.profile = profile;
     }
 
-    public List<Record> recordsFromRdata() {
-        List<Record> records = new ArrayList<Record>();
-        if (getRdata() != null && !getRdata().isEmpty()) {
-            for (String rData : getRdata()) {
-                Record r = new Record();
-                r.setName(getOwnerName());
-                r.setTypeCode(intValueOfRrtype());
-                r.setTtl(getTtl());
-                if (rData != null){
-                    r.setRdata(Arrays.asList(rData.split("\\s")));
-                }
-                if (profile != null) {
-                    r.setProfile(profile);
-                }
-                records.add(r);
-            }
-        }
-        return records;
-    }
-
 }

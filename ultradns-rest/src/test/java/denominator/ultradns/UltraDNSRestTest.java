@@ -314,7 +314,7 @@ public class UltraDNSRestTest {
     }
 
     @Test
-    public void testAddRRLBPoolWithSubDomainAsHostName() throws Exception {
+    public void testAddRRLBPoolWithNonFQDNAsHostName() throws Exception {
         final String zoneName = "denominator.io.";
         final String hostName = "h2";
         final int typeCode = 1;

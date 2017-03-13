@@ -288,7 +288,7 @@ public class UltraDNSRestTest {
     }
 
     @Test
-    public void testAddRRLBPoolWithFQDNAsHostName() throws Exception {
+    public void createRRPoolInZoneForNameAndType() throws Exception {
         final String zoneName = "denominator.io.";
         final String hostName = "h1.denominator.io.";
         final int typeCode = 1;

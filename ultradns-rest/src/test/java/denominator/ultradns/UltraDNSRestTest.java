@@ -363,7 +363,7 @@ public class UltraDNSRestTest {
     }
 
     @Test
-    public void testGetRegionsByIdAndName() throws Exception {
+    public void getRegionsByIdAndName() throws Exception {
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse().setBody(getAvailableRegionsResponse));
 

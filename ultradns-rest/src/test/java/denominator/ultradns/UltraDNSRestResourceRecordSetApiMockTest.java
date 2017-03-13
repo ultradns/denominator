@@ -164,7 +164,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
                     UltraDNSRestException.DATA_NOT_FOUND,
                     "Data not found.")));
     // Response to the request to create the pool.
-    server.enqueue(new MockResponse().setBody(PUT_NEW_RR_SET_RESPONSE));
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
     // Response to the request to add a record to the pool.
     server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
 

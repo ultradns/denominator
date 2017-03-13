@@ -164,6 +164,32 @@ public class UltraDNSMockResponse {
             "    }\n" +
             "}\n";
 
+    public static final String RR_SET_WITH_NO_AAAA_RECORDS = "{\n" +
+            "    \"zoneName\": \"denominator.io.\",\n" +
+            "    \"rrSets\": [\n" +
+            "        {\n" +
+            "            \"ownerName\": \"www.denominator.io.\",\n" +
+            "            \"rrtype\": \"AAAA (28)\",\n" +
+            "            \"ttl\": 3600,\n" +
+            "            \"profile\": {\n" +
+            "                \"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\",\n" +
+            "                \"order\": \"ROUND_ROBIN\",\n" +
+            "                \"description\": \"1\"\n" +
+            "            }\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"queryInfo\": {\n" +
+            "        \"sort\": \"OWNER\",\n" +
+            "        \"reverse\": false,\n" +
+            "        \"limit\": 100\n" +
+            "    },\n" +
+            "    \"resultInfo\": {\n" +
+            "        \"totalCount\": 1,\n" +
+            "        \"offset\": 0,\n" +
+            "        \"returnedCount\": 1\n" +
+            "    }\n" +
+            "}\n";
+
     public static final String RR_SET_WITH_TWO_RECORDS = "{\n" +
             "    \"zoneName\": \"denominator.io.\",\n" +
             "    \"rrSets\": [\n" +

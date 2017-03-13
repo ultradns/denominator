@@ -362,4 +362,57 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
             .hasBody(addRecordToRRPoolRequestBody);
   }
 
+  @Test
+  public void putFirstAAAAReusesExistingEmptyRoundRobinPool() throws Exception {
+    server.enqueueSessionResponse();
+    // Response to the request to get the RR Sets in the pool.
+    server.enqueue(new MockResponse().setBody(RR_SET_WITH_NO_AAAA_RECORDS));
+    // Response to the request to create the pool. It will be a 400 bad
+    // request since the pool is already created.
+    server.enqueue(new MockResponse()
+            .setResponseCode(400)
+            .setBody(UltraDNSMockResponse.getMockErrorResponse(
+                    UltraDNSRestException.POOL_ALREADY_EXISTS,
+                    "Pool already created for this host name : " +
+                            "www.denominator.io.")));
+    // Response to the request to add a record to the pool.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+
+    ResourceRecordSetApi api = server.connect().api()
+            .basicRecordSetsInZone("denominator.io.");
+    api.put(aaaa("www.denominator.io.", 3600, "3FFE:0B80:0447:0001:0000:0000:0000:0001"));
+
+    server.assertSessionRequest();
+
+    // Assert request to get the RR Sets in the pool.
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/28/www.denominator.io.");
+
+    // Assert request to create the pool.
+    String addRRLBPoolRequestBody = "{" +
+              "\"ttl\": 300, " +
+              "\"rdata\": [], " +
+              "\"profile\": {" +
+                "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
+                "\"order\": \"ROUND_ROBIN\", " +
+                "\"description\": \"This is a great RD Pool\"" +
+              "}" +
+            "}";
+    server.assertRequest()
+            .hasMethod("POST")
+            .hasPath("/zones/denominator.io./rrsets/28/www.denominator.io.")
+            .hasBody(addRRLBPoolRequestBody);
+
+    // Assert request to add a record to the pool.
+    String addRecordToRRPoolRequestBody = "{" +
+              "\"ttl\": 3600, " +
+              "\"rdata\": [\"3FFE:0B80:0447:0001:0000:0000:0000:0001\"]" +
+            "}";
+    server.assertRequest()
+            .hasMethod("PATCH")
+            .hasPath("/zones/denominator.io./rrsets/28/www.denominator.io.")
+            .hasBody(addRecordToRRPoolRequestBody);
+  }
+
 }

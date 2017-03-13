@@ -340,7 +340,7 @@ public class UltraDNSRestTest {
     }
 
     @Test
-    public void testAddRRLBPoolWhenPoolAlreadyExists() throws Exception {
+    public void createRRPoolInZoneForNameAndTypeWhenAlreadyExists() throws Exception {
         thrown.expect(UltraDNSRestException.class);
         thrown.expectMessage("Pool already created for this host name : h2.denominator.io.");
 

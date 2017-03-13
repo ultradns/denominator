@@ -69,7 +69,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse()
             .setResponseCode(404)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
-                    "" + UltraDNSRestException.ZONE_NOT_FOUND,
+                    UltraDNSRestException.ZONE_NOT_FOUND,
                     "Zone does not exist in the system.")));
 
     ResourceRecordSetApi api = server.connect().api()
@@ -87,7 +87,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse()
             .setResponseCode(404)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
-                    "" + UltraDNSRestException.DATA_NOT_FOUND,
+                    UltraDNSRestException.DATA_NOT_FOUND,
                     "Data not found.")));
 
     ResourceRecordSetApi api = server.connect().api()
@@ -122,7 +122,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse()
             .setResponseCode(404)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
-                    "" + UltraDNSRestException.DATA_NOT_FOUND,
+                    UltraDNSRestException.DATA_NOT_FOUND,
                     "Data not found.")));
 
     ResourceRecordSetApi api = server.connect().api()
@@ -161,7 +161,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse()
             .setResponseCode(404)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
-                    "" + UltraDNSRestException.DATA_NOT_FOUND,
+                    UltraDNSRestException.DATA_NOT_FOUND,
                     "Data not found.")));
     // Response to the request to create the pool.
     server.enqueue(new MockResponse().setBody(PUT_NEW_RR_SET_RESPONSE));
@@ -214,7 +214,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse()
             .setResponseCode(400)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
-                    "" + UltraDNSRestException.POOL_ALREADY_EXISTS,
+                    UltraDNSRestException.POOL_ALREADY_EXISTS,
                     "Pool already created for this host name : " +
                             "www.denominator.io.")));
     // Response to the request to add a record to the pool.

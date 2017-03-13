@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static denominator.model.ResourceRecordSets.a;
+import static denominator.model.ResourceRecordSets.aaaa;
 import static denominator.ultradns.UltraDNSMockResponse.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -307,6 +308,57 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.assertRequest()
             .hasMethod("PATCH")
             .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.")
+            .hasBody(addRecordToRRPoolRequestBody);
+  }
+
+  @Test
+  public void putFirstAAAACreatesRoundRobinPoolThenAddsRecordToIt() throws Exception {
+    server.enqueueSessionResponse();
+    // Response to the request to get the RR Sets in the pool.
+    server.enqueue(new MockResponse()
+            .setResponseCode(404)
+            .setBody(UltraDNSMockResponse.getMockErrorResponse(
+                    UltraDNSRestException.DATA_NOT_FOUND,
+                    "Data not found.")));
+    // Response to the request to create the pool.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+    // Response to the request to add a record to the pool.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+
+    ResourceRecordSetApi api = server.connect().api()
+            .basicRecordSetsInZone("denominator.io.");
+    api.put(aaaa("www.denominator.io.", 3600, "3FFE:0B80:0447:0001:0000:0000:0000:0001"));
+
+    server.assertSessionRequest();
+
+    // Assert request to get the RR Sets in the pool.
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/28/www.denominator.io.");
+
+    // Assert request to create the pool.
+    String addRRLBPoolRequestBody = "{" +
+              "\"ttl\": 300, " +
+              "\"rdata\": [], " +
+              "\"profile\": {" +
+              "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
+                "\"order\": \"ROUND_ROBIN\", " +
+                "\"description\": \"This is a great RD Pool\"" +
+              "}" +
+            "}";
+    server.assertRequest()
+            .hasMethod("POST")
+            .hasPath("/zones/denominator.io./rrsets/28/www.denominator.io.")
+            .hasBody(addRRLBPoolRequestBody);
+
+    // Assert request to add a record to the pool.
+    String addRecordToRRPoolRequestBody = "{" +
+              "\"ttl\": 3600, " +
+              "\"rdata\": [\"3FFE:0B80:0447:0001:0000:0000:0000:0001\"]" +
+            "}";
+    server.assertRequest()
+            .hasMethod("PATCH")
+            .hasPath("/zones/denominator.io./rrsets/28/www.denominator.io.")
             .hasBody(addRecordToRRPoolRequestBody);
   }
 

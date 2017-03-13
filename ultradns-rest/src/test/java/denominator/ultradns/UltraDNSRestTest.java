@@ -451,7 +451,7 @@ public class UltraDNSRestTest {
     }
 
     @Test
-    public void testDeleteRRPoolWhenPoolNotFound() throws Exception {
+    public void deleteRRPoolWhenPoolNotFound() throws Exception {
         thrown.expect(UltraDNSRestException.class);
         thrown.expectMessage("Cannot find resource record data for the input zone, record type and owner combination.");
 

@@ -434,7 +434,7 @@ public class UltraDNSRestTest {
     }
 
     @Test
-    public void testDeleteRRPoolWhenPoolExists() throws Exception {
+    public void deleteRRPool() throws Exception {
         final String zoneName = "denominator.io.";
         final String hostName = "h2";
         final int typeCode = 1;

@@ -80,6 +80,21 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
   }
 
   @Test
+  public void listWhenThereAreMatches() throws Exception {
+    server.enqueueSessionResponse();
+    server.enqueue(new MockResponse().setBody(GET_RESOURCE_RECORDS_PRESENT));
+
+    ResourceRecordSetApi api = server.connect().api()
+            .basicRecordSetsInZone("denominator.io.");
+    api.iterator();
+
+    server.assertSessionRequest();
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets");
+  }
+
+  @Test
   public void iterateByNameWhenNoneMatch() throws Exception {
     thrown.expect(UltraDNSRestException.class);
     thrown.expectMessage("Data not found.");

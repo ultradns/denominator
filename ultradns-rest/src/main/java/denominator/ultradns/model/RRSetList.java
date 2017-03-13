@@ -34,7 +34,7 @@ public class RRSetList {
                         if (rrSet.getTtl() != null) {
                             r.setTtl(rrSet.getTtl());
                         }
-                        if (rData != null){
+                        if (rData != null) {
                             r.setRdata(Arrays.asList(rData.split("\\s")));
                         }
                         records.add(r);

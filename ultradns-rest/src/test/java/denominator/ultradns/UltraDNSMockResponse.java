@@ -135,7 +135,36 @@ public class UltraDNSMockResponse {
             "    }\n" +
             "}\n";
 
-    public static final String PUT_NEW_RR_SET_RESPONSE = "{\n" +
+    public static final String RR_SET_WITH_ONE_RECORD = "{\n" +
+            "    \"zoneName\": \"denominator.io.\",\n" +
+            "    \"rrSets\": [\n" +
+            "        {\n" +
+            "            \"ownerName\": \"www.denominator.io.\",\n" +
+            "            \"rrtype\": \"A (1)\",\n" +
+            "            \"ttl\": 3600,\n" +
+            "            \"rdata\": [\n" +
+            "                \"192.0.2.1\"\n" +
+            "            ],\n" +
+            "            \"profile\": {\n" +
+            "                \"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\",\n" +
+            "                \"order\": \"ROUND_ROBIN\",\n" +
+            "                \"description\": \"1\"\n" +
+            "            }\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"queryInfo\": {\n" +
+            "        \"sort\": \"OWNER\",\n" +
+            "        \"reverse\": false,\n" +
+            "        \"limit\": 100\n" +
+            "    },\n" +
+            "    \"resultInfo\": {\n" +
+            "        \"totalCount\": 1,\n" +
+            "        \"offset\": 0,\n" +
+            "        \"returnedCount\": 1\n" +
+            "    }\n" +
+            "}\n";
+
+    public static final String RR_SET_WITH_TWO_RECORDS = "{\n" +
             "    \"zoneName\": \"denominator.io.\",\n" +
             "    \"rrSets\": [\n" +
             "        {\n" +
@@ -144,6 +173,7 @@ public class UltraDNSMockResponse {
             "            \"ttl\": 3600,\n" +
             "            \"rdata\": [\n" +
             "                \"192.0.2.1\",\n" +
+            "                \"198.51.100.1\"\n" +
             "            ],\n" +
             "            \"profile\": {\n" +
             "                \"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\",\n" +

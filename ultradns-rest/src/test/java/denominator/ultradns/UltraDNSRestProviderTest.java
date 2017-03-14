@@ -51,4 +51,12 @@ public class UltraDNSRestProviderTest {
     assertThat(manager.api().zones()).isInstanceOf(UltraDNSRestZoneApi.class);
   }
 
+  @Test
+  public void testCredentialsRequired() {
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("no credentials supplied. ultradnsrest requires username,password");
+
+    create(PROVIDER).api().zones().iterator();
+  }
+
 }

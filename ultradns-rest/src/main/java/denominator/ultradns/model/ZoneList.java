@@ -13,8 +13,10 @@ public class ZoneList {
 
     public List<String> getZoneNames() {
         List<String> zoneNames = new ArrayList<String>();
-        for(Zone zone : getZones()){
-            zoneNames.add(zone.getProperties().getName());
+        if (getZones()!= null && !getZones().isEmpty()) {
+            for(Zone zone : getZones()){
+                zoneNames.add(zone.getProperties().getName());
+            }
         }
         return zoneNames;
     }

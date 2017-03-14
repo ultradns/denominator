@@ -27,8 +27,17 @@ interface UltraDNSRest {
   ZoneList getZonesOfAccount(@Param("accountName") String accountName);
 
   @RequestLine("POST /zones")
-  @Body("%7B\"properties\": %7B\"name\": \"{name}\",\"accountName\": \"{accountName}\",\"type\": \"{type}\"%7D, " +
-          "\"primaryCreateInfo\": %7B\"forceImport\": {forceImport},\"createType\": \"{createType}\"%7D%7D")
+  @Body("%7B" +
+          "\"properties\": %7B" +
+            "\"name\": \"{name}\", " +
+            "\"accountName\": \"{accountName}\", " +
+            "\"type\": \"{type}\"" +
+        "%7D, " +
+            "\"primaryCreateInfo\": %7B" +
+            "\"forceImport\": {forceImport}, " +
+            "\"createType\": \"{createType}\"" +
+          "%7D" +
+        "%7D")
   void createPrimaryZone(@Param("name") final String name, @Param("accountName") final String accountName,
                          @Param("type") final String type, @Param("forceImport") final boolean forceImport,
                          @Param("createType") final String createType);

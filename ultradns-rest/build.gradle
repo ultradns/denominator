@@ -14,6 +14,7 @@ dependencies {
   compile     'com.netflix.feign:feign-core:8.18.0'
   compile     'com.netflix.feign:feign-sax:8.18.0'
   compile     'com.netflix.feign:feign-gson:8.18.0'
+  compile     'com.netflix.feign:feign-httpclient:8.18.0'
   compile     'io.github.openfeign.form:feign-form:2.0.5'
   compile     'log4j:log4j:1.2.17'
   compile     'commons-lang:commons-lang:2.4'

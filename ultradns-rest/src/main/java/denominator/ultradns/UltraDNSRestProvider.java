@@ -28,6 +28,7 @@ import feign.Request.Options;
 import feign.form.FormEncoder;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
+import feign.httpclient.ApacheHttpClient;
 import org.apache.commons.lang.StringUtils;
 import denominator.ResourceTypeToValue.ResourceTypes;
 
@@ -211,6 +212,7 @@ public class UltraDNSRestProvider extends BasicProvider {
       );
 
       return Feign.builder()
+              .client(new ApacheHttpClient())
               .logger(logger)
               .logLevel(logLevel)
               .options(options)

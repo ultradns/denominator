@@ -171,6 +171,24 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
   }
 
   @Test
+  public void getByNameAndTypeWhenZoneAbsent() throws Exception {
+    thrown.expect(UltraDNSRestException.class);
+    thrown.expectMessage("Zone does not exist in the system.");
+
+    server.enqueueSessionResponse();
+    // Response to the request to get the RR Sets in the pool.
+    server.enqueue(new MockResponse()
+            .setResponseCode(404)
+            .setBody(UltraDNSMockResponse.getMockErrorResponse(
+                    UltraDNSRestException.ZONE_NOT_FOUND,
+                    "Zone does not exist in the system.")));
+
+    ResourceRecordSetApi api = server.connect().api()
+            .basicRecordSetsInZone("denominator.io.");
+    api.getByNameAndType("www.denominator.io.", "A");
+  }
+
+  @Test
   public void putFirstACreatesRoundRobinPoolThenAddsRecordToIt() throws Exception {
     server.enqueueSessionResponse();
     // Response to the request to get the RR Sets in the pool.

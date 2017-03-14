@@ -100,15 +100,6 @@ interface UltraDNSRest {
   RRSetList getLoadBalancingPoolsByZone(@Param("zoneName") String zoneName, @Param("typeCode") int typeCode);
 
   @RequestLine("POST /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
-//  @Body("%7B" +
-//          "\"ttl\": 300, " +
-//          "\"rdata\": %5B%5D, " +
-//          "\"profile\": %7B" +
-//            "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
-//            "\"order\": \"ROUND_ROBIN\", " +
-//            "\"description\": \"This is a great RD Pool\"" +
-//          "%7D" +
-//        "%7D")
   @Body("{requestBody}")
   void addRRLBPool(@Param("zoneName") String zoneName,
                    @Param("hostName") String name,

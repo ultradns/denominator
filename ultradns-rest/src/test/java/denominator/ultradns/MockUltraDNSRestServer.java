@@ -69,6 +69,11 @@ final class MockUltraDNSRestServer extends UltraDNSRestProvider implements TestR
     delegate.enqueue(mockResponse);
   }
 
+  void enqueueError(int responseCode, int errorCode, String errorDescription) {
+    delegate.enqueue(new MockResponse().setResponseCode(responseCode)
+            .setBody(UltraDNSMockResponse.getMockErrorResponse(errorCode, errorDescription)));
+  }
+
   RecordedRequestAssert assertRequest() throws InterruptedException {
     return assertThat(delegate.takeRequest());
   }
@@ -77,6 +82,13 @@ final class MockUltraDNSRestServer extends UltraDNSRestProvider implements TestR
     return assertThat(delegate.takeRequest())
             .hasMethod("POST")
             .hasPath("/authorization/token");
+  }
+
+  public RecordedRequestAssert assertRequest(String requestType, String path, String body) throws InterruptedException {
+    return assertThat(delegate.takeRequest())
+            .hasMethod(requestType)
+            .hasPath(path)
+            .hasBody(format(body));
   }
 
   void shutdown() throws IOException {

@@ -128,7 +128,7 @@ public class UltraDNSMockResponse {
             "            \"rrtype\": \"SOA (6)\",\n" +
             "            \"ttl\": 86400,\n" +
             "            \"rdata\": [\n" +
-            "                \"pdns1.ultradns.net. aaaaaaa\\\\.bbbbbbb.neustar.biz. 2017012518 86400 86400 86400 86400\"\n" +
+            "                \"pdns1.ultradns.net. arghya\\\\.b.neustar.biz. 2017012518 86400 86400 86400 86400\"\n" +
             "            ]\n" +
             "        }\n" +
             "    ],\n" +
@@ -144,8 +144,76 @@ public class UltraDNSMockResponse {
             "    }\n" +
             "}\n";
 
+    public static final String GET_ZONES_OF_ACCOUNT_PRESENT = "{\n" +
+            "    \"queryInfo\": {\n" +
+            "        \"sort\": \"NAME\",\n" +
+            "        \"reverse\": false,\n" +
+            "        \"limit\": 100\n" +
+            "    },\n" +
+            "    \"resultInfo\": {\n" +
+            "        \"totalCount\": 2,\n" +
+            "        \"offset\": 0,\n" +
+            "        \"returnedCount\": 2\n" +
+            "    },\n" +
+            "    \"zones\": [\n" +
+            "        {\n" +
+            "            \"properties\": {\n" +
+            "                \"name\": \"www.test-zone-1.com.\",\n" +
+            "                \"accountName\": \"npp-rest-test1\",\n" +
+            "                \"type\": \"PRIMARY\",\n" +
+            "                \"dnssecStatus\": \"UNSIGNED\",\n" +
+            "                \"status\": \"ACTIVE\",\n" +
+            "                \"owner\": \"nppresttest1\",\n" +
+            "                \"resourceRecordCount\": 3,\n" +
+            "                \"lastModifiedDateTime\": \"2016-12-23T10:45Z\"\n" +
+            "            },\n" +
+            "            \"registrarInfo\": {\n" +
+            "                \"nameServers\": {\n" +
+            "                    \"missing\": [\n" +
+            "                        \"udns1.ultradns.net.\",\n" +
+            "                        \"udns2.ultradns.net.\"\n" +
+            "                    ]\n" +
+            "                }\n" +
+            "            }\n" +
+            "        },\n" +
+            "        {\n" +
+            "            \"properties\": {\n" +
+            "                \"name\": \"www.test-zone-2.com.\",\n" +
+            "                \"accountName\": \"npp-rest-test1\",\n" +
+            "                \"type\": \"PRIMARY\",\n" +
+            "                \"dnssecStatus\": \"UNSIGNED\",\n" +
+            "                \"status\": \"ACTIVE\",\n" +
+            "                \"owner\": \"nppresttest1\",\n" +
+            "                \"resourceRecordCount\": 3,\n" +
+            "                \"lastModifiedDateTime\": \"2017-01-12T11:01Z\"\n" +
+            "            },\n" +
+            "            \"registrarInfo\": {\n" +
+            "                \"nameServers\": {\n" +
+            "                    \"missing\": [\n" +
+            "                        \"udns1.ultradns.net.\",\n" +
+            "                        \"udns2.ultradns.net.\"\n" +
+            "                    ]\n" +
+            "                }\n" +
+            "            }\n" +
+            "        }\n" +
+            "    ]\n" +
+            "}\n";
 
-    public static String getMockErrorResponse(String errorCode, String errorMessage){
+    public static final String GET_ZONES_OF_ACCOUNT_ABSENT = "{\n" +
+            "    \"queryInfo\": {\n" +
+            "        \"sort\": \"NAME\",\n" +
+            "        \"reverse\": false,\n" +
+            "        \"limit\": 100\n" +
+            "    },\n" +
+            "    \"resultInfo\": {\n" +
+            "        \"totalCount\": 0,\n" +
+            "        \"offset\": 0,\n" +
+            "        \"returnedCount\": 0\n" +
+            "    },\n" +
+            "    \"zones\": [ ]\n" +
+            "}";
+
+    public static String getMockErrorResponse(int errorCode, String errorMessage){
         return
                 "[\n"
                         + "    {\n"

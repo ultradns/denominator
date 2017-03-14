@@ -59,4 +59,12 @@ public class UltraDNSRestProviderTest {
     create(PROVIDER).api().zones().iterator();
   }
 
+  @Test
+  public void testTwoPartCredentialsRequired() {
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("incorrect credentials supplied. ultradnsrest requires username,password");
+
+    create(PROVIDER, credentials("customer", "username", "password")).api().zones().iterator();
+  }
+
 }

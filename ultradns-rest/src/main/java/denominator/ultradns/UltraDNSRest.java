@@ -22,10 +22,21 @@ interface UltraDNSRest {
   ZoneList getZonesOfAccount(@Param("accountName") String accountName);
 
   @RequestLine("POST /zones")
-  @Body("%7B\"properties\": %7B\"name\": \"{name}\",\"accountName\": \"{accountName}\",\"type\": \"{type}\"%7D, " +
-          "\"primaryCreateInfo\": %7B\"forceImport\": {forceImport},\"createType\": \"{createType}\"%7D%7D")
-  void createPrimaryZone(@Param("name") final String name, @Param("accountName") final String accountName,
-                         @Param("type") final String type, @Param("forceImport") final boolean forceImport,
+  @Body("%7B" +
+          "\"properties\": %7B" +
+            "\"name\": \"{name}\", " +
+            "\"accountName\": \"{accountName}\", " +
+            "\"type\": \"{type}\"" +
+          "%7D, " +
+            "\"primaryCreateInfo\": %7B" +
+            "\"forceImport\": {forceImport}, " +
+            "\"createType\": \"{createType}\"" +
+          "%7D" +
+        "%7D")
+  void createPrimaryZone(@Param("name") final String name,
+                         @Param("accountName") final String accountName,
+                         @Param("type") final String type,
+                         @Param("forceImport") final boolean forceImport,
                          @Param("createType") final String createType);
 
   /**
@@ -56,18 +67,23 @@ interface UltraDNSRest {
 
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   void partialUpdateResourceRecord(@Param("zoneName") String zoneName,
-                            @Param("rrType") int rrType,
-                            @Param("hostName") String hostName,
-                            RRSet rrSet);
+                                   @Param("rrType") int rrType,
+                                   @Param("hostName") String hostName,
+                                   RRSet rrSet);
 
   @RequestLine("DELETE /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   Status deleteResourceRecordByNameType(@Param("zoneName") String zoneName,
-                                      @Param("rrType") int rrType,
-                                      @Param("hostName") String hostName);
+                                        @Param("rrType") int rrType,
+                                        @Param("hostName") String hostName);
 
-  @RequestLine("PATCH /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   @Headers("Content-Type: application/json-patch+json")
-  @Body("%5B%7B\"op\": \"remove\",\"path\": \"/rdata/{index}\"%7D%5D")
+  @RequestLine("PATCH /zones/{zoneName}/rrsets/{rrType}/{hostName}")
+  @Body("%5B" +
+          "%7B" +
+            "\"op\": \"remove\", " +
+            "\"path\": \"/rdata/{index}\"" +
+          "%7D" +
+        "%5D")
   Status deleteResourceRecord(@Param("zoneName") String zoneName,
                               @Param("rrType") int rrType,
                               @Param("hostName") String hostName,
@@ -140,10 +156,6 @@ interface UltraDNSRest {
   @RequestLine("GET /geoip/territories?codes={codes}")
   Collection<Collection<Region>> getAvailableRegions(@Param("codes") String codes);
 
-  /**
-   * This is kept in hold for migration
-   * Commenting & stubbing the method
-   */
   @RequestLine("POST")
   @Body("<v01:getDirectionalDNSGroupDetails><GroupId>{GroupId}</GroupId></v01:getDirectionalDNSGroupDetails>")
   DirectionalGroup getDirectionalDNSGroupDetails(@Param("GroupId") String groupId);
@@ -151,11 +163,11 @@ interface UltraDNSRest {
   /**
    * @throws UltraDNSRestException with code {@link UltraDNSRestException#POOL_RECORD_ALREADY_EXISTS}.
    */
-  @RequestLine("POST")
-  String addDirectionalPoolRecord(@Param("record") DirectionalRecord toCreate,
-                                  @Param("group") DirectionalGroup group,
-                                  @Param("poolId") String poolId);
-
+  @RequestLine("PATCH /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
+  Status addDirectionalPoolRecord(@Param("zoneName") String zoneName,
+                                  @Param("hostName") String hostName,
+                                  @Param("poolRecordType") String type,
+                                  RRSet rrSet);
   /**
    * @throws UltraDNSRestException with code {@link UltraDNSRestException#RESOURCE_RECORD_ALREADY_EXISTS}.
    */
@@ -172,13 +184,44 @@ interface UltraDNSRest {
                                             @Param("poolRecordType") int rrType);
 
   @RequestLine("POST /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
-  @Body("%7B\"profile\": %7B\"@context\": \"http://schemas.ultradns.com/DirPool.jsonschema\",\"description\": \"{poolRecordType}\"%7D%7D")
-  Status addDirectionalPool(@Param("zoneName") String zoneName, @Param("hostName") String name,
+  @Body("%7B" +
+            "\"profile\": %7B" +
+            "\"@context\": \"http://schemas.ultradns.com/DirPool.jsonschema\", " +
+             "\"description\": \"{poolRecordType}\"" +
+          "%7D" +
+        "%7D")
+  Status addDirectionalPool(@Param("zoneName") String zoneName,
+                            @Param("hostName") String name,
                             @Param("poolRecordType") String type);
 
-  @RequestLine("POST")
-  @Body("<v01:deleteDirectionalPoolRecord><transactionID /><dirPoolRecordId>{dirPoolRecordId}</dirPoolRecordId></v01:deleteDirectionalPoolRecord>")
-  void deleteDirectionalPoolRecord(@Param("dirPoolRecordId") String id);
+  @Headers("Content-Type: application/json-patch+json")
+  @RequestLine("PATCH /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
+  @Body("%5B" +
+          "%7B" +
+            "\"op\": \"remove\", " +
+            "\"path\": \"/rdata/{index}\"" +
+          "%7D, " +
+          "%7B" +
+            "\"op\": \"remove\", " +
+            "\"path\": \"/profile/rdataInfo/{index}\"" +
+          "%7D" +
+        "%5D")
+  void deleteDirectionalPoolRecord(@Param("zoneName") String zoneName,
+                                   @Param("hostName") String name,
+                                   @Param("poolRecordType") String type,
+                                   @Param("index") int index);
+
+  @Headers("Content-Type: application/json-patch+json")
+  @RequestLine("PATCH /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
+  @Body("[" +
+          "{" +
+            "\"op\": \"remove\", " +
+            "\"path\": \"/profile/noResponse\"" +
+          "}" +
+        "]")
+  void deleteDirectionalNoResponseRecord(@Param("zoneName") String zoneName,
+                                         @Param("hostName") String name,
+                                         @Param("poolRecordType") String type);
 
   @RequestLine("POST")
   @Body("<v01:deleteDirectionalPool><transactionID /><dirPoolID>{dirPoolID}</dirPoolID><retainRecordID /></v01:deleteDirectionalPool>")

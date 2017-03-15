@@ -243,7 +243,7 @@ public class UltraDNSMockResponse {
             "            \"rrtype\": \"SOA (6)\",\n" +
             "            \"ttl\": 86400,\n" +
             "            \"rdata\": [\n" +
-            "                \"pdns1.ultradns.net. aaaaaaa\\\\.bbbbbbb.neustar.biz. 2017012518 86400 86400 86400 86400\"\n" +
+            "                \"pdns1.ultradns.net. arghya\\\\.b.neustar.biz. 2017012518 86400 86400 86400 86400\"\n" +
             "            ]\n" +
             "        }\n" +
             "    ],\n" +

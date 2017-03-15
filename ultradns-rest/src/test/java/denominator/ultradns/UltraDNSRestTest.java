@@ -553,7 +553,7 @@ public class UltraDNSRestTest {
         server.assertSessionRequest();
         server.assertRequest("POST",
                 "/zones/test-zone-1.com./rrsets/A/dir_pool_1.test-zone-1.com.",
-                "{\"profile\": {\"@context\": \"http://schemas.ultradns.com/DirPool.jsonschema\",\"description\": \"A\"}}");
+                "{\"profile\": {\"@context\": \"http://schemas.ultradns.com/DirPool.jsonschema\", \"description\": \"A\"}}");
     }
 
     @Test
@@ -594,7 +594,7 @@ public class UltraDNSRestTest {
         server.assertSessionRequest();
         server.assertRequest("PATCH",
                 "/zones/test-zone-1.com./rrsets/1/pool_1.test-zone-1.com.",
-                "[{\"op\": \"remove\",\"path\": \"/rdata/0\"}]");
+                "[{\"op\": \"remove\", \"path\": \"/rdata/0\"}]");
     }
 
     static String getAvailableRegionsResponse =

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.TreeSet;
 
 import static denominator.ResourceTypeToValue.lookup;
 
@@ -137,6 +138,30 @@ public class RRSetList {
             }
         }
         return records;
+    }
+
+    public TreeSet<String> getDirectionalGroupDetails(String groupName) {
+        TreeSet<String> countryCodes = new TreeSet<String>();
+        if (getRrSets() != null && !getRrSets().isEmpty()) {
+            for (RRSet rrSet : getRrSets()) {
+                if(rrSet.getProfile() != null & rrSet.getProfile().getRdataInfo() != null) {
+                    List<RDataInfo> rDataInfoList = rrSet.getProfile().getRdataInfo();
+                    for (RDataInfo rd : rDataInfoList) {
+                        if (rd.getGeoInfo() != null && rd.getGeoInfo().getName() != null
+                                && rd.getGeoInfo().getName().equals(groupName)) {
+                            countryCodes = rd.getGeoInfo().getCodes();
+                        }
+                    }
+                }
+                if(rrSet.getProfile() != null & rrSet.getProfile().getNoResponse() != null) {
+                    GeoInfo geoInfo = rrSet.getProfile().getNoResponse().getGeoInfo();
+                    if (geoInfo != null && geoInfo.getName() != null && geoInfo.getName().equals(groupName)) {
+                        countryCodes = geoInfo.getCodes();
+                    }
+                }
+            }
+        }
+        return countryCodes;
     }
 
     public void isDirectionalRecord(DirectionalRecord r) {

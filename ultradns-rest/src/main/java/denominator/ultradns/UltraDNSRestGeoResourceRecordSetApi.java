@@ -256,7 +256,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
           record.rdata.add(rdatum.toString());
         }
         try {
-          api.addDirectionalPoolRecord(record, directionalGroup, poolId);
+          //api.addDirectionalPoolRecord(record, directionalGroup, poolId);
         } catch (UltraDNSRestException e) {
           // lost race
           if (e.code() != UltraDNSRestException.POOL_RECORD_ALREADY_EXISTS) {
@@ -282,7 +282,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
     Iterator<DirectionalRecord> record = recordsByNameTypeAndQualifier(name, type, qualifier);
     while (record.hasNext()) {
       try {
-        api.deleteDirectionalPoolRecord(record.next().id);
+        //api.deleteDirectionalPoolRecord(record.next().id);
       } catch (UltraDNSRestException e) {
         // lost race
         if (e.code() != UltraDNSRestException.DIRECTIONALPOOL_RECORD_NOT_FOUND) {

@@ -69,6 +69,11 @@ final class MockUltraDNSRestServer extends UltraDNSRestProvider implements TestR
     delegate.enqueue(mockResponse);
   }
 
+  void enqueueError(int responseCode, int errorCode, String errorDescription) {
+    delegate.enqueue(new MockResponse().setResponseCode(responseCode)
+            .setBody(UltraDNSMockResponse.getMockErrorResponse(errorCode, errorDescription)));
+  }
+
   RecordedRequestAssert assertRequest() throws InterruptedException {
     return assertThat(delegate.takeRequest());
   }

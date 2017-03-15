@@ -237,6 +237,21 @@ public class UltraDNSRestTest {
     }
 
     @Test
+    public void recordsInZoneByNameAndTypeInvalidZone() throws Exception {
+        thrown.expect(UltraDNSRestException.class);
+        thrown.expectMessage("Zone does not exist in the system.");
+
+        // Response to the request to get the RR Sets in the pool.
+        server.enqueue(new MockResponse()
+                .setResponseCode(404)
+                .setBody(UltraDNSMockResponse.getMockErrorResponse(
+                        UltraDNSRestException.ZONE_NOT_FOUND,
+                        "Zone does not exist in the system.")));
+
+        mockApi().getResourceRecordsOfDNameByType("ARGHH", "ARGHH", 6);
+    }
+
+    @Test
     public void createRecordInZone() throws Exception {
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse());

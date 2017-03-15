@@ -99,6 +99,32 @@ public class UltraDNSRestTest {
     }
 
     @Test
+    public void retryOnSystemError() throws Exception {
+        thrown.expect(UltraDNSRestException.class);
+        thrown.expectMessage("System Error");
+
+        server.enqueueSessionResponse();
+        // First time, send a "System Error" response.
+        server.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody(UltraDNSMockResponse.getMockErrorResponse(
+                        UltraDNSRestException.SYSTEM_ERROR,
+                        "System Error")));
+        // Second time, send the network status good response.
+        server.enqueue(new MockResponse().setBody("{ \"message\": \"Good\" }"));
+
+        assertThat(mockApi().getNeustarNetworkStatus().getMessage()).isEqualTo("Good");
+
+        server.assertSessionRequest();
+        server.assertRequest()
+                .hasMethod("GET")
+                .hasPath("/status");
+        server.assertRequest()
+                .hasMethod("GET")
+                .hasPath("/status");
+    }
+
+    @Test
     public void testAccountsListOfUser() throws Exception {
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse().setBody(GET_ACCOUNTS_LIST_OF_USER));

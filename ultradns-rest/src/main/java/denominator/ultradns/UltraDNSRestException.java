@@ -59,6 +59,10 @@ class UltraDNSRestException extends FeignException {
    */
   static final int POOL_RECORD_ALREADY_EXISTS = 4009;
   /**
+   * Invalid_grant:Token not found, expired or invalid.
+   */
+  static final int INVALID_GRANT = 60001;
+  /**
    * Data not found.
    */
   static final int DATA_NOT_FOUND = 70002;

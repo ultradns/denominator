@@ -125,6 +125,22 @@ public class UltraDNSRestTest {
     }
 
     @Test
+    public void noRetryOnInvalidUser() throws Exception {
+        thrown.expect(UltraDNSRestException.class);
+        thrown.expectMessage(
+                "invalid_grant:Token not found, expired or invalid.");
+
+        server.enqueueSessionResponse();
+        server.enqueue(new MockResponse()
+                .setResponseCode(401)
+                .setBody(UltraDNSMockResponse.getMockErrorResponse(
+                        UltraDNSRestException.INVALID_GRANT,
+                        "invalid_grant:Token not found, expired or invalid.")));
+
+        mockApi().getNeustarNetworkStatus();
+    }
+
+    @Test
     public void testAccountsListOfUser() throws Exception {
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse().setBody(GET_ACCOUNTS_LIST_OF_USER));

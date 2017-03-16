@@ -22,6 +22,33 @@ public class UltraDNSRestGeoSupport {
   Map<String, Collection<String>> regions(UltraDNSRest api) {
     Map<String, Collection<String>> availableRegions = new TreeMap<String, Collection<String>>();
 
+    Collection<Region> topLevelRegions = buildRegionHierarchyByCallingUltraDNSRest(api);
+    for (Region topLevelRegion : topLevelRegions) {
+      Map<String, Collection<String>> regionHierarchy = topLevelRegion.getRegionHierarchy();
+      for (Map.Entry<String, Collection<String>> regionSubregions : regionHierarchy.entrySet()) {
+        availableRegions.put(regionSubregions.getKey(), regionSubregions.getValue());
+      }
+    }
+
+    System.out.println("In UltraDNSRestGeoSupport.java, in regions(), returning: " + (new Gson()).toJson(availableRegions));
+    return availableRegions;
+  }
+
+  Map<Region, Collection<Region>> regionsAsRegions(UltraDNSRest api) {
+    Map<Region, Collection<Region>> availableRegions = new TreeMap<Region, Collection<Region>>();
+
+    Collection<Region> topLevelRegions = buildRegionHierarchyByCallingUltraDNSRest(api);
+    for (Region topLevelRegion : topLevelRegions) {
+      Map<Region, Collection<Region>> regionHierarchy = topLevelRegion.getRegionHierarchyAsRegions();
+      for (Map.Entry<Region, Collection<Region>> regionSubregions : regionHierarchy.entrySet()) {
+        availableRegions.put(regionSubregions.getKey(), regionSubregions.getValue());
+      }
+    }
+
+    return availableRegions;
+  }
+
+  private Collection<Region> buildRegionHierarchyByCallingUltraDNSRest(UltraDNSRest api) {
     Collection<Collection<Region>> response = api.getAvailableRegions("");
     Collection<Region> topLevelRegions = response.iterator().next();
     TreeSet<String> sortedEffectiveCodes = getSortedEffectiveCodes(topLevelRegions);
@@ -59,15 +86,7 @@ public class UltraDNSRestGeoSupport {
       }
     }
 
-    for (Region topLevelRegion : topLevelRegions) {
-      Map<String, Collection<String>> regionHierarchy = topLevelRegion.getRegionHierarchy();
-      for (Map.Entry<String, Collection<String>> regionSubregions : regionHierarchy.entrySet()) {
-        availableRegions.put(regionSubregions.getKey(), regionSubregions.getValue());
-      }
-    }
-
-    System.out.println("In UltraDNSRestGeoSupport.java, in regions(), returning: " + (new Gson()).toJson(availableRegions));
-    return availableRegions;
+    return topLevelRegions;
   }
 
   private TreeSet<Region> getSortedSecondLevelRegions(Collection<Region> topLevelRegions) {

@@ -132,6 +132,10 @@ public class Region implements Comparable<Region> {
     } else {
       if (childRegions != null) {
         for (Region childRegion : childRegions) {
+          subRegionNames.add(childRegion.getName());
+        }
+
+        for (Region childRegion : childRegions) {
           Map<String, Collection<String>> childChildRegionHierarchy = childRegion.getRegionHierarchy();
           for (Map.Entry<String, Collection<String>> entry : childChildRegionHierarchy.entrySet()) {
             regionNameSubRegionNames.put(entry.getKey(), entry.getValue());
@@ -141,6 +145,38 @@ public class Region implements Comparable<Region> {
     }
     if (subRegionNames.size() > 0) {
       regionNameSubRegionNames.put(this.getName(), subRegionNames);
+    }
+    return regionNameSubRegionNames;
+  }
+
+  public Map<Region, Collection<Region>> getRegionHierarchyAsRegions() {
+    Map<Region, Collection<Region>> regionNameSubRegionNames = new TreeMap<Region, Collection<Region>>();
+    Collection<Region> subRegionNames = new TreeSet<Region>();
+    TreeSet<Region> childRegions = getChildRegions();
+    if (this.isCountry()) {
+      if (childRegions == null || childRegions.size() == 0) {
+        subRegionNames.add(this);
+      } else {
+        for (Region childRegion : childRegions) {
+          subRegionNames.add(childRegion);
+        }
+      }
+    } else {
+      if (childRegions != null) {
+        for (Region childRegion : childRegions) {
+          subRegionNames.add(childRegion);
+        }
+
+        for (Region childRegion : childRegions) {
+          Map<Region, Collection<Region>> childChildRegionHierarchy = childRegion.getRegionHierarchyAsRegions();
+          for (Map.Entry<Region, Collection<Region>> entry : childChildRegionHierarchy.entrySet()) {
+            regionNameSubRegionNames.put(entry.getKey(), entry.getValue());
+          }
+        }
+      }
+    }
+    if (subRegionNames.size() > 0) {
+      regionNameSubRegionNames.put(this, subRegionNames);
     }
     return regionNameSubRegionNames;
   }

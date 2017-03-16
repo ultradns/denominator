@@ -76,7 +76,8 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
               .getResourceRecordsOfDNameByType(zoneName, name, typeValue)
               .buildRecords();
     } catch (UltraDNSRestException e) {
-      if (e.code() == UltraDNSRestException.DATA_NOT_FOUND) {
+      if (e.code() == UltraDNSRestException.DATA_NOT_FOUND ||
+          e.code() == UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND) {
         records = new ArrayList<Record>();
       } else {
         throw e;

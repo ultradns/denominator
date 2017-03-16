@@ -449,6 +449,28 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
   }
 
   @Test
+  public void deleteNonExistentPool() throws Exception {
+    server.enqueueSessionResponse();
+    // Response to UltraDNSRestResourceRecordSetApi#recordsByNameAndType(name, type)
+    server.enqueue(new MockResponse()
+            .setResponseCode(404)
+            .setBody(UltraDNSMockResponse.getMockErrorResponse(
+                    UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND,
+                    "Cannot find resource record data for the input zone, " +
+                            "record type and owner combination.")));
+
+    ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
+    api.deleteByNameAndType("pool_2.denominator.io.", "A");
+
+    server.assertSessionRequest();
+
+    // Assert request to get the RR Sets in the pool.
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
+  }
+
+  @Test
   public void deleteAlsoRemovesPool() throws Exception {
     server.enqueueSessionResponse();
     // Response to UltraDNSRestResourceRecordSetApi#recordsByNameAndType(name, type)

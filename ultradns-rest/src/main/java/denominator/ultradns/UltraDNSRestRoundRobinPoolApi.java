@@ -66,6 +66,7 @@ class UltraDNSRestRoundRobinPoolApi {
     } catch (UltraDNSRestException e) {
       switch (e.code()) {
         // lost race
+        case UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND:
         case UltraDNSRestException.POOL_NOT_FOUND:
         case UltraDNSRestException.RESOURCE_RECORD_NOT_FOUND:
           return;

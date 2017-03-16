@@ -471,6 +471,49 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
   }
 
   @Test
+  public void deleteAnAlreadyDeletedPool01() throws Exception {
+    server.enqueueSessionResponse();
+    // Response to UltraDNSRestResourceRecordSetApi#recordsByNameAndType(name, type)
+    server.enqueue(new MockResponse().setBody(POOL_WITH_ONE_RESOURCE_RECORDS));
+    // Response to UltraDNSRestResourceRecordSetApi#getResourceRecordsOfDNameByType(zoneName, name, intType)
+    server.enqueue(new MockResponse().setBody(POOL_WITH_ONE_RESOURCE_RECORDS));
+    // Response to the request to delete a resource record.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+    // Response to UltraDNSRest#deleteLBPool(zoneName, hostName, typeCode)
+    server.enqueue(new MockResponse()
+            .setResponseCode(404)
+            .setBody(UltraDNSMockResponse.getMockErrorResponse(
+                    UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND,
+                    "Cannot find resource record data for the input zone, " +
+                            "record type and owner combination.")));
+
+    ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
+    api.deleteByNameAndType("pool_2.denominator.io.", "A");
+
+    server.assertSessionRequest();
+
+    // Assert request to get the RR Sets in the pool.
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
+    server.assertRequest()
+            .hasMethod("PATCH")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.")
+            .hasBody("[" +
+                      "{" +
+                        "\"op\": \"remove\", " +
+                        "\"path\": \"/rdata/0\"" +
+                      "}" +
+                    "]");
+    server.assertRequest()
+            .hasMethod("DELETE")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
+  }
+
+  @Test
   public void deleteAlsoRemovesPool() throws Exception {
     server.enqueueSessionResponse();
     // Response to UltraDNSRestResourceRecordSetApi#recordsByNameAndType(name, type)

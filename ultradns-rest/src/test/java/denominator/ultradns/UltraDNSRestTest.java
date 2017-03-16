@@ -304,6 +304,19 @@ public class UltraDNSRestTest {
     }
 
     @Test
+    public void deleteRecord() throws Exception {
+        server.enqueueSessionResponse();
+        server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+
+        mockApi().deleteResourceRecord("denominator.io.", 1, "www.denominator.io.", 0);
+
+        server.assertSessionRequest();
+        server.assertRequest()
+                .hasMethod("PATCH")
+                .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.");
+    }
+
+    @Test
     public void testGetLoadBalancingPoolsByZoneWhichIsPresent() throws Exception {
         final String zoneName = "denominator.io.";
         final int typeCode = 1;

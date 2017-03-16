@@ -61,20 +61,16 @@ class UltraDNSRestRoundRobinPoolApi {
     name = checkNotNull(name, "pool name was null");
     type = checkNotNull(type, "pool record type was null");
     final int typeCode = lookup(type);
-    RRSetList rrSetList = api.getLoadBalancingPoolsByZone(zoneName, typeCode);
-    RRSet rrSet = rrSetList.rrSetByNameAndType(name, type);
-    if (rrSet == null || rrSet.getRdata() == null || rrSet.getRdata().isEmpty()) {
-      try {
-        api.deleteLBPool(zoneName, typeCode, name);
-      } catch (UltraDNSRestException e) {
-        switch (e.code()) {
-          // lost race
-          case UltraDNSRestException.POOL_NOT_FOUND:
-          case UltraDNSRestException.RESOURCE_RECORD_NOT_FOUND:
-            return;
-        }
-        throw e;
+    try {
+      api.deleteLBPool(zoneName, typeCode, name);
+    } catch (UltraDNSRestException e) {
+      switch (e.code()) {
+        // lost race
+        case UltraDNSRestException.POOL_NOT_FOUND:
+        case UltraDNSRestException.RESOURCE_RECORD_NOT_FOUND:
+          return;
       }
+      throw e;
     }
   }
 }

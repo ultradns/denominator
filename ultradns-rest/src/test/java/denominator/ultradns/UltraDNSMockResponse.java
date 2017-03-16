@@ -135,6 +135,154 @@ public class UltraDNSMockResponse {
             "    }\n" +
             "}\n";
 
+    public static final String POOL_WITH_FOUR_RESOURCE_RECORDS = "{\n" +
+            "    \"zoneName\": \"denominator.io.\",\n" +
+            "    \"rrSets\": [\n" +
+            "        {\n" +
+            "            \"ownerName\": \"pool_2.denominator.io.\",\n" +
+            "            \"rrtype\": \"A (1)\",\n" +
+            "            \"ttl\": 86400,\n" +
+            "            \"rdata\": [\n" +
+            "                \"1.1.1.1\",\n" +
+            "                \"2.2.2.2\",\n" +
+            "                \"3.3.3.3\",\n" +
+            "                \"4.4.4.4\"\n" +
+            "            ],\n" +
+            "            \"profile\": {\n" +
+            "                \"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\",\n" +
+            "                \"order\": \"ROUND_ROBIN\",\n" +
+            "                \"description\": \"1\"\n" +
+            "            }\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"queryInfo\": {\n" +
+            "        \"sort\": \"OWNER\",\n" +
+            "        \"reverse\": false,\n" +
+            "        \"limit\": 100\n" +
+            "    },\n" +
+            "    \"resultInfo\": {\n" +
+            "        \"totalCount\": 1,\n" +
+            "        \"offset\": 0,\n" +
+            "        \"returnedCount\": 1\n" +
+            "    }\n" +
+            "}\n";
+
+    public static final String POOL_WITH_THREE_RESOURCE_RECORDS = "{\n" +
+            "    \"zoneName\": \"denominator.io.\",\n" +
+            "    \"rrSets\": [\n" +
+            "        {\n" +
+            "            \"ownerName\": \"pool_2.denominator.io.\",\n" +
+            "            \"rrtype\": \"A (1)\",\n" +
+            "            \"ttl\": 86400,\n" +
+            "            \"rdata\": [\n" +
+            "                \"2.2.2.2\",\n" +
+            "                \"3.3.3.3\",\n" +
+            "                \"4.4.4.4\"\n" +
+            "            ],\n" +
+            "            \"profile\": {\n" +
+            "                \"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\",\n" +
+            "                \"order\": \"ROUND_ROBIN\",\n" +
+            "                \"description\": \"1\"\n" +
+            "            }\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"queryInfo\": {\n" +
+            "        \"sort\": \"OWNER\",\n" +
+            "        \"reverse\": false,\n" +
+            "        \"limit\": 100\n" +
+            "    },\n" +
+            "    \"resultInfo\": {\n" +
+            "        \"totalCount\": 1,\n" +
+            "        \"offset\": 0,\n" +
+            "        \"returnedCount\": 1\n" +
+            "    }\n" +
+            "}\n";
+
+    public static final String POOL_WITH_TWO_RESOURCE_RECORDS = "{\n" +
+            "    \"zoneName\": \"denominator.io.\",\n" +
+            "    \"rrSets\": [\n" +
+            "        {\n" +
+            "            \"ownerName\": \"pool_2.denominator.io.\",\n" +
+            "            \"rrtype\": \"A (1)\",\n" +
+            "            \"ttl\": 86400,\n" +
+            "            \"rdata\": [\n" +
+            "                \"3.3.3.3\",\n" +
+            "                \"4.4.4.4\"\n" +
+            "            ],\n" +
+            "            \"profile\": {\n" +
+            "                \"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\",\n" +
+            "                \"order\": \"ROUND_ROBIN\",\n" +
+            "                \"description\": \"1\"\n" +
+            "            }\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"queryInfo\": {\n" +
+            "        \"sort\": \"OWNER\",\n" +
+            "        \"reverse\": false,\n" +
+            "        \"limit\": 100\n" +
+            "    },\n" +
+            "    \"resultInfo\": {\n" +
+            "        \"totalCount\": 1,\n" +
+            "        \"offset\": 0,\n" +
+            "        \"returnedCount\": 1\n" +
+            "    }\n" +
+            "}\n";
+
+    public static final String POOL_WITH_ONE_RESOURCE_RECORDS = "{\n" +
+            "    \"zoneName\": \"denominator.io.\",\n" +
+            "    \"rrSets\": [\n" +
+            "        {\n" +
+            "            \"ownerName\": \"pool_2.denominator.io.\",\n" +
+            "            \"rrtype\": \"A (1)\",\n" +
+            "            \"ttl\": 86400,\n" +
+            "            \"rdata\": [\n" +
+            "                \"4.4.4.4\"\n" +
+            "            ],\n" +
+            "            \"profile\": {\n" +
+            "                \"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\",\n" +
+            "                \"order\": \"ROUND_ROBIN\",\n" +
+            "                \"description\": \"1\"\n" +
+            "            }\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"queryInfo\": {\n" +
+            "        \"sort\": \"OWNER\",\n" +
+            "        \"reverse\": false,\n" +
+            "        \"limit\": 100\n" +
+            "    },\n" +
+            "    \"resultInfo\": {\n" +
+            "        \"totalCount\": 1,\n" +
+            "        \"offset\": 0,\n" +
+            "        \"returnedCount\": 1\n" +
+            "    }\n" +
+            "}\n";
+
+    public static final String POOL_WITH_NO_RESOURCE_RECORDS = "{\n" +
+            "    \"zoneName\": \"denominator.io.\",\n" +
+            "    \"rrSets\": [\n" +
+            "        {\n" +
+            "            \"ownerName\": \"pool_2.denominator.io.\",\n" +
+            "            \"rrtype\": \"A (1)\",\n" +
+            "            \"ttl\": 86400,\n" +
+            "            \"profile\": {\n" +
+            "                \"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\",\n" +
+            "                \"order\": \"ROUND_ROBIN\",\n" +
+            "                \"description\": \"1\"\n" +
+            "            }\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"queryInfo\": {\n" +
+            "        \"sort\": \"OWNER\",\n" +
+            "        \"reverse\": false,\n" +
+            "        \"limit\": 100\n" +
+            "    },\n" +
+            "    \"resultInfo\": {\n" +
+            "        \"totalCount\": 1,\n" +
+            "        \"offset\": 0,\n" +
+            "        \"returnedCount\": 1\n" +
+            "    }\n" +
+            "}\n";
+
     public static final String RR_SET_WITH_ONE_RECORD = "{\n" +
             "    \"zoneName\": \"denominator.io.\",\n" +
             "    \"rrSets\": [\n" +

@@ -448,4 +448,94 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
             .hasBody(addRecordToRRPoolRequestBody);
   }
 
+  @Test
+  public void deleteAlsoRemovesPool() throws Exception {
+    server.enqueueSessionResponse();
+    // Response to UltraDNSRestResourceRecordSetApi#recordsByNameAndType(name, type)
+    server.enqueue(new MockResponse().setBody(POOL_WITH_FOUR_RESOURCE_RECORDS));
+
+    // Response to api.getResourceRecordsOfDNameByType(zoneName, name, intType)
+    server.enqueue(new MockResponse().setBody(POOL_WITH_FOUR_RESOURCE_RECORDS));
+    // Response to the request to delete a resource record.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+    // Response to api.getResourceRecordsOfDNameByType(zoneName, name, intType)
+    server.enqueue(new MockResponse().setBody(POOL_WITH_THREE_RESOURCE_RECORDS));
+    // Response to the request to delete a resource record.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+    // Response to api.getResourceRecordsOfDNameByType(zoneName, name, intType)
+    server.enqueue(new MockResponse().setBody(POOL_WITH_TWO_RESOURCE_RECORDS));
+    // Response to the request to delete a resource record.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+    // Response to api.getResourceRecordsOfDNameByType(zoneName, name, intType)
+    server.enqueue(new MockResponse().setBody(POOL_WITH_ONE_RESOURCE_RECORDS));
+    // Response to the request to delete a resource record.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+
+    // Response to the request to delete a pool.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+
+    ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
+    api.deleteByNameAndType("pool_2.denominator.io.", "A");
+
+    server.assertSessionRequest();
+
+    // Assert request to get the RR Sets in the pool.
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
+
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
+    server.assertRequest()
+            .hasMethod("PATCH")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.")
+            .hasBody("[" +
+                      "{" +
+                        "\"op\": \"remove\", " +
+                        "\"path\": \"/rdata/0\"" +
+                      "}" +
+                    "]");
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
+    server.assertRequest()
+            .hasMethod("PATCH")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.")
+            .hasBody("[" +
+                      "{" +
+                        "\"op\": \"remove\", " +
+                        "\"path\": \"/rdata/0\"" +
+                      "}" +
+                    "]");
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
+    server.assertRequest()
+            .hasMethod("PATCH")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.")
+            .hasBody("[" +
+                      "{" +
+                        "\"op\": \"remove\", " +
+                        "\"path\": \"/rdata/0\"" +
+                      "}" +
+                    "]");
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
+    server.assertRequest()
+            .hasMethod("PATCH")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.")
+            .hasBody("[" +
+                      "{" +
+                        "\"op\": \"remove\", " +
+                        "\"path\": \"/rdata/0\"" +
+                      "}" +
+                    "]");
+
+    server.assertRequest()
+            .hasMethod("DELETE")
+            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
+  }
+
 }

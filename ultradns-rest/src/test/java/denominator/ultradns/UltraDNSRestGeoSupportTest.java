@@ -1,6 +1,7 @@
 package denominator.ultradns;
 
 import com.squareup.okhttp.mockwebserver.MockResponse;
+import denominator.ultradns.model.Region;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -68,6 +69,29 @@ public class UltraDNSRestGeoSupportTest {
         UltraDNSRest api = mockApi();
         UltraDNSRestGeoSupport ultraDNSRestGeoSupport =  new UltraDNSRestGeoSupport();
         Map<String, Collection<String>> availableRegions = ultraDNSRestGeoSupport.regions(api);
+
+        server.assertSessionRequest();
+        server.assertRequest()
+                .hasMethod("GET")
+                .hasPath("/geoip/territories?codes=");
+        server.assertRequest()
+                .hasMethod("GET")
+                .hasPath("/geoip/territories?codes=A1%2CA2%2CA3%2CANT%2COCN%2CSAM");
+        server.assertRequest()
+                .hasMethod("GET")
+                .hasPath("/geoip/territories?codes=ANT-AQ%2CANT-BV%2CANT-TF%2COCN-AS%2COCN-AU%2COCN-CC%2COCN-CK%2COCN-CX%2COCN-FJ%2COCN-FM%2COCN-GU%2COCN-HM%2COCN-KI%2COCN-MH%2COCN-MP%2COCN-NC%2COCN-NF%2COCN-NR%2COCN-NU%2COCN-NZ%2COCN-PF%2COCN-PG%2COCN-PN%2COCN-PW%2COCN-SB%2COCN-TK%2COCN-TO%2COCN-TV%2COCN-U9%2COCN-UM%2COCN-VU%2COCN-WF%2COCN-WS%2CSAM-AR%2CSAM-BO%2CSAM-BR%2CSAM-CL%2CSAM-CO%2CSAM-EC%2CSAM-FK%2CSAM-GF%2CSAM-GS%2CSAM-GY%2CSAM-PE%2CSAM-PY%2CSAM-SR%2CSAM-U4%2CSAM-UY");
+    }
+
+    @Test
+    public void regionsAsRegions() throws Exception {
+        server.enqueueSessionResponse();
+        server.enqueue(new MockResponse().setBody(getAvailableRegionsResponseTopLevel));
+        server.enqueue(new MockResponse().setBody(getAvailableRegionsResponseSecondLevel));
+        server.enqueue(new MockResponse().setBody(getAvailableRegionsResponseThirdLevelPart01));
+
+        UltraDNSRest api = mockApi();
+        UltraDNSRestGeoSupport ultraDNSRestGeoSupport =  new UltraDNSRestGeoSupport();
+        Map<Region, Collection<Region>> availableRegions = ultraDNSRestGeoSupport.regionsAsRegions(api);
 
         server.assertSessionRequest();
         server.assertRequest()

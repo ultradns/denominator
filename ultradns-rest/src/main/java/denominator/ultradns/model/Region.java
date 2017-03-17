@@ -130,6 +130,10 @@ public class Region implements Comparable<Region> {
         }
       }
     } else {
+      if (this.isRegion()) {
+        subRegionNames.add(this.getName());
+      }
+
       if (childRegions != null) {
         for (Region childRegion : childRegions) {
           subRegionNames.add(childRegion.getName());
@@ -162,6 +166,10 @@ public class Region implements Comparable<Region> {
         }
       }
     } else {
+      if (this.isRegion()) {
+        subRegionNames.add(this);
+      }
+
       if (childRegions != null) {
         for (Region childRegion : childRegions) {
           subRegionNames.add(childRegion);

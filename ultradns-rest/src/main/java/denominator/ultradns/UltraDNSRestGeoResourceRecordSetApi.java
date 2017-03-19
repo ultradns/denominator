@@ -1,12 +1,15 @@
 package denominator.ultradns;
 
-import java.sql.Array;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -17,7 +20,12 @@ import denominator.common.Filter;
 import denominator.model.ResourceRecordSet;
 import denominator.profile.GeoResourceRecordSetApi;
 import denominator.ultradns.model.RRSet;
+import denominator.ultradns.model.RDataInfo;
+import denominator.ultradns.model.GeoInfo;
+import denominator.ultradns.model.Profile;
 import denominator.ultradns.model.Record;
+import denominator.ultradns.model.DirectionalRecord;
+import denominator.ultradns.model.DirectionalGroup;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -29,9 +37,6 @@ import static denominator.common.Util.filter;
 import static denominator.common.Util.nextOrNull;
 import static denominator.common.Util.toMap;
 import static denominator.model.ResourceRecordSets.nameAndTypeEqualTo;
-
-import denominator.ultradns.model.DirectionalRecord;
-import denominator.ultradns.model.DirectionalGroup;
 
 final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetApi {
   private static final Logger logger = Logger.getLogger(UltraDNSRestGeoResourceRecordSetApi.class);
@@ -54,17 +59,21 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
       return "CNAME".equals(input.getType());
     }
   };
+  private final UltraDNSRestGeoSupport ultraDNSRestGeoSupport;
 
   UltraDNSRestGeoResourceRecordSetApi(Collection<String> supportedTypes,
                                       Lazy<Map<String, Collection<String>>> regions,
                                       UltraDNSRest api,
                                       GroupGeoRecordByNameTypeCustomIterator.Factory iteratorFactory,
-                                      String zoneName) {
+                                      String zoneName,
+                                      UltraDNSRestGeoSupport ultraDNSRestGeoSupport
+                                      ) {
     this.supportedTypes = supportedTypes;
     this.regions = regions;
     this.api = api;
     this.iteratorFactory = iteratorFactory;
     this.zoneName = zoneName;
+    this.ultraDNSRestGeoSupport = ultraDNSRestGeoSupport;
   }
 
   @Override
@@ -124,7 +133,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
       return null;
     }
     Iterator<DirectionalRecord> records = recordsByNameTypeAndQualifier(name, type, qualifier);
-    return nextOrNull(iteratorFactory.create(records));
+    return nextOrNull(iteratorFactory.create(records, zoneName));
   }
 
   private Iterator<DirectionalRecord> recordsByNameTypeAndQualifier(String name, String type,
@@ -159,23 +168,23 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
     checkArgument(rrset.qualifier() != null, "no qualifier on: %s", rrset);
     checkArgument(IS_GEO.apply(rrset), "%s failed on: %s", IS_GEO, rrset);
     checkArgument(supportedTypes.contains(rrset.type()), "%s not a supported type for geo: %s",
-                  rrset.type(),
-                  supportedTypes);
+            rrset.type(), supportedTypes);
+
     int ttlToApply = rrset.ttl() != null ? rrset.ttl() : DEFAULT_TTL;
     String group = rrset.qualifier();
     Map<String, Collection<String>> regions = rrset.geo().regions();
+
     DirectionalGroup directionalGroup = new DirectionalGroup();
     directionalGroup.setName(group);
     directionalGroup.setRegionToTerritories(regions);
-    List<Map<String, Object>>
-        recordsLeftToCreate =
-        new ArrayList<Map<String, Object>>(rrset.records());
-    Iterator<DirectionalRecord>
-        iterator =
-        recordsByNameTypeAndQualifier(rrset.name(), rrset.type(), group);
+
+    List<Map<String, Object>> recordsLeftToCreate = new ArrayList<Map<String, Object>>(rrset.records());
+    Iterator<DirectionalRecord> iterator = recordsByNameTypeAndQualifier(rrset.name(), rrset.type(), group);
+
     while (iterator.hasNext()) {
       DirectionalRecord record = iterator.next();
       Map<String, Object> rdata = toMap(record.getType(), record.rdata);
+
       if (recordsLeftToCreate.contains(rdata)) {
         recordsLeftToCreate.remove(rdata);
         boolean shouldUpdate = false;
@@ -183,97 +192,45 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
           record.ttl = ttlToApply;
           shouldUpdate = true;
         } else {
-          directionalGroup = new DirectionalGroup();
-          //directionalGroup = api.getDirectionalDNSGroupDetails(record.getGeoGroupId());
+          directionalGroup = ultraDNSRestGeoSupport.getDirectionalDNSGroupByName(zoneName, record.name,
+                  dirType(record.getType()), record.getGeoGroupName());
           if (!regions.equals(directionalGroup.getRegionToTerritories())) {
             directionalGroup.setRegionToTerritories(regions);
             shouldUpdate = true;
           }
         }
         if (shouldUpdate) {
-          try {
-            api.updateDirectionalPoolRecord(record, directionalGroup);
-          } catch (UltraDNSRestException e) {
-            // lost race
-            if (e.code() != UltraDNSRestException.RESOURCE_RECORD_ALREADY_EXISTS) {
-              throw e;
-            }
-          }
+            updateDirectionalPoolRecord(zoneName, record, directionalGroup);
         }
       } else {
-        int indexToDelete = -1;
-        String rData = "";
-        int intType = lookup(record.getType());
-
-        if (record.getRdata() != null && !record.getRdata().isEmpty()) {
-          rData = StringUtils.join(record.getRdata(), " ");
-        }
-
-        List<RRSet> rrSets = api.getResourceRecordsOfDNameByType(zoneName, record.getName(),
-                intType).getRrSets();
-        if (rrSets != null && !rrSets.isEmpty()) {
-          RRSet rrSet = rrSets.get(0);
-          if (rrSet != null & rrSet.getRdata() != null) {
-            indexToDelete = rrSet.getRdata().indexOf(rData);
-          }
-        }
-        if (indexToDelete >= 0 ) {
-          try {
-            api.deleteResourceRecord(zoneName, intType, record.getName(), indexToDelete);
-          } catch (UltraDNSRestException e) {
-              throw e;
-          }
-        }
+        deleteResourceRecord(record);
       }
     }
 
     if (!recordsLeftToCreate.isEmpty()) {
-      // shotgun create
-      String poolId;
+      String poolName = rrset.name();
       try {
         String type = rrset.type();
         if ("CNAME".equals(type)) {
           type = "A";
         }
-        // Hvv to work
-        poolId = "";
-        api.addDirectionalPool(zoneName, rrset.name(), type);
+        api.addDirectionalPool(zoneName, poolName, type);
       } catch (UltraDNSRestException e) {
-        // lost race
-        if (e.code() == UltraDNSRestException.POOL_ALREADY_EXISTS) {
-          poolId = "";
-          //poolId = api.getDirectionalPoolsOfZone(zoneName).get(rrset.name()); Have to work on this
-        } else {
+        if (e.code() != UltraDNSRestException.POOL_ALREADY_EXISTS) {
           throw e;
         }
       }
+
       DirectionalRecord record = new DirectionalRecord();
       record.setType(rrset.type());
       record.setTtl(ttlToApply);
 
       for (Map<String, Object> rdata : recordsLeftToCreate) {
-        for (Object rdatum : rdata.values()) {
-          record.rdata.add(rdatum.toString());
+        for (Object rDatum : rdata.values()) {
+          record.rdata.add(rDatum.toString());
         }
-        try {
-          //api.addDirectionalPoolRecord(record, directionalGroup, poolId);
-        } catch (UltraDNSRestException e) {
-          // lost race
-          if (e.code() != UltraDNSRestException.POOL_RECORD_ALREADY_EXISTS) {
-            throw e;
-          }
-        }
+        addDirectionalPoolRecord(zoneName, poolName, record, directionalGroup);
       }
-    }
-  }
-
-  private int dirType(String type) {
-    if ("A".equals(type) || "CNAME".equals(type)) {
-      return lookup("A");
-    } else if ("AAAA".equals(type)) {
-      return lookup("AAAA");
-    } else {
-      return lookup(type);
     }
   }
 
@@ -281,14 +238,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
   public void deleteByNameTypeAndQualifier(String name, String type, String qualifier) {
     Iterator<DirectionalRecord> record = recordsByNameTypeAndQualifier(name, type, qualifier);
     while (record.hasNext()) {
-      try {
-        //api.deleteDirectionalPoolRecord(record.next().id);
-      } catch (UltraDNSRestException e) {
-        // lost race
-        if (e.code() != UltraDNSRestException.DIRECTIONALPOOL_RECORD_NOT_FOUND) {
-          throw e;
-        }
-      }
+      deleteDirectionalPoolRecord(record.next());
     }
   }
 
@@ -304,7 +254,120 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
         throw e;
       }
     }
-    return iteratorFactory.create(list.iterator());
+    return iteratorFactory.create(list.iterator(), zoneName);
+  }
+
+  private void addDirectionalPoolRecord(String zoneName, String hostName, DirectionalRecord record, DirectionalGroup directionalGroup) {
+
+    List<String> rdata = record.getRdata();
+
+    GeoInfo geoInfo = new GeoInfo();
+    geoInfo.setCodes(ultraDNSRestGeoSupport.getTerritoryCodes(directionalGroup));
+    geoInfo.setName(directionalGroup.getName());
+
+    RDataInfo rDataInfo = new RDataInfo();
+    rDataInfo.setGeoInfo(geoInfo);
+    List<RDataInfo> rDataInfos = Arrays.asList(rDataInfo);
+
+    Profile profile = new Profile();
+    profile.setRdataInfo(rDataInfos);
+
+    RRSet rrSet = new RRSet();
+    rrSet.setProfile(profile);
+    rrSet.setRdata(rdata);
+
+    try {
+      api.addDirectionalPoolRecord(zoneName, hostName, record.getType(), rrSet);
+    } catch (UltraDNSRestException e) {
+      throw e;
+    }
+  }
+
+  public void updateDirectionalPoolRecord(String zoneName, Record record, DirectionalGroup directionalGroup) {
+
+  }
+
+  private void deleteDirectionalPoolRecord(DirectionalRecord record) {
+    if (record.getRdata() != null && !record.getRdata().isEmpty()) {
+      if (record.getRdata().get(0).equals("No Data Response")) {
+        try {
+          api.deleteDirectionalNoResponseRecord(zoneName, record.getName(), record.getType());
+        } catch (UltraDNSRestException e) {
+          if (e.code() != UltraDNSRestException.PATH_NOT_FOUND_TO_PATCH) {
+            throw e;
+          }
+        }
+      } else {
+        int indexToDelete = -1;
+        String rData = StringUtils.join(record.getRdata(), " ");;
+        try {
+          List<RRSet> rrSets = api.getDirectionalDNSRecordsForHost(zoneName, record.getName(), record.getTypeCode()).getRrSets();
+          if (rrSets != null && !rrSets.isEmpty()) {
+            RRSet rrSet = rrSets.get(0);
+            if (rrSet != null & rrSet.getRdata() != null) {
+              indexToDelete = rrSet.getRdata().indexOf(rData);
+            }
+          }
+        } catch (UltraDNSRestException e) {
+          if (e.code() != UltraDNSRestException.DATA_NOT_FOUND) {
+            throw e;
+          }
+        }
+        if (indexToDelete >= 0 ) {
+          try {
+            api.deleteDirectionalPoolRecord(zoneName, record.getName(), record.getType(), indexToDelete);
+          } catch (UltraDNSRestException e) {
+            if (e.code() != UltraDNSRestException.PATH_NOT_FOUND_TO_PATCH) {
+              throw e;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private void deleteResourceRecord(DirectionalRecord record) {
+    int indexToDelete = -1;
+    String rData = "";
+    int intType = lookup(record.getType());
+
+    if (record.getRdata() != null && !record.getRdata().isEmpty()) {
+      rData = StringUtils.join(record.getRdata(), " ");
+    }
+
+    try {
+      List<RRSet> rrSets = api.getResourceRecordsOfDNameByType(zoneName, record.getName(), intType).getRrSets();
+      if (rrSets != null && !rrSets.isEmpty()) {
+        RRSet rrSet = rrSets.get(0);
+        if (rrSet != null & rrSet.getRdata() != null) {
+          indexToDelete = rrSet.getRdata().indexOf(rData);
+        }
+      }
+    } catch (UltraDNSRestException e) {
+      if (e.code() != UltraDNSRestException.DATA_NOT_FOUND) {
+        throw e;
+      }
+    }
+
+    if (indexToDelete >= 0 ) {
+      try {
+        api.deleteResourceRecord(zoneName, intType, record.getName(), indexToDelete);
+      } catch (UltraDNSRestException e) {
+        if (e.code() != UltraDNSRestException.PATH_NOT_FOUND_TO_PATCH) {
+          throw e;
+        }
+      }
+    }
+  }
+
+  private int dirType(String type) {
+    if ("A".equals(type) || "CNAME".equals(type)) {
+      return lookup("A");
+    } else if ("AAAA".equals(type)) {
+      return lookup("AAAA");
+    } else {
+      return lookup(type);
+    }
   }
 
   static final class Factory implements GeoResourceRecordSetApi.Factory {
@@ -336,8 +399,8 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
         }
         throw e;
       }
-      return new UltraDNSRestGeoResourceRecordSetApi(supportedTypes, regions, api, iteratorFactory,
-                                                 name);
+      return new UltraDNSRestGeoResourceRecordSetApi(supportedTypes,
+              regions, api, iteratorFactory, name, new UltraDNSRestGeoSupport(api));
     }
   }
 }

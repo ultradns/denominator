@@ -2,6 +2,8 @@ package denominator.ultradns;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Set;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -11,11 +13,23 @@ import javax.inject.Named;
 import com.google.gson.Gson;
 import dagger.Module;
 import dagger.Provides;
+import denominator.ultradns.model.DirectionalGroup;
 import denominator.ultradns.model.Region;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 @Module(injects = UltraDNSRestGeoResourceRecordSetApi.Factory.class, complete = false)
 public class UltraDNSRestGeoSupport {
+
+  private UltraDNSRest api = null;
+
+  private static final Logger logger = Logger.getLogger(UltraDNSRestGeoSupport.class);
+
+  public UltraDNSRestGeoSupport() {}
+
+  public UltraDNSRestGeoSupport(UltraDNSRest api) {
+    this.api = api;
+  }
 
   @Provides
   @Named("geo")
@@ -34,7 +48,7 @@ public class UltraDNSRestGeoSupport {
     return availableRegions;
   }
 
-  Map<Region, Collection<Region>> regionsAsRegions(UltraDNSRest api) {
+  Map<Region, Collection<Region>> regionsAsRegions() {
     Map<Region, Collection<Region>> availableRegions = new TreeMap<Region, Collection<Region>>();
 
     Collection<Region> topLevelRegions = buildRegionHierarchyByCallingUltraDNSRest(api);
@@ -131,4 +145,101 @@ public class UltraDNSRestGeoSupport {
     return commaSeparatedEffectiveCodes;
   }
 
+  public DirectionalGroup getDirectionalDNSGroupByName(String zoneName, String hostName, int rrType, String groupName) {
+
+    TreeSet<String> codes = api.getDirectionalDNSRecordsForHost(zoneName, hostName, rrType)
+            .getDirectionalGroupDetails(groupName);
+
+    Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
+
+    if (codes != null && !codes.isEmpty()) {
+      regionToTerritories = getRegionToTerritories(codes);
+    }
+
+    DirectionalGroup directionalGroup = new DirectionalGroup();
+    directionalGroup.setName(groupName);
+    directionalGroup.setRegionToTerritories(regionToTerritories);
+
+    return  directionalGroup;
+  }
+
+  public Map<String, Collection<String>> getRegionToTerritories(TreeSet<String> codes) {
+
+    Map<Region, Collection<Region>> regions = regionsAsRegions();
+    Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
+
+    Iterator<String> iterator = codes.iterator();
+    while(iterator.hasNext()) {
+      String code = iterator.next();
+      Collection<String> list = new ArrayList<String>();
+      boolean codeFound = false;
+
+      if (code.equals("A1") || code.equals("A2") || code.equals("A3")) {
+        for (Region region : regions.keySet()) {
+          if (region.getCode().equals(code)) {
+            list.add(region.getName());
+            if (code.equals("A1") || code.equals("A2")) {
+              regionToTerritories.put(region.getName() + " (" + code + ")", list);
+            } else {
+              regionToTerritories.put(region.getName(), list);
+            }
+          }
+        }
+      } else {
+        for (Map.Entry<Region, Collection<Region>> entry : regions.entrySet()) {
+          for (Region region : entry.getValue()) {
+            if (region.getEffectiveCode().equals(code)) {
+              logger.info("Code Matched for " + code);
+              logger.info(entry.getKey().getName() + "  ||  "  + region.getCode());
+              if (regionToTerritories.keySet().contains(entry.getKey().getName())) {
+                list = regionToTerritories.get(entry.getKey().getName());
+              }
+              list.add(region.getName());
+              regionToTerritories.put(entry.getKey().getName(), list);
+              codeFound = true;
+              break;
+            }
+          }
+          if (codeFound) {
+            break;
+          }
+        }
+      }
+    }
+    return regionToTerritories;
+  }
+
+  public TreeSet<String> getTerritoryCodes(DirectionalGroup directionalGroup) {
+    TreeSet<String> territoryCodes = new TreeSet<String>();
+
+    if (directionalGroup.getRegionToTerritories() != null && !directionalGroup.getRegionToTerritories().isEmpty()) {
+      Map<String, Collection<String>> regionToTerritories = directionalGroup.getRegionToTerritories();
+      Set<Region> regions = new TreeSet<Region>();
+      Set<String> regionNames = new TreeSet<String>();
+
+      for (Map.Entry<Region, Collection<Region>> entry : regionsAsRegions().entrySet()) {
+        regions.add(entry.getKey());
+        regions.addAll(entry.getValue());
+      }
+
+      for (Map.Entry<String, Collection<String>> regionToTerritory : regionToTerritories.entrySet()) {
+        regionNames.addAll(regionToTerritory.getValue());
+      }
+
+      Iterator<String> regionNamesIterator = regionNames.iterator();
+      while (regionNamesIterator.hasNext()) {
+        String regionName = regionNamesIterator.next();
+        Iterator<Region> regionsIterator = regions.iterator();
+        while (regionsIterator.hasNext()) {
+          Region region = regionsIterator.next();
+          if (regionName.equals(region.getName())) {
+            logger.info("Region Matched with name: " + regionName);
+            territoryCodes.add(region.getEffectiveCode());
+            break;
+          }
+        }
+      }
+    }
+    return territoryCodes;
+  }
 }

@@ -90,8 +90,8 @@ public class UltraDNSRestGeoSupportTest {
         server.enqueue(new MockResponse().setBody(getAvailableRegionsResponseThirdLevelPart01));
 
         UltraDNSRest api = mockApi();
-        UltraDNSRestGeoSupport ultraDNSRestGeoSupport =  new UltraDNSRestGeoSupport();
-        Map<Region, Collection<Region>> availableRegions = ultraDNSRestGeoSupport.regionsAsRegions(api);
+        UltraDNSRestGeoSupport ultraDNSRestGeoSupport =  new UltraDNSRestGeoSupport(api);
+        Map<Region, Collection<Region>> availableRegions = ultraDNSRestGeoSupport.regionsAsRegions();
 
         server.assertSessionRequest();
         server.assertRequest()

@@ -69,11 +69,6 @@ public class Region implements Comparable<Region> {
     return this.childRegions;
   }
 
-  public void setChildRegions(Region[] regions) {
-    TreeSet<Region> tmpChildRegions = (TreeSet<Region>) Arrays.asList(regions);
-    this.setChildRegions(tmpChildRegions);
-  }
-
   public void setChildRegions(Collection<Region> regions) {
     this.childRegions = new TreeSet<Region>(regions);
     for (Region childRegion : childRegions) {

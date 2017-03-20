@@ -93,7 +93,7 @@ public class Region implements Comparable<Region> {
     String[] childRegionEffectiveCodes = new String[this.getChildRegions().size()];
     int i = 0;
     for (Region region : this.getChildRegions()) {
-      childRegionEffectiveCodes[i] = region.getCode();
+      childRegionEffectiveCodes[i] = region.getEffectiveCode();
       i++;
     }
     Arrays.sort(childRegionEffectiveCodes);

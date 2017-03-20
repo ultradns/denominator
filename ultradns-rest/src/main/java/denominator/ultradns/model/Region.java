@@ -187,11 +187,11 @@ public class Region implements Comparable<Region> {
   @Override
   public String toString() {
     String str = "{";
-    str += "code: " + this.code;
-    str += ", name: " + this.name;
-    str += ", type: " + this.type;
-    str += ", id: " + this.id;
-    str += ", effectiveCode: " + this.effectiveCode;
+    str += "\"code\": \"" + this.code + "\"";
+    str += ", \"name\": \"" + this.name + "\"";
+    str += ", \"type\": \"" + this.type + "\"";
+    str += ", \"id\": " + this.id;
+    str += ", \"effectiveCode\": \"" + this.effectiveCode + "\"";
     str += "}";
     return str;
   }

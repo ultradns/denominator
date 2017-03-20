@@ -200,12 +200,9 @@ public class Region implements Comparable<Region> {
   public boolean equals(Object object) {
     if (object instanceof Region) {
       Region region1 = (Region) object;
-      return ((this.name == region1.name || this.name.equals(region1.name)) &&
-              (this.type == region1.type || this.type.equals(region1.type)) &&
-              (this.code == region1.code || this.code.equals(region1.code)) &&
-              (this.effectiveCode == region1.effectiveCode || this.effectiveCode.equals(region1.effectiveCode)) &&
-              (this.parentRegion == region1.parentRegion || this.parentRegion.equals(region1.parentRegion)) &&
-              (this.childRegions == region1.childRegions || this.childRegions.equals(region1.childRegions)) &&
+      return ((this.name == region1.name || (this.name != null && region1.name != null && this.name.equals(region1.name))) &&
+              (this.type == region1.type || (this.type != null && region1.type != null && this.type.equals(region1.type))) &&
+              (this.code == region1.code || (this.code != null && region1.code != null && this.code.equals(region1.code))) &&
               (this.id == region1.id));
     } else {
       return false;

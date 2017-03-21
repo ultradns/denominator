@@ -50,6 +50,12 @@ public class RegionTest {
         String[] expectedEffectiveCodes = new String[tmpExpectedEffectiveCodes.size()];
         tmpExpectedEffectiveCodes.toArray(expectedEffectiveCodes);
         assertThat(nam.getEffectiveCodesOfChildRegions()).isEqualTo(expectedEffectiveCodes);
+
+        assertThat(nam.getEffectiveCodeForGeo()).isEqualTo("NAM");
+        assertThat(usa.getEffectiveCodeForGeo()).isEqualTo("US");
+        Region virginiaInUsa = new Region("Virginia", "VA", "State", 101);
+        usa.setChildRegions(Arrays.asList(virginiaInUsa));
+        assertThat(virginiaInUsa.getEffectiveCodeForGeo()).isEqualTo("US-VA");
     }
 
     @Test

@@ -13,6 +13,7 @@ public class Region implements Comparable<Region> {
   private String type;
   private int id;
   private String effectiveCode;
+  private String effectiveCodeForGeo;
 
   private Region parentRegion;
   private TreeSet<Region> childRegions;
@@ -22,6 +23,8 @@ public class Region implements Comparable<Region> {
     this.code = code;
     this.type = type;
     this.id = id;
+    this.setEffectiveCode();
+    this.setEffectiveCodeForGeo();
   }
 
   public String getName() {
@@ -63,6 +66,7 @@ public class Region implements Comparable<Region> {
   public void setParent(Region region) {
     this.parentRegion = region;
     this.setEffectiveCode();
+    this.setEffectiveCodeForGeo();
   }
 
   public TreeSet<Region> getChildRegions() {
@@ -73,7 +77,6 @@ public class Region implements Comparable<Region> {
     this.childRegions = new TreeSet<Region>(regions);
     for (Region childRegion : childRegions) {
       childRegion.setParent(this);
-      childRegion.setEffectiveCode();
     }
   }
 
@@ -98,6 +101,22 @@ public class Region implements Comparable<Region> {
     }
     Arrays.sort(childRegionEffectiveCodes);
     return childRegionEffectiveCodes;
+  }
+
+  public String getEffectiveCodeForGeo() {
+    return this.effectiveCodeForGeo;
+  }
+
+  public void setEffectiveCodeForGeo() {
+    if (this.isCountry() || this.isRegion()) {
+      this.effectiveCodeForGeo = this.getCode();
+    } else {
+      String parentRegionCode = "";
+      if (this.getParentRegion() != null) {
+        parentRegionCode = this.getParentRegion().getCode();
+      }
+      this.effectiveCodeForGeo = parentRegionCode + "-" + this.getCode();
+    }
   }
 
   public boolean isRegion() {

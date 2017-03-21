@@ -211,6 +211,7 @@ public class Region implements Comparable<Region> {
     str += ", \"type\": \"" + this.type + "\"";
     str += ", \"id\": " + this.id;
     str += ", \"effectiveCode\": \"" + this.effectiveCode + "\"";
+    str += ", \"effectiveCodeForGeo\": \"" + this.effectiveCodeForGeo + "\"";
     str += "}";
     return str;
   }

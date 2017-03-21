@@ -188,7 +188,8 @@ public class UltraDNSRestGeoSupport {
       } else {
         for (Map.Entry<Region, Collection<Region>> entry : regions.entrySet()) {
           for (Region region : entry.getValue()) {
-            if (region.getEffectiveCode().equals(code)) {
+            logger.info("getRegionToTerritories#getEffectiveCodeForGeo: " + region.getEffectiveCodeForGeo());
+            if (region.getEffectiveCodeForGeo().equals(code)) {
               logger.info("Code Matched for " + code);
               logger.info(entry.getKey().getName() + "  ||  "  + region.getCode());
               if (regionToTerritories.keySet().contains(entry.getKey().getName())) {
@@ -232,9 +233,11 @@ public class UltraDNSRestGeoSupport {
         Iterator<Region> regionsIterator = regions.iterator();
         while (regionsIterator.hasNext()) {
           Region region = regionsIterator.next();
+          logger.info("region: " + region);
           if (regionName.equals(region.getName())) {
-            logger.info("Region Matched with name: " + regionName);
-            territoryCodes.add(region.getEffectiveCode());
+            logger.info("It is matched: regionName" + regionName + ", getEffectiveCode: " + region.getEffectiveCode());
+            logger.info("getTerritoryCodes#getEffectiveCodeForGeo: " + region.getEffectiveCodeForGeo());
+            territoryCodes.add(region.getEffectiveCodeForGeo());
             break;
           }
         }

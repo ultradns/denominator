@@ -78,7 +78,43 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
 
   @Override
   public Map<String, Collection<String>> supportedRegions() {
-    return regions.get();
+
+    logger.info("-------------------------------------- Start of Working Space -------------------------------------------- \n");
+
+    Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
+    regionToTerritories.put("Antarctica", Arrays.asList("Bouvet Island","French Southern Territories"));
+    regionToTerritories.put("Asia", Arrays.asList("Japan","Korea, Republic of","Myanmar","Nepal","Turkmenistan","Undefined Asia","Uzbekistan"));
+    regionToTerritories.put("Europe", Arrays.asList("Albania","Belarus","Vatican City"));
+    regionToTerritories.put("Middle East", Arrays.asList("Iran","Israel","Jordan","Kuwait","Oman","Qatar","United Arab Emirates","Yemen"));
+    regionToTerritories.put("Anonymous Proxy (A1)", Arrays.asList("Anonymous Proxy"));
+    regionToTerritories.put("Satellite Provider (A2)", Arrays.asList("Satellite Provider"));
+    regionToTerritories.put("Unknown / Uncategorized IPs", Arrays.asList("Unknown / Uncategorized IPs"));
+    regionToTerritories.put("North America", Arrays.asList("North America"));
+    regionToTerritories.put("South America", Arrays.asList("South America"));
+    regionToTerritories.put("Asia", Arrays.asList("Asia", "India"));
+    regionToTerritories.put("India", Arrays.asList("Delhi"));
+    regionToTerritories.put("Angola", Arrays.asList("Namibe"));
+
+    DirectionalGroup directionalGroup = new DirectionalGroup();
+    directionalGroup.setName("D");
+    directionalGroup.setRegionToTerritories(regionToTerritories);
+
+    TreeSet<String> codes = ultraDNSRestGeoSupport.getTerritoryCodes(directionalGroup);
+    Iterator<String> it = codes.iterator();
+
+    logger.info("Converted codes: \n" );
+    while (it.hasNext()) {
+      logger.info(it.next());
+    }
+
+    logger.info("\n\nConverting Back: \n\n" );
+    for (Map.Entry<String, Collection<String>> entry : ultraDNSRestGeoSupport.getRegionToTerritories(codes).entrySet()) {
+      logger.info(entry.getKey() + "  ||  " + entry.getValue());
+    }
+
+    logger.info("---------------------------------------- End of Working Space ------------------------------------------- \n");
+    //return regions.get();
+    return new HashMap<String, Collection<String>>();
   }
 
   @Override

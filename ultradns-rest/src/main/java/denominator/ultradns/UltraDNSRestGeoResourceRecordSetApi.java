@@ -204,7 +204,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
             updateDirectionalPoolRecord(zoneName, record, directionalGroup);
         }
       } else {
-        deleteResourceRecord(record);
+        deleteDirectionalPoolRecord(record);
       }
     }
 
@@ -366,40 +366,6 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
               throw e;
             }
           }
-        }
-      }
-    }
-  }
-
-  private void deleteResourceRecord(DirectionalRecord record) {
-    int indexToDelete = -1;
-    String rData = "";
-    int intType = lookup(record.getType());
-
-    if (record.getRdata() != null && !record.getRdata().isEmpty()) {
-      rData = StringUtils.join(record.getRdata(), " ");
-    }
-
-    try {
-      List<RRSet> rrSets = api.getResourceRecordsOfDNameByType(zoneName, record.getName(), intType).getRrSets();
-      if (rrSets != null && !rrSets.isEmpty()) {
-        RRSet rrSet = rrSets.get(0);
-        if (rrSet != null & rrSet.getRdata() != null) {
-          indexToDelete = rrSet.getRdata().indexOf(rData);
-        }
-      }
-    } catch (UltraDNSRestException e) {
-      if (e.code() != UltraDNSRestException.DATA_NOT_FOUND) {
-        throw e;
-      }
-    }
-
-    if (indexToDelete >= 0 ) {
-      try {
-        api.deleteResourceRecord(zoneName, intType, record.getName(), indexToDelete);
-      } catch (UltraDNSRestException e) {
-        if (e.code() != UltraDNSRestException.PATH_NOT_FOUND_TO_PATCH) {
-          throw e;
         }
       }
     }

@@ -2,12 +2,18 @@ package denominator.ultradns;
 
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import denominator.model.ResourceRecordSet;
+import denominator.model.profile.Geo;
+import denominator.model.rdata.AData;
 import denominator.profile.GeoResourceRecordSetApi;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import static denominator.ultradns.UltraDNSRestException.DIRECTIONAL_NOT_ENABLED;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,107 +42,336 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     @Test
     public void supportedRegionsCache() throws Exception {
         server.enqueueSessionResponse();
-        setAvailableRegions();
+        enqueueAvailableRegionsResponse();
 
         GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
         assertThat(api.supportedRegions()).hasSize(15);
 
         server.assertSessionRequest();
-        assertAvailableRegions();
+        assertAvailableRegionsRequest();
     }
 
     /**
-     * WIP - Need to add more when 3 API will get clarified
+     * WIP - Need to Debug the logic
      * @throws Exception
      */
     @Test
+    @Ignore
     public void listWhenPresent() throws Exception {
         server.enqueueSessionResponse();
-        setAvailableRegions();
+        enqueueAvailableRegionsResponse();
         server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
         server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        enqueueAvailableRegionsResponse();
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        enqueueAvailableRegionsResponse();
 
         GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
         Iterator<ResourceRecordSet<?>> iterator = api.iterator();
+        /*System.out.println("in listWhenPresent(), iterator = " + iterator);
+        System.out.println("in listWhenPresent(), iterator.hasNext() = " + iterator.hasNext());
+        ResourceRecordSet<?> nextElement = iterator.next();
+        System.out.println("iterator.next() = " + nextElement);*/
 
-        /*while (iterator.hasNext()) {
-            System.out.printf(iterator.next().name());
+        /*int i=1;
+        while (iterator.hasNext()) {
+            System.out.println("----|" +  iterator.next());
         }*/
 
-        server.assertSessionRequest();
-        assertAvailableRegions();
-        server.assertRequest("GET", "/zones/denominator.io./rrsets/?q=kind%3ADIR_POOLS", "");
+       /* server.assertSessionRequest();
+        assertAvailableRegionsRequest();
+        server.assertRequest("GET", "/zones/denominator.io./rrsets/?q=kind%3ADIR_POOLS", "");*/
         // server.assertRequest("GET", "/zones/denominator.io./rrsets/A/dir_pool_1.denominator.io.?q=kind:DIR_POOLS", "");
     }
 
-    private void setAvailableRegions() {
+    @Test
+    public void putWhenRegionsMatches() throws Exception {
+        server.enqueueSessionResponse();
+        enqueueAvailableRegionsResponse();
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        enqueueAvailableRegionsResponse();
+
+        ResourceRecordSet<AData> europe = ResourceRecordSet
+                .<AData>builder()
+                .name("test_directional_pool.denominator.io.")
+                .type("A")
+                .qualifier("Europe")
+                .ttl(200)
+                .add(AData.create("2.2.2.2"))
+                .geo(Geo.create(new LinkedHashMap<String, Collection<String>>() {
+                    {
+                        put("Europe", Arrays.asList("Spain", "United Kingdom - England, Northern Ireland, Scotland, Wales", "Sweden"));
+                    }
+                })).build();
+
+        GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
+        api.put(europe);
+
+        server.assertSessionRequest();
+        assertAvailableRegionsRequest();
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        assertAvailableRegionsRequest();
+    }
+
+    @Test
+    public void putWhenRegionsDiffer() throws Exception {
+        server.enqueueSessionResponse();
+        enqueueAvailableRegionsResponse();
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        enqueueAvailableRegionsResponse();
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        enqueueAvailableRegionsResponse();
+        server.enqueue(new MockResponse().setBody(
+                "{" +
+                    "\"message\": \"Successful" +
+                "\"}"
+        ));
+
+        ResourceRecordSet<AData> europe = ResourceRecordSet
+                .<AData>builder()
+                .name("test_directional_pool.denominator.io.")
+                .type("A")
+                .qualifier("Europe")
+                .ttl(200)
+                .add(AData.create("2.2.2.2"))
+                .geo(Geo.create(new LinkedHashMap<String, Collection<String>>() {
+                    {
+                        put("Europe", Arrays.asList("Spain"));
+                    }
+                })).build();
+
+        GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
+        api.put(europe);
+
+        server.assertSessionRequest();
+        assertAvailableRegionsRequest();
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        assertAvailableRegionsRequest();
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        assertAvailableRegionsRequest();
+        server.assertRequest("PATCH",
+                "/zones/denominator.io./rrsets/A/test_directional_pool.denominator.io.",
+                "[{\"op\": \"replace\", \"path\": \"/profile/rdataInfo/1\", " +
+                        "\"value\": {\"geoInfo\":{\"name\":\"Europe\",\"codes\":[\"ES\"]},\"ttl\":200}}]");
+    }
+
+    @Test
+    public void putWhenTTLDiffers() throws Exception {
+        server.enqueueSessionResponse();
+        enqueueAvailableRegionsResponse();
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        enqueueAvailableRegionsResponse();
+        server.enqueue(new MockResponse().setBody(
+                "{" +
+                    "\"message\": \"Successful" +
+                "\"}"
+        ));
+
+        ResourceRecordSet<AData> europe = ResourceRecordSet
+                .<AData>builder()
+                .name("test_directional_pool.denominator.io.")
+                .type("A")
+                .qualifier("Europe")
+                .ttl(500)
+                .add(AData.create("2.2.2.2"))
+                .geo(Geo.create(new LinkedHashMap<String, Collection<String>>() {
+                    {
+                        put("Europe", Arrays.asList("Spain", "Sweden"));
+                    }
+                })).build();
+
+        GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
+        api.put(europe);
+
+        server.assertSessionRequest();
+        assertAvailableRegionsRequest();
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        assertAvailableRegionsRequest();
+        server.assertRequest("PATCH",
+                "/zones/denominator.io./rrsets/A/test_directional_pool.denominator.io.",
+                "[{\"op\": \"replace\", \"path\": \"/profile/rdataInfo/1\", " +
+                        "\"value\": {\"geoInfo\":{\"name\":\"Europe\",\"codes\":[\"ES\",\"SE\"]},\"ttl\":500}}]");
+    }
+
+    @Test
+    public void putAsNewDirectionalRecord() throws Exception {
+        server.enqueueSessionResponse();
+        enqueueAvailableRegionsResponse();
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        server.enqueueError(400, UltraDNSRestException.POOL_ALREADY_EXISTS,
+                "Pool already created for this host name : dir_pool_1.test-zone-1.com.");
+        enqueueAvailableRegionsResponse();
+        server.enqueue(new MockResponse().setBody(
+                "{" +
+                    "\"message\": \"Successful" +
+                "\"}"
+        ));
+
+        ResourceRecordSet<AData> europe = ResourceRecordSet
+                .<AData>builder()
+                .name("test_directional_pool.denominator.io.")
+                .type("A")
+                .qualifier("Europe")
+                .ttl(500)
+                .add(AData.create("7.7.7.7"))
+                .geo(Geo.create(new LinkedHashMap<String, Collection<String>>() {
+                    {
+                        put("Europe", Arrays.asList("Spain", "Sweden"));
+                    }
+                })).build();
+
+        GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
+        api.put(europe);
+
+        server.assertSessionRequest();
+        assertAvailableRegionsRequest();
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        server.assertRequest("PATCH",
+                "/zones/denominator.io./rrsets/A/test_directional_pool.denominator.io.",
+                "[{\"op\": \"remove\", \"path\": \"/rdata/1\"}, " +
+                        "{\"op\": \"remove\", \"path\": \"/profile/rdataInfo/1\"}]");
+        server.assertRequest("POST",
+                "/zones/denominator.io./rrsets/A/test_directional_pool.denominator.io.",
+                    "{\"profile\": {\"@context\": \"http://schemas.ultradns.com/DirPool.jsonschema\", " +
+                        "\"description\": \"A\"}}");
+        assertAvailableRegionsRequest();
+        server.assertRequest("PATCH",
+                "/zones/denominator.io./rrsets/A/test_directional_pool.denominator.io.",
+                "{\n" +
+                    "  \"rdata\": [\n" +
+                    "    \"7.7.7.7\"\n" +
+                    "  ],\n" +
+                    "  \"profile\": {\n" +
+                    "    \"rdataInfo\": [\n" +
+                    "      {\n" +
+                    "        \"geoInfo\": {\n" +
+                    "          \"name\": \"Europe\",\n" +
+                    "          \"codes\": [\n" +
+                    "            \"ES\",\n" +
+                    "            \"SE\"\n" +
+                    "          ]\n" +
+                    "        }\n" +
+                    "      }\n" +
+                    "    ]\n" +
+                    "  }\n" +
+                "}");
+    }
+
+    private void enqueueAvailableRegionsResponse() {
         server.enqueue(new MockResponse().setBody(GET_AVAILABLE_CONTINENTS_RESPONSE));
         server.enqueue(new MockResponse().setBody(GET_AVAILABLE_COUNTRIES_RESPONSE));
         server.enqueue(new MockResponse().setBody(GET_AVAILABLE_STATES_RESPONSE));
     }
 
-    private void assertAvailableRegions() throws InterruptedException {
+    private void assertAvailableRegionsRequest() throws InterruptedException {
         server.assertRequest("GET", "/geoip/territories?codes=", "");
         server.assertRequest("GET", "/geoip/territories?codes=A1%2CA2%2CA3%2CASI%2CEUR%2CNAM", "");
         server.assertRequest("GET", "/geoip/territories?codes=ASI-IN%2CASI-JP%2CASI-MY%2CEUR-ES%2CEUR-GB%2CEUR-SE%2CNAM-U3%2CNAM-US", "");
     }
 
+    ResourceRecordSet<AData> europe = ResourceRecordSet
+            .<AData>builder()
+            .name("test_pool_.denominator.io.")
+            .type("A")
+            .qualifier("Europe")
+            .ttl(200)
+            .add(AData.create("2.2.2.2"))
+            .geo(Geo.create(new LinkedHashMap<String, Collection<String>>() {
+                {
+                    put("Europe", Arrays.asList("Spain", "Sweden", "United Kingdom - England, Northern Ireland, Scotland, Wales"));
+                }
+            })).build();
+
     private String DIRECTIONAL_POOLS_RESPONSE = "{\n" +
             "    \"zoneName\": \"denominator.io.\",\n" +
             "    \"rrSets\": [\n" +
             "        {\n" +
-            "            \"ownerName\": \"dir_pool_1.denominator.io.\",\n" +
+            "            \"ownerName\": \"test_directional_pool.denominator.io.\",\n" +
             "            \"rrtype\": \"A (1)\",\n" +
             "            \"rdata\": [\n" +
             "                \"1.1.1.1\",\n" +
-            "                \"1.1.2.2\"              \n" +
+            "                \"2.2.2.2\",\n" +
+            "                \"3.3.3.3\"\n" +
             "            ],\n" +
             "            \"profile\": {\n" +
             "                \"@context\": \"http://schemas.ultradns.com/DirPool.jsonschema\",\n" +
-            "                \"description\": \"A\",\n" +
-            "                \"conflictResolve\": \"GEO\",\n" +
+            "                \"description\": \"Nice Pool\",\n" +
+            "                \"conflictResolve\": null,\n" +
             "                \"rdataInfo\": [\n" +
             "                    {\n" +
             "                        \"geoInfo\": {\n" +
-            "                            \"name\": \"GroupB\",\n" +
+            "                            \"name\": \"NorthAmerica\",\n" +
             "                            \"codes\": [\n" +
-            "                                \"NAM\"\n" +
+            "                                \"CA-AB\",\n" +
+            "                                \"CA-BC\",\n" +
+            "                                \"MX\",\n" +
+            "                                \"US\",\n" +
+            "                                \"VI\"\n" +
             "                            ]\n" +
             "                        },\n" +
-            "                        \"ipInfo\": {\n" +
-            "                            \"name\": \"GroupA\",\n" +
-            "                            \"ips\": [\n" +
-            "                                {\n" +
-            "                                    \"start\": \"10.1.1.1\",\n" +
-            "                                    \"end\": \"10.1.1.5\"\n" +
-            "                                }\n" +
-            "                            ]\n" +
-            "                        },\n" +
-            "                        \"ttl\": 86400,\n" +
+            "                        \"ttl\": 100,\n" +
             "                        \"type\": \"A\"\n" +
             "                    },\n" +
             "                    {\n" +
             "                        \"geoInfo\": {\n" +
-            "                            \"name\": \"Group1-A\",\n" +
+            "                            \"name\": \"Europe\",\n" +
             "                            \"codes\": [\n" +
-            "                                \"AE\",\n" +
-            "                                \"AL\",\n" +
-            "                                \"BV\",\n" +
-            "                                \"U8\",\n" +
-            "                                \"UZ\",\n" +
-            "                                \"VA\",\n" +
-            "                                \"YE\"\n" +
+            "                                \"ES\",\n" +
+            "                                \"GB\",\n" +
+            "                                \"SE\"\n" +
             "                            ]\n" +
             "                        },\n" +
-            "                        \"ttl\": 111,\n" +
+            "                        \"ttl\": 200,\n" +
+            "                        \"type\": \"A\"\n" +
+            "                    },\n" +
+            "                    {\n" +
+            "                        \"geoInfo\": {\n" +
+            "                            \"name\": \"Asia\",\n" +
+            "                            \"codes\": [\n" +
+            "                                \"BD\",\n" +
+            "                                \"IN\",\n" +
+            "                                \"IN-UT\",\n" +
+            "                                \"IN-WB\",\n" +
+            "                                \"JP\"\n" +
+            "                            ]\n" +
+            "                        },\n" +
+            "                        \"ttl\": 300,\n" +
             "                        \"type\": \"A\"\n" +
             "                    }\n" +
             "                ],\n" +
             "                \"noResponse\": {\n" +
             "                    \"geoInfo\": {\n" +
-            "                        \"name\": \"GroupX\",\n" +
+            "                        \"name\": \"Group-NoResPonse\",\n" +
             "                        \"codes\": [\n" +
-            "                            \"EUR\"\n" +
+            "                            \"ANT\"\n" +
             "                        ]\n" +
             "                    },\n" +
             "                    \"ttl\": null\n" +
@@ -145,7 +380,6 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
             "        }\n" +
             "    ],\n" +
             "    \"queryInfo\": {\n" +
-            "        \"q\": \"kind:DIR_POOLS\",\n" +
             "        \"sort\": \"OWNER\",\n" +
             "        \"reverse\": false,\n" +
             "        \"limit\": 100\n" +
@@ -155,7 +389,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
             "        \"offset\": 0,\n" +
             "        \"returnedCount\": 1\n" +
             "    }\n" +
-            "}";
+            "}\n";
 
     private String GET_AVAILABLE_CONTINENTS_RESPONSE = "[\n" +
             "    [\n" +

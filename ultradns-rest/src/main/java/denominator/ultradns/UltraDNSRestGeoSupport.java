@@ -16,14 +16,11 @@ import dagger.Provides;
 import denominator.ultradns.model.DirectionalGroup;
 import denominator.ultradns.model.Region;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 @Module(injects = UltraDNSRestGeoResourceRecordSetApi.Factory.class, complete = false)
 public class UltraDNSRestGeoSupport {
 
   private UltraDNSRest api = null;
-
-  private static final Logger logger = Logger.getLogger(UltraDNSRestGeoSupport.class);
 
   public UltraDNSRestGeoSupport() {}
 
@@ -188,9 +185,7 @@ public class UltraDNSRestGeoSupport {
       } else {
         for (Map.Entry<Region, Collection<Region>> entry : regions.entrySet()) {
           for (Region region : entry.getValue()) {
-            if (region.getEffectiveCode().equals(code)) {
-              logger.info("Code Matched for " + code);
-              logger.info(entry.getKey().getName() + "  ||  "  + region.getCode());
+            if (region.getEffectiveCodeForGeo().equals(code)) {
               if (regionToTerritories.keySet().contains(entry.getKey().getName())) {
                 list = regionToTerritories.get(entry.getKey().getName());
               }
@@ -233,8 +228,7 @@ public class UltraDNSRestGeoSupport {
         while (regionsIterator.hasNext()) {
           Region region = regionsIterator.next();
           if (regionName.equals(region.getName())) {
-            logger.info("Region Matched with name: " + regionName);
-            territoryCodes.add(region.getEffectiveCode());
+            territoryCodes.add(region.getEffectiveCodeForGeo());
             break;
           }
         }

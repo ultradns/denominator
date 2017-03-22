@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static denominator.model.ResourceRecordSets.a;
 import static denominator.model.ResourceRecordSets.aaaa;
+import static denominator.model.ResourceRecordSets.ns;
 import static denominator.ultradns.UltraDNSMockResponse.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -668,6 +669,40 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.assertRequest()
             .hasMethod("DELETE")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
+  }
+
+  @Test
+  public void putFirstNsRecordAddsIt() throws Exception {
+    server.enqueueSessionResponse();
+    // Response to the request to get the RR Sets in the pool.
+    server.enqueue(new MockResponse()
+            .setResponseCode(404)
+            .setBody(UltraDNSMockResponse.getMockErrorResponse(
+                    UltraDNSRestException.DATA_NOT_FOUND,
+                    "Data not found.")));
+    // Response to the request to create the pool.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+
+    ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
+    api.put(ns("www.denominator.io.", 3600, "ns1.denominator.io."));
+
+    server.assertSessionRequest();
+
+    // Assert request to get the NS records
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.");
+
+    // Assert request to create the NS record
+    server.assertRequest()
+            .hasMethod("POST")
+            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.")
+            .hasBody("{\n" +
+                    "  \"ttl\": 3600,\n" +
+                    "  \"rdata\": [\n" +
+                    "    \"ns1.denominator.io.\"\n" +
+                    "  ]\n" +
+                    "}");
   }
 
 }

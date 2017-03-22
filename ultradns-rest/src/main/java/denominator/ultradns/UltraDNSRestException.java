@@ -77,7 +77,7 @@ class UltraDNSRestException extends FeignException {
   /**
    * No such path in target JSON document
    */
-  static final int PATH_NOT_FOUND_TO_PATCH = 17001;
+  static final int PATH_NOT_FOUND_TO_PATCH = 170001;
 
   private static final long serialVersionUID = 1L;
   private final int code;

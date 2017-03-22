@@ -184,16 +184,4 @@ public class RRSetList {
         this.rrSets = rrSets;
     }
 
-    public RRSet rrSetByNameAndType(final String name, final String type) {
-        final String typeWithTypeCode = type + " (" + lookup(type) + ")";
-        if (getRrSets() != null && !getRrSets().isEmpty()) {
-            for (RRSet rrSet : getRrSets()) {
-                if (rrSet.getOwnerName().equals(name) &&
-                        rrSet.getRrtype().equals(typeWithTypeCode)) {
-                    return rrSet;
-                }
-            }
-        }
-        return null;
-    }
 }

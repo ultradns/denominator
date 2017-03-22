@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.gson.Gson;
 import dagger.Lazy;
 import denominator.Provider;
 import denominator.common.Filter;
@@ -283,8 +284,52 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
     }
   }
 
-  public void updateDirectionalPoolRecord(String zoneName, Record record, DirectionalGroup directionalGroup) {
+  public void updateDirectionalPoolRecord(String zoneName, DirectionalRecord record, DirectionalGroup directionalGroup) {
+    int indexToUpdate = -1;
+    String rData = "";
+    int intType = lookup(record.getType());
+    List<RRSet> rrSets = new ArrayList<RRSet>();
 
+    if (record.getRdata() != null && !record.getRdata().isEmpty()) {
+      rData = StringUtils.join(record.getRdata(), " ");
+    }
+
+    try {
+      rrSets = api.getDirectionalDNSRecordsForHost(zoneName, record.getName(), intType).getRrSets();
+      if (rrSets != null && !rrSets.isEmpty()) {
+        RRSet rrSet = rrSets.get(0);
+        if (rrSet != null & rrSet.getRdata() != null) {
+          indexToUpdate = rrSet.getRdata().indexOf(rData);
+        }
+      }
+    } catch (UltraDNSRestException e) {
+      if (e.code() != UltraDNSRestException.DATA_NOT_FOUND) {
+        throw e;
+      }
+    }
+
+    if (indexToUpdate >= 0 ) {
+      RDataInfo rDataInfo = rrSets.get(0).getProfile().getRdataInfo().get(indexToUpdate);
+      GeoInfo geoInfo = new GeoInfo();
+      geoInfo.setCodes(ultraDNSRestGeoSupport.getTerritoryCodes(directionalGroup));
+      geoInfo.setName(directionalGroup.getName());
+      rDataInfo.setGeoInfo(geoInfo);
+      if (record.getTtl() != 0) {
+        rDataInfo.setTtl(record.getTtl());
+      }
+
+      try {
+        Gson gson = new Gson();
+        logger.info("JSON is: \n" + gson.toJson(rDataInfo));
+        api.updateDirectionalPoolRecord(zoneName, record.getName(), record.getType(), gson.toJson(rDataInfo) ,indexToUpdate);
+      } catch (UltraDNSRestException e) {
+        if (e.code() != UltraDNSRestException.PATH_NOT_FOUND_TO_PATCH) {
+          throw e;
+        }
+      }
+    } else {
+      // we can add here
+    }
   }
 
   private void deleteDirectionalPoolRecord(DirectionalRecord record) {

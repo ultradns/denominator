@@ -159,12 +159,21 @@ interface UltraDNSRest {
                                   @Param("hostName") String hostName,
                                   @Param("poolRecordType") String type,
                                   RRSet rrSet);
-  /**
-   * @throws UltraDNSRestException with code {@link UltraDNSRestException#RESOURCE_RECORD_ALREADY_EXISTS}.
-   */
-  @RequestLine("POST")
-  void updateDirectionalPoolRecord(@Param("record") DirectionalRecord update,
-                                   @Param("group") DirectionalGroup group);
+
+  @Headers("Content-Type: application/json-patch+json")
+  @RequestLine("PATCH /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
+  @Body("%5B" +
+          "%7B" +
+            "\"op\": \"replace\", " +
+            "\"path\": \"/profile/rdataInfo/{index}\", " +
+            "\"value\": {rDataInfo}" +
+          "%7D" +
+        "%5D")
+  void updateDirectionalPoolRecord(@Param("zoneName") String zoneName,
+                                   @Param("hostName") String name,
+                                   @Param("poolRecordType") String type,
+                                   @Param("rDataInfo") String rDataInfo,
+                                   @Param("index") int index);
 
   @RequestLine("GET /zones/{zoneName}/rrsets/?q=kind:DIR_POOLS")
   RRSetList getDirectionalPoolsOfZone(@Param("zoneName") String zoneName);
@@ -213,8 +222,4 @@ interface UltraDNSRest {
   void deleteDirectionalNoResponseRecord(@Param("zoneName") String zoneName,
                                          @Param("hostName") String name,
                                          @Param("poolRecordType") String type);
-
-  @RequestLine("POST")
-  @Body("<v01:deleteDirectionalPool><transactionID /><dirPoolID>{dirPoolID}</dirPoolID><retainRecordID /></v01:deleteDirectionalPool>")
-  void deleteDirectionalPool(@Param("dirPoolID") String dirPoolID);
 }

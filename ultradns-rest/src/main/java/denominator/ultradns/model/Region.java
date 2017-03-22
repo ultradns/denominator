@@ -81,6 +81,9 @@ public class Region implements Comparable<Region> {
   }
 
   public String getEffectiveCode() {
+    if (this.effectiveCode == null && this.code != null) {
+      this.setEffectiveCode();
+    }
     return this.effectiveCode;
   }
 
@@ -104,6 +107,9 @@ public class Region implements Comparable<Region> {
   }
 
   public String getEffectiveCodeForGeo() {
+    if (this.effectiveCodeForGeo == null && this.code != null) {
+      this.setEffectiveCodeForGeo();
+    }
     return this.effectiveCodeForGeo;
   }
 
@@ -210,8 +216,8 @@ public class Region implements Comparable<Region> {
     str += ", \"name\": \"" + this.name + "\"";
     str += ", \"type\": \"" + this.type + "\"";
     str += ", \"id\": " + this.id;
-    str += ", \"effectiveCode\": \"" + this.effectiveCode + "\"";
-    str += ", \"effectiveCodeForGeo\": \"" + this.effectiveCodeForGeo + "\"";
+    str += ", \"effectiveCode\": \"" + this.getEffectiveCode() + "\"";
+    str += ", \"effectiveCodeForGeo\": \"" + this.getEffectiveCodeForGeo() + "\"";
     str += "}";
     return str;
   }

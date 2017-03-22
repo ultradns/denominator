@@ -62,7 +62,7 @@ public class RegionTest {
     public void testToString() throws Exception {
         Region region = new Region("South America", "SAM", "Region", 12);
         region.setEffectiveCode();
-        assertThat(region.toString()).isEqualTo("{\"code\": \"SAM\", \"name\": \"South America\", \"type\": \"Region\", \"id\": 12, \"effectiveCode\": \"SAM\"}");
+        assertThat(region.toString()).isEqualTo("{\"code\": \"SAM\", \"name\": \"South America\", \"type\": \"Region\", \"id\": 12, \"effectiveCode\": \"SAM\", \"effectiveCodeForGeo\": \"SAM\"}");
     }
 
     @Test

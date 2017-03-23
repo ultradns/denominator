@@ -117,19 +117,9 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
   }
 
   private void update(String name, String type, int ttlToApply, List<Record> toUpdate) {
-    if (roundRobinPoolApi.isPoolType(type)) {
-      // RRSet rrSet = roundRobinPoolApi.getPoolByNameAndType(name, type);
-      Gson gson = new Gson();
-      for (Record record : toUpdate) {
-        // api.updateRecordOfRRPool(record.id, lbPoolId, record.rdata.get(0), ttlToApply);
-        api.updateRecordOfRRPool(zoneName, lookup(type), name, ttlToApply, gson.toJson(record.getRdata()), gson.toJson(record.getProfile()));
-        // api.updateRecordOfRRPool(zoneName, lookup(type), name, ttlToApply, record.getName());
-      }
-    } else {
-      for (Record record : toUpdate) {
-        record.ttl = ttlToApply;
-        api.partialUpdateResourceRecord(zoneName, record.getTypeCode(), name, record.buildRRSet());
-      }
+    for (Record record : toUpdate) {
+      record.ttl = ttlToApply;
+      api.partialUpdateResourceRecord(zoneName, record.getTypeCode(), name, record.buildRRSet());
     }
   }
 

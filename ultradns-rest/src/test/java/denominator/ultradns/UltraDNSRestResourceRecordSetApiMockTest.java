@@ -748,4 +748,53 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
                     "}");
   }
 
+  @Test
+  public void putMethodInvocationSoThatOneNsRecordIsDeleted() throws Exception {
+    server.enqueueSessionResponse();
+    // Response to the request to get the RR Sets for the owner name in put().
+    server.enqueue(new MockResponse().setBody(RR_SET_LIST_WITH_TWO_NS_RECORDS));
+    // Response to api.getResourceRecordsOfDNameByType(zoneName, name, intType) in remove().
+    server.enqueue(new MockResponse().setBody(RR_SET_LIST_WITH_TWO_NS_RECORDS));
+    // Response to the request to delete a NS resource record in remove().
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+    // Response to the request to update a NS resource record in create().
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+
+    ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
+    api.put(ns("www.denominator.io.", 4800, "ns1.denominator.io."));
+
+    server.assertSessionRequest();
+
+    // Assert request to get the NS records
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.");
+
+    // Assert request to get the NS records
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.");
+    // Assert request to delete a NS record
+    server.assertRequest()
+            .hasMethod("PATCH")
+            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.")
+            .hasBody("[" +
+                      "{" +
+                        "\"op\": \"remove\", " +
+                        "\"path\": \"/rdata/1\"" +
+                      "}" +
+                    "]");
+
+    // Assert request to update the NS record
+    server.assertRequest()
+            .hasMethod("PATCH")
+            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.")
+            .hasBody("{\n" +
+                    "  \"ttl\": 4800,\n" +
+                    "  \"rdata\": [\n" +
+                    "    \"ns1.denominator.io.\"\n" +
+                    "  ]\n" +
+                    "}");
+  }
+
 }

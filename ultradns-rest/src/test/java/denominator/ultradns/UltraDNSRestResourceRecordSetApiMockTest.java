@@ -705,4 +705,47 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
                     "}");
   }
 
+  @Test
+  public void putSecondNsRecordAddsIt() throws Exception {
+    server.enqueueSessionResponse();
+    // Response to the request to get the RR Sets for the owner name.
+    server.enqueue(new MockResponse().setBody(RR_SET_LIST_WITH_ONE_NS_RECORD));
+    // Response to the request to update the pool.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+    // Response to the request to create the pool.
+    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
+
+    ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
+    api.put(ns("www.denominator.io.", 2400, Arrays.asList("ns1.denominator.io.", "ns2.denominator.io.")));
+
+    server.assertSessionRequest();
+
+    // Assert request to get the NS records
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.");
+
+    // Assert request to update the NS record
+    server.assertRequest()
+            .hasMethod("PATCH")
+            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.")
+            .hasBody("{\n" +
+                    "  \"ttl\": 2400,\n" +
+                    "  \"rdata\": [\n" +
+                    "    \"ns1.denominator.io.\"\n" +
+                    "  ]\n" +
+                    "}");
+
+    // Assert request to create the NS record
+    server.assertRequest()
+            .hasMethod("POST")
+            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.")
+            .hasBody("{\n" +
+                    "  \"ttl\": 2400,\n" +
+                    "  \"rdata\": [\n" +
+                    "    \"ns2.denominator.io.\"\n" +
+                    "  ]\n" +
+                    "}");
+  }
+
 }

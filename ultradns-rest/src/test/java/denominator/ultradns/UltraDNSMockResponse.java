@@ -383,6 +383,30 @@ public class UltraDNSMockResponse {
             "    }\n" +
             "}\n";
 
+    public static final String RR_SET_LIST_WITH_ONE_NS_RECORD = "{\n" +
+            "  \"zoneName\": \"denominator.io.\",\n" +
+            "  \"rrSets\": [\n" +
+            "    {\n" +
+            "      \"ownerName\": \"www.denominator.io.\",\n" +
+            "      \"rrtype\": \"NS (2)\",\n" +
+            "      \"ttl\": 3600,\n" +
+            "      \"rdata\": [\n" +
+            "        \"ns1.denominator.io.\"\n" +
+            "      ]\n" +
+            "    }\n" +
+            "  ],\n" +
+            "  \"queryInfo\": {\n" +
+            "    \"sort\": \"OWNER\",\n" +
+            "    \"reverse\": false,\n" +
+            "    \"limit\": 100\n" +
+            "  },\n" +
+            "  \"resultInfo\": {\n" +
+            "    \"totalCount\": 1,\n" +
+            "    \"offset\": 0,\n" +
+            "    \"returnedCount\": 1\n" +
+            "  }\n" +
+            "}";
+
     public static final String GET_SOA_RESOURCE_RECORDS = "{\n" +
             "    \"zoneName\": \"denominator.io.\",\n" +
             "    \"rrSets\": [\n" +

@@ -40,8 +40,6 @@ public class UltraDNSRestGeoSupport {
         availableRegions.put(regionSubregions.getKey(), regionSubregions.getValue());
       }
     }
-
-    System.out.println("In UltraDNSRestGeoSupport.java, in regions(), returning: " + (new Gson()).toJson(availableRegions));
     return availableRegions;
   }
 

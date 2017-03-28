@@ -310,13 +310,11 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
 
     if (indexToUpdate >= 0 ) {
       RDataInfo rDataInfo = rrSets.get(0).getProfile().getRdataInfo().get(indexToUpdate);
-      GeoInfo geoInfo = new GeoInfo();
+      GeoInfo geoInfo = rDataInfo.getGeoInfo();
       geoInfo.setCodes(ultraDNSRestGeoSupport.getTerritoryCodes(directionalGroup));
       geoInfo.setName(directionalGroup.getName());
       rDataInfo.setGeoInfo(geoInfo);
-      if (record.getTtl() != 0) {
-        rDataInfo.setTtl(record.getTtl());
-      }
+      rDataInfo.setTtl(record.getTtl());
 
       try {
         Gson gson = new Gson();
@@ -327,8 +325,6 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
           throw e;
         }
       }
-    } else {
-      // we can add here
     }
   }
 

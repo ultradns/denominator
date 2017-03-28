@@ -1,15 +1,11 @@
 package denominator.ultradns.model;
 
-import org.apache.log4j.Logger;
-
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.TreeSet;
-
-import static denominator.ResourceTypeToValue.lookup;
 
 public class RRSetList {
 
@@ -18,27 +14,27 @@ public class RRSetList {
 
     private final String DIR_POOL_SCHEMA ="http://schemas.ultradns.com/DirPool.jsonschema";
 
-    private static final Logger logger = Logger.getLogger(RRSetList.class);
-
     public List<Record> buildRecords(){
         List<Record> records = new ArrayList<Record>();
         if (getRrSets() != null && !getRrSets().isEmpty()) {
             for (RRSet rrSet : getRrSets()){
-                /**
-                 * Creation of ResourceRecord with rData
-                 */
-                if (rrSet.getRdata() != null && !rrSet.getRdata().isEmpty()) {
-                    for (String rData : rrSet.getRdata()){
-                        Record r = new Record();
-                        r.setName(rrSet.getOwnerName());
-                        r.setTypeCode(rrSet.intValueOfRrtype());
-                        if (rrSet.getTtl() != null) {
-                            r.setTtl(rrSet.getTtl());
+                if (!isDirectionalRecord(rrSet)) {
+                    /**
+                     * Creation of ResourceRecord with rData
+                     */
+                    if (rrSet.getRdata() != null && !rrSet.getRdata().isEmpty()) {
+                        for (String rData : rrSet.getRdata()) {
+                            Record r = new Record();
+                            r.setName(rrSet.getOwnerName());
+                            r.setTypeCode(rrSet.intValueOfRrtype());
+                            if (rrSet.getTtl() != null) {
+                                r.setTtl(rrSet.getTtl());
+                            }
+                            if (rData != null) {
+                                r.setRdata(Arrays.asList(rData.split("\\s")));
+                            }
+                            records.add(r);
                         }
-                        if (rData != null) {
-                            r.setRdata(Arrays.asList(rData.split("\\s")));
-                        }
-                        records.add(r);
                     }
                 }
             }
@@ -50,7 +46,7 @@ public class RRSetList {
         List<DirectionalRecord> records = new ArrayList<DirectionalRecord>();
         if (getRrSets() != null && !getRrSets().isEmpty()) {
             for (RRSet rrSet : getRrSets()) {
-                if ( rrSet.getProfile() != null && rrSet.getProfile() != null && rrSet.getProfile().getContext().equals(DIR_POOL_SCHEMA)) {
+                if (isDirectionalRecord(rrSet)) {
                     List<String> rDataList = new ArrayList<String>();
                     List<RDataInfo> rDataInfoList = new ArrayList<RDataInfo>();
 
@@ -164,8 +160,12 @@ public class RRSetList {
         return countryCodes;
     }
 
-    public void isDirectionalRecord(DirectionalRecord r) {
-
+    private boolean isDirectionalRecord(RRSet rrSet) {
+        return (
+            rrSet.getProfile() != null
+            && rrSet.getProfile().getContext() != null
+            && rrSet.getProfile().getContext().equals(DIR_POOL_SCHEMA)
+        );
     }
 
     public String getZoneName() {

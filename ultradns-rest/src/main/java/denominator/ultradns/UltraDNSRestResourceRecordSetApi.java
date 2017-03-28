@@ -36,8 +36,6 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
 
   @Override
   public Iterator<ResourceRecordSet<?>> iterator() {
-    // this will list all basic or RR pool records.
-    // In Progress - Arghya 31/01/17
     Iterator<Record> orderedRecords = api
             .getResourceRecordsOfZone(zoneName)
             .buildRecords()

@@ -37,8 +37,8 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
         this.session = session;
         this.credentials = credentials;
         this.sessionValid = sessionValid;
-        // As per UltraDNS Authentication API Response
-        this.durationMillis = 3600 * 1000;
+        this.durationMillis = Long.parseLong(UltraDNSRestPropertyLoader
+                .getProperty("ultradns.rest.token.expiry.millis"));
     }
 
     @Override

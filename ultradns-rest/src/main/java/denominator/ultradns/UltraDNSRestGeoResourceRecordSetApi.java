@@ -98,7 +98,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
 
   @Override
   public Iterator<ResourceRecordSet<?>> iterateByName(String name) {
-    return iteratorForDNameAndDirectionalType(checkNotNull(name, "description"), 0);
+    return iteratorForDNameAndDirectionalType(checkNotNull(name, "description"), 255);
   }
 
   @Override

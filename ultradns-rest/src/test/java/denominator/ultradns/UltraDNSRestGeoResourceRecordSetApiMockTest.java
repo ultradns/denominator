@@ -1,14 +1,15 @@
 package denominator.ultradns;
 
 import com.squareup.okhttp.mockwebserver.MockResponse;
+import static denominator.assertj.ModelAssertions.assertThat;
 import denominator.model.ResourceRecordSet;
 import denominator.model.profile.Geo;
 import denominator.model.rdata.AData;
 import denominator.profile.GeoResourceRecordSetApi;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,7 +17,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import static denominator.ultradns.UltraDNSRestException.DIRECTIONAL_NOT_ENABLED;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class UltraDNSRestGeoResourceRecordSetApiMockTest {
 
@@ -51,38 +51,90 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
         assertAvailableRegionsRequest();
     }
 
-    /**
-     * WIP - Need to Debug the logic
-     * @throws Exception
-     */
     @Test
-    @Ignore
     public void listWhenPresent() throws Exception {
         server.enqueueSessionResponse();
         enqueueAvailableRegionsResponse();
         server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
         server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
-        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
-        enqueueAvailableRegionsResponse();
-        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
-        enqueueAvailableRegionsResponse();
+        enqueueDirectionalDNSGroupByName();
+        enqueueDirectionalDNSGroupByName();
+        enqueueDirectionalDNSGroupByName();
 
         GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
         Iterator<ResourceRecordSet<?>> iterator = api.iterator();
-        /*System.out.println("in listWhenPresent(), iterator = " + iterator);
-        System.out.println("in listWhenPresent(), iterator.hasNext() = " + iterator.hasNext());
-        ResourceRecordSet<?> nextElement = iterator.next();
-        System.out.println("iterator.next() = " + nextElement);*/
 
-        /*int i=1;
-        while (iterator.hasNext()) {
-            System.out.println("----|" +  iterator.next());
-        }*/
+        assertNorthAmerica(iterator.next());
+        assertEurope(iterator.next());
+        assertAsia(iterator.next());
+        assertThat(iterator).isEmpty();
 
-       /* server.assertSessionRequest();
+        server.assertSessionRequest();
         assertAvailableRegionsRequest();
-        server.assertRequest("GET", "/zones/denominator.io./rrsets/?q=kind%3ADIR_POOLS", "");*/
-        // server.assertRequest("GET", "/zones/denominator.io./rrsets/A/dir_pool_1.denominator.io.?q=kind:DIR_POOLS", "");
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/?q=kind%3ADIR_POOLS",
+                "");
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        assertDirectionalDNSGroupByName();
+        assertDirectionalDNSGroupByName();
+        assertDirectionalDNSGroupByName();
+    }
+
+    @Test
+    public void iterateByNameWhenPresent() throws Exception {
+        server.enqueueSessionResponse();
+        enqueueAvailableRegionsResponse();
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        enqueueDirectionalDNSGroupByName();
+        enqueueDirectionalDNSGroupByName();
+        enqueueDirectionalDNSGroupByName();
+
+        GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
+        Iterator<ResourceRecordSet<?>> iterator = api.iterateByName("test_directional_pool.denominator.io.");
+
+        assertNorthAmerica(iterator.next());
+        assertEurope(iterator.next());
+        assertAsia(iterator.next());
+        assertThat(iterator).isEmpty();
+
+        server.assertSessionRequest();
+        assertAvailableRegionsRequest();
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/255/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        assertDirectionalDNSGroupByName();
+        assertDirectionalDNSGroupByName();
+        assertDirectionalDNSGroupByName();
+
+    }
+
+    @Test
+    public void iterateByNameAndTypeWhenPresent() throws Exception {
+        server.enqueueSessionResponse();
+        enqueueAvailableRegionsResponse();
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        enqueueDirectionalDNSGroupByName();
+        enqueueDirectionalDNSGroupByName();
+        enqueueDirectionalDNSGroupByName();
+
+        GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
+        Iterator<ResourceRecordSet<?>> iterator = api.iterateByNameAndType("test_directional_pool.denominator.io.", "A");
+
+        assertNorthAmerica(iterator.next());
+        assertEurope(iterator.next());
+        assertAsia(iterator.next());
+        assertThat(iterator).isEmpty();
+
+        server.assertSessionRequest();
+        assertAvailableRegionsRequest();
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        assertDirectionalDNSGroupByName();
+        assertDirectionalDNSGroupByName();
+        assertDirectionalDNSGroupByName();
     }
 
     @Test
@@ -285,6 +337,18 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
                 "}");
     }
 
+    private void enqueueDirectionalDNSGroupByName() {
+        server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
+        enqueueAvailableRegionsResponse();
+    }
+
+    private void assertDirectionalDNSGroupByName() throws InterruptedException {
+        server.assertRequest("GET",
+                "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
+                "");
+        assertAvailableRegionsRequest();
+    }
+
     private void enqueueAvailableRegionsResponse() {
         server.enqueue(new MockResponse().setBody(GET_AVAILABLE_CONTINENTS_RESPONSE));
         server.enqueue(new MockResponse().setBody(GET_AVAILABLE_COUNTRIES_RESPONSE));
@@ -297,18 +361,36 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
         server.assertRequest("GET", "/geoip/territories?codes=ASI-IN%2CASI-JP%2CASI-MY%2CEUR-ES%2CEUR-GB%2CEUR-SE%2CNAM-U3%2CNAM-US", "");
     }
 
-    ResourceRecordSet<AData> europe = ResourceRecordSet
-            .<AData>builder()
-            .name("test_pool_.denominator.io.")
-            .type("A")
-            .qualifier("Europe")
-            .ttl(200)
-            .add(AData.create("2.2.2.2"))
-            .geo(Geo.create(new LinkedHashMap<String, Collection<String>>() {
-                {
-                    put("Europe", Arrays.asList("Spain", "Sweden", "United Kingdom - England, Northern Ireland, Scotland, Wales"));
-                }
-            })).build();
+    private void assertNorthAmerica(ResourceRecordSet<?> actual) {
+        assertThat(actual)
+                .hasName("test_directional_pool.denominator.io.")
+                .hasType("A")
+                .hasQualifier("NorthAmerica")
+                .hasTtl(100)
+                .containsExactlyRecords(AData.create("1.1.1.1"))
+                .containsRegion("North America", "United States", "U.S. Virgin Islands");
+    }
+
+    private void assertEurope(ResourceRecordSet<?> actual) {
+        assertThat(actual)
+                .hasName("test_directional_pool.denominator.io.")
+                .hasType("A")
+                .hasQualifier("Europe")
+                .hasTtl(200)
+                .containsExactlyRecords(AData.create("2.2.2.2"))
+                .containsRegion("Europe", "Spain", "United Kingdom - England, Northern Ireland, Scotland, Wales", "Sweden");
+    }
+
+    private void assertAsia(ResourceRecordSet<?> actual) {
+        assertThat(actual)
+                .hasName("test_directional_pool.denominator.io.")
+                .hasType("A")
+                .hasQualifier("Asia")
+                .hasTtl(300)
+                .containsExactlyRecords(AData.create("3.3.3.3"))
+                .containsRegion("Asia", "India", "Japan")
+                .containsRegion("India", "West Bengal");
+    }
 
     private String DIRECTIONAL_POOLS_RESPONSE = "{\n" +
             "    \"zoneName\": \"denominator.io.\",\n" +

@@ -160,7 +160,7 @@ public class UltraDNSRestGeoSupport {
     return  directionalGroup;
   }
 
-  public Map<String, Collection<String>> getRegionToTerritories(TreeSet<String> codes) {
+  private Map<String, Collection<String>> getRegionToTerritories(TreeSet<String> codes) {
 
     Map<Region, Collection<Region>> regions = regionsAsRegions();
     Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();

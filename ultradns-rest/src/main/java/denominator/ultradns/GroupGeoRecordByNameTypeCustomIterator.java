@@ -56,12 +56,20 @@ class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordS
     if (!peekingIterator.hasNext()) {
       return false;
     }
-    DirectionalRecord record = peekingIterator.peek();
-    if (record.isNoResponseRecord()) {
-      // TODO: log as this is unsupported
-      peekingIterator.next();
+    DirectionalRecord record;
+    while (true) {
+      if (peekingIterator.hasNext()) {
+        record = peekingIterator.peek();
+        if (record.isNoResponseRecord()) {
+          // TODO: log as this is unsupported
+          peekingIterator.next();
+        } else {
+          return true;
+        }
+      } else {
+        return false;
+      }
     }
-    return true;
   }
 
   @Override

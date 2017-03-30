@@ -4,7 +4,6 @@ import denominator.Provider;
 import feign.Request;
 import feign.RequestTemplate;
 import feign.Target;
-import org.apache.log4j.Logger;
 
 import javax.inject.Inject;
 

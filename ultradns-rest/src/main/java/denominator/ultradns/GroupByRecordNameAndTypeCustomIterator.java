@@ -21,7 +21,7 @@ class GroupByRecordNameAndTypeCustomIterator implements Iterator<ResourceRecordS
   }
 
   static boolean fqdnAndTypeEquals(Record actual, Record expected) {
-    return actual.name.equals(expected.name) && actual.typeCode == expected.typeCode;
+    return actual.getName().equals(expected.getName()) && actual.getTypeCode() == expected.getTypeCode();
   }
 
   @Override
@@ -32,19 +32,19 @@ class GroupByRecordNameAndTypeCustomIterator implements Iterator<ResourceRecordS
   @Override
   public ResourceRecordSet<?> next() {
     Record record = peekingIterator.next();
-    String type = ResourceTypeToValue.lookup(record.typeCode);
+    String type = ResourceTypeToValue.lookup(record.getTypeCode());
     Builder<Map<String, Object>> builder = ResourceRecordSet.builder()
-        .name(record.name)
+        .name(record.getName())
         .type(type)
-        .ttl(record.ttl);
+        .ttl(record.getTtl());
 
-    builder.add(toMap(type, record.rdata));
+    builder.add(toMap(type, record.getRdata()));
 
     while (hasNext()) {
       Record next = peekingIterator.peek();
       if (fqdnAndTypeEquals(next, record)) {
         peekingIterator.next();
-        builder.add(toMap(type, next.rdata));
+        builder.add(toMap(type, next.getRdata()));
       } else {
         break;
       }

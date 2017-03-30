@@ -105,7 +105,7 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
     List<Record> soas = api.getResourceRecordsOfDNameByType(name, name, 6).buildRecords();
     checkState(!soas.isEmpty(), "SOA record for zone %s was not present", name);
     Record soa = soas.get(0);
-    return Zone.create(name, name, soa.ttl, soa.rdata.get(1));
+    return Zone.create(name, name, soa.getTtl(), soa.getRdata().get(1));
   }
 
   private String getCurrentAccountName(){

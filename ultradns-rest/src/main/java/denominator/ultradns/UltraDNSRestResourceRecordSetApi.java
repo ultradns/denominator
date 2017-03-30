@@ -95,10 +95,10 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
 
     for (Iterator<Record> shouldUpdate = toUpdate.iterator(); shouldUpdate.hasNext();) {
       Record record = shouldUpdate.next();
-      Map<String, Object> rdata = toMap(rrset.type(), record.rdata);
+      Map<String, Object> rdata = toMap(rrset.type(), record.getRdata());
       if (toCreate.contains(rdata)) {
         toCreate.remove(rdata);
-        if (ttlToApply == record.ttl) {
+        if (ttlToApply == record.getTtl()) {
           shouldUpdate.remove();
         }
       } else {
@@ -116,7 +116,7 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
 
   private void update(String name, String type, int ttlToApply, List<Record> toUpdate) {
     for (Record record : toUpdate) {
-      record.ttl = ttlToApply;
+      record.setTtl(ttlToApply);
       api.partialUpdateResourceRecord(zoneName, record.getTypeCode(), name, record.buildRRSet());
     }
   }
@@ -126,13 +126,13 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
       roundRobinPoolApi.add(name, type, ttl, rdatas);
     } else {
       Record record = new Record();
-      record.name = name;
-      record.typeCode = lookup(type);
-      record.ttl = ttl;
+      record.setName(name);
+      record.setTypeCode(lookup(type));
+      record.setTtl(ttl);
 
       for (Map<String, Object> rdata : rdatas) {
         for (Object rdatum : rdata.values()) {
-          record.rdata.add(rdatum.toString());
+          record.getRdata().add(rdatum.toString());
         }
         api.createResourceRecord(zoneName, record.getTypeCode(), name, record.buildRRSet());
       }

@@ -43,7 +43,7 @@ class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordS
 
   static boolean typeTTLAndGeoGroupEquals(DirectionalRecord actual, DirectionalRecord expected) {
     return actual.getType().equals(expected.getType())
-            && actual.ttl == expected.ttl
+            && actual.getTtl() == expected.getTtl()
             && actual.getGeoGroupName().equals(expected.getGeoGroupName())
             && actual.getName().equals(expected.getName());
   }
@@ -78,14 +78,14 @@ class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordS
 
     Builder<Map<String, Object>>
         builder =
-        ResourceRecordSet.builder().name(record.name).type(record.getType())
-            .qualifier(record.getGeoGroupName()).ttl(record.ttl);
+        ResourceRecordSet.builder().name(record.getName()).type(record.getType())
+            .qualifier(record.getGeoGroupName()).ttl(record.getTtl());
 
-    builder.add(toMap(record.getType(), record.rdata));
+    builder.add(toMap(record.getType(), record.getRdata()));
 
     final String key = record.getName() + "||" + record.getType() + "||" + record.getGeoGroupName();
     if (!cache.containsKey(key)) {
-      Geo profile = Geo.create(ultraDNSRestGeoSupport.getDirectionalDNSGroupByName(zoneName, record.name,
+      Geo profile = Geo.create(ultraDNSRestGeoSupport.getDirectionalDNSGroupByName(zoneName, record.getName(),
               dirType(record.getType()), record.getGeoGroupName()).getRegionToTerritories());
       cache.put(key, profile);
     }
@@ -95,7 +95,7 @@ class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordS
       DirectionalRecord next = peekingIterator.peek();
       if (typeTTLAndGeoGroupEquals(next, record)) {
         peekingIterator.next();
-        builder.add(toMap(record.getType(), next.rdata));
+        builder.add(toMap(record.getType(), next.getRdata()));
       } else {
         break;
       }

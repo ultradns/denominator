@@ -34,7 +34,7 @@ final class UltraDNSRestFilters {
 
     @Override
     public boolean apply(Record in) {
-      return typeValue == in.typeCode;
+      return typeValue == in.getTypeCode();
     }
 
     @Override
@@ -54,7 +54,7 @@ final class UltraDNSRestFilters {
 
     @Override
     public boolean apply(Record in) {
-      return id.equals(in.id);
+      return id.equals(in.getName());
     }
 
     @Override

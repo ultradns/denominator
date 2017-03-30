@@ -5,32 +5,14 @@ import java.util.List;
 
 public class Record {
 
-    public String id;
-    public Long created;
-    public String name;
-    public int typeCode;
-    public int ttl;
-    public List<String> rdata = new ArrayList<String>();
-    public Profile profile;
+    private String name;
+    private int typeCode;
+    private int ttl;
+    private List<String> rdata = new ArrayList<String>();
+    private Profile profile;
 
     public RRSet buildRRSet(){
         return new RRSet(getTtl(), getRdata());
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Long getCreated() {
-        return created;
-    }
-
-    public void setCreated(Long created) {
-        this.created = created;
     }
 
     public String getName() {

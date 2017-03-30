@@ -188,16 +188,16 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
 
     while (iterator.hasNext()) {
       DirectionalRecord record = iterator.next();
-      Map<String, Object> rdata = toMap(record.getType(), record.rdata);
+      Map<String, Object> rdata = toMap(record.getType(), record.getRdata());
 
       if (recordsLeftToCreate.contains(rdata)) {
         recordsLeftToCreate.remove(rdata);
         boolean shouldUpdate = false;
-        if (ttlToApply != record.ttl) {
-          record.ttl = ttlToApply;
+        if (ttlToApply != record.getTtl()) {
+          record.setTtl(ttlToApply);
           shouldUpdate = true;
         } else {
-          directionalGroup = ultraDNSRestGeoSupport.getDirectionalDNSGroupByName(zoneName, record.name,
+          directionalGroup = ultraDNSRestGeoSupport.getDirectionalDNSGroupByName(zoneName, record.getName(),
                   dirType(record.getType()), record.getGeoGroupName());
           if (!regions.equals(directionalGroup.getRegionToTerritories())) {
             directionalGroup.setRegionToTerritories(regions);
@@ -232,7 +232,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
 
       for (Map<String, Object> rdata : recordsLeftToCreate) {
         for (Object rDatum : rdata.values()) {
-          record.rdata.add(rDatum.toString());
+          record.getRdata().add(rDatum.toString());
         }
         addDirectionalPoolRecord(zoneName, poolName, record, directionalGroup);
       }

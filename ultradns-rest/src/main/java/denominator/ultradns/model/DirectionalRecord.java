@@ -2,19 +2,10 @@ package denominator.ultradns.model;
 
 public class DirectionalRecord extends Record {
 
-    String geoGroupId;
-    String geoGroupName;
-    String ipGroupName;
-    boolean noResponseRecord;
-    String type;
-
-    public String getGeoGroupId() {
-        return geoGroupId;
-    }
-
-    public void setGeoGroupId(String geoGroupId) {
-        this.geoGroupId = geoGroupId;
-    }
+    private String geoGroupName;
+    private String ipGroupName;
+    private boolean noResponseRecord;
+    private String type;
 
     public String getGeoGroupName() {
         return geoGroupName;

@@ -6,8 +6,8 @@ import java.util.TreeMap;
 
 public class DirectionalGroup {
 
-    String name;
-    Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
+    private String name;
+    private Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
 
     public String getName() {
         return name;

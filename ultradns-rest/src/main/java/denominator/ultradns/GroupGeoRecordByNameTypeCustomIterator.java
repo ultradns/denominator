@@ -11,7 +11,7 @@ import denominator.model.ResourceRecordSet;
 import denominator.model.ResourceRecordSet.Builder;
 import denominator.model.profile.Geo;
 import denominator.ultradns.model.DirectionalRecord;
-import denominator.ultradns.model.DirectionalGroup;
+import denominator.ResourceTypeToValue.ResourceTypes;
 
 import static denominator.ResourceTypeToValue.lookup;
 import static denominator.common.Util.peekingIterator;
@@ -104,10 +104,10 @@ class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordS
   }
 
   public int dirType(String type) {
-    if ("A".equals(type) || "CNAME".equals(type)) {
-      return lookup("A");
-    } else if ("AAAA".equals(type)) {
-      return lookup("AAAA");
+    if (ResourceTypes.A.name().equals(type) || ResourceTypes.CNAME.name().equals(type)) {
+      return lookup(ResourceTypes.A.name());
+    } else if (ResourceTypes.AAAA.name().equals(type)) {
+      return lookup(ResourceTypes.AAAA.name());
     } else {
       return lookup(type);
     }

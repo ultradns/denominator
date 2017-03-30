@@ -3,12 +3,11 @@ package denominator.ultradns;
 import java.util.List;
 import java.util.Map;
 
-import denominator.ultradns.model.RRSet;
-import denominator.ultradns.model.RRSetList;
-
 import static denominator.ResourceTypeToValue.lookup;
 import static denominator.common.Preconditions.checkNotNull;
 import static denominator.common.Preconditions.checkState;
+
+import denominator.ResourceTypeToValue.ResourceTypes;
 
 class UltraDNSRestRoundRobinPoolApi {
 
@@ -21,7 +20,7 @@ class UltraDNSRestRoundRobinPoolApi {
   }
 
   boolean isPoolType(String type) {
-    return type.equals("A") || type.equals("AAAA");
+    return type.equals(ResourceTypes.A.name()) || type.equals(ResourceTypes.AAAA.name());
   }
 
   void add(String name, String type, int ttl, List<Map<String, Object>> rdatas) {

@@ -6,10 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -24,7 +21,6 @@ import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.RDataInfo;
 import denominator.ultradns.model.GeoInfo;
 import denominator.ultradns.model.Profile;
-import denominator.ultradns.model.Record;
 import denominator.ultradns.model.DirectionalRecord;
 import denominator.ultradns.model.DirectionalGroup;
 import org.apache.commons.lang.StringUtils;
@@ -38,6 +34,7 @@ import static denominator.common.Util.filter;
 import static denominator.common.Util.nextOrNull;
 import static denominator.common.Util.toMap;
 import static denominator.model.ResourceRecordSets.nameAndTypeEqualTo;
+import denominator.ResourceTypeToValue.ResourceTypes;
 
 final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetApi {
   private static final Logger logger = Logger.getLogger(UltraDNSRestGeoResourceRecordSetApi.class);
@@ -57,7 +54,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
   private final Filter<DirectionalRecord> isCNAME = new Filter<DirectionalRecord>() {
     @Override
     public boolean apply(DirectionalRecord input) {
-      return "CNAME".equals(input.getType());
+      return ResourceTypes.CNAME.name().equals(input.getType());
     }
   };
   private final UltraDNSRestGeoSupport ultraDNSRestGeoSupport;
@@ -109,13 +106,17 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
     if (!supportedTypes.contains(type)) {
       return Collections.<ResourceRecordSet<?>>emptyList().iterator();
     }
-    if ("CNAME".equals(type)) {
+    if (ResourceTypes.CNAME.name().equals(type)) {
       // retain original type (this will filter out A, AAAA)
       return filter(
-          concat(iteratorForDNameAndDirectionalType(name, lookup("A")),
-                 iteratorForDNameAndDirectionalType(name, lookup("AAAA"))), filter);
-    } else if ("A".equals(type) || "AAAA".equals(type)) {
-      int dirType = "AAAA".equals(type) ? lookup("AAAA") : lookup("A");
+          concat(
+            iteratorForDNameAndDirectionalType(name, lookup(ResourceTypes.A.name())),
+            iteratorForDNameAndDirectionalType(name, lookup(ResourceTypes.AAAA.name()))
+          ), filter
+      );
+    } else if (ResourceTypes.A.name().equals(type) || ResourceTypes.AAAA.name().equals(type)) {
+      int dirType = ResourceTypes.AAAA.name().equals(type) ? lookup(ResourceTypes.AAAA.name())
+              : lookup(ResourceTypes.A.name());
       Iterator<ResourceRecordSet<?>> iterator = iteratorForDNameAndDirectionalType(name, dirType);
       // retain original type (this will filter out CNAMEs)
       return filter(iterator, filter);
@@ -139,10 +140,13 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
 
   private Iterator<DirectionalRecord> recordsByNameTypeAndQualifier(String name, String type,
                                                                                  String qualifier) {
-    if ("CNAME".equals(type)) {
+    if (ResourceTypes.CNAME.name().equals(type)) {
       return filter(
-          concat(recordsForNameTypeAndQualifier(name, "A", qualifier),
-                 recordsForNameTypeAndQualifier(name, "AAAA", qualifier)), isCNAME);
+          concat(
+              recordsForNameTypeAndQualifier(name, ResourceTypes.A.name(), qualifier),
+              recordsForNameTypeAndQualifier(name, ResourceTypes.AAAA.name(), qualifier)
+          ), isCNAME
+      );
     } else {
       return recordsForNameTypeAndQualifier(name, type, qualifier);
     }
@@ -212,8 +216,8 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
       String poolName = rrset.name();
       try {
         String type = rrset.type();
-        if ("CNAME".equals(type)) {
-          type = "A";
+        if (ResourceTypes.CNAME.name().equals(type)) {
+          type = ResourceTypes.A.name();
         }
         api.addDirectionalPool(zoneName, poolName, type);
       } catch (UltraDNSRestException e) {
@@ -367,11 +371,11 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
     }
   }
 
-  private int dirType(String type) {
-    if ("A".equals(type) || "CNAME".equals(type)) {
-      return lookup("A");
-    } else if ("AAAA".equals(type)) {
-      return lookup("AAAA");
+  public int dirType(String type) {
+    if (ResourceTypes.A.name().equals(type) || ResourceTypes.CNAME.name().equals(type)) {
+      return lookup(ResourceTypes.A.name());
+    } else if (ResourceTypes.AAAA.name().equals(type)) {
+      return lookup(ResourceTypes.AAAA.name());
     } else {
       return lookup(type);
     }

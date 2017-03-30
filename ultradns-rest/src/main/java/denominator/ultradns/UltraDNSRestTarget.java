@@ -13,10 +13,6 @@ class UltraDNSRestTarget implements Target<UltraDNSRest> {
   private final Provider provider;
   private final InvalidatableTokenProvider lazyToken;
 
-  static final String SOAP_TEMPLATE = "<?xml version=\"1.0\"?>\n";
-
-  private static final Logger logger = Logger.getLogger(UltraDNSRestTarget.class);
-
   @Inject
   UltraDNSRestTarget(Provider provider, InvalidatableTokenProvider lazyToken) {
     this.provider = provider;

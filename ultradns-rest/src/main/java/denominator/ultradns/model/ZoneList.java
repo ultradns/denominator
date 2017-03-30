@@ -6,13 +6,17 @@ import java.util.List;
 public class ZoneList {
 
     private List<Zone> zones;
+    List<String> zoneNames = new ArrayList<String>();
 
     public List<Zone> getZones() {
         return zones;
     }
 
+    public void setZones(List<Zone> zones) {
+        this.zones = zones;
+    }
+
     public List<String> getZoneNames() {
-        List<String> zoneNames = new ArrayList<String>();
         if (getZones()!= null && !getZones().isEmpty()) {
             for(Zone zone : getZones()){
                 zoneNames.add(zone.getProperties().getName());
@@ -20,23 +24,4 @@ public class ZoneList {
         }
         return zoneNames;
     }
-
-    private class Zone {
-
-        private ZoneProperties properties;
-
-        public ZoneProperties getProperties() {
-            return properties;
-        }
-    }
-
-    private class ZoneProperties {
-
-        private String name;
-
-        public String getName() {
-            return name;
-        }
-    }
-
 }

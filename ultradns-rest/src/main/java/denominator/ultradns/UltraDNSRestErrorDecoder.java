@@ -11,12 +11,10 @@ import com.google.gson.stream.JsonToken;
 import feign.FeignException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
-import org.apache.log4j.Logger;
 
 class UltraDNSRestErrorDecoder implements ErrorDecoder {
 
   private AtomicReference<Boolean> sessionValid;
-  private static final Logger logger = Logger.getLogger(UltraDNSRestErrorDecoder.class);
 
   @Inject
   UltraDNSRestErrorDecoder(AtomicReference<Boolean> sessionValid) {
@@ -25,7 +23,6 @@ class UltraDNSRestErrorDecoder implements ErrorDecoder {
 
   @Override
   public Exception decode(String methodKey, Response response) {
-    logger.info("Decoding Error .......");
     try {
       JsonReader reader = new JsonReader(response.body().asReader());
       UltraDNSRestException.Message message = new UltraDNSRestException.Message();

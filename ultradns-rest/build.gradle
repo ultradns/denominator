@@ -1,5 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'jacoco'
+apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+apply plugin: 'findbugs'
 
 sourceCompatibility = 1.6
 
@@ -37,4 +40,33 @@ jacocoTestReport {
     csv.enabled false
     html.destination "${buildDir}/jacocoHtml"
   }
+}
+
+findbugs{
+  ignoreFailures = true
+  findbugsTest.enabled = false
+}
+
+tasks.withType(FindBugs) {
+  reports {
+    xml.enabled false
+    html.enabled true
+  }
+}
+
+pmd {
+  ignoreFailures = true
+  pmdTest.enabled = false
+}
+
+tasks.withType(Pmd){
+  reports {
+    xml.enabled true
+    html.enabled true
+  }
+}
+
+checkstyle {
+  ignoreFailures = true
+  configFile = new File("checkstyle.xml")
 }

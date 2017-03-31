@@ -167,7 +167,7 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
     RRSet rrSet = null;
     if (rrSets != null && !rrSets.isEmpty()) {
       rrSet = rrSets.get(0);
-      if (rrSet != null & rrSet.getRdata() != null) {
+      if (rrSet != null && rrSet.getRdata() != null) {
         int indexToDelete = rrSet.getRdata().indexOf(rData);
         if (indexToDelete >= 0 ) {
           try {

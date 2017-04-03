@@ -61,7 +61,6 @@ class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordS
       if (peekingIterator.hasNext()) {
         record = peekingIterator.peek();
         if (record.isNoResponseRecord()) {
-          // TODO: log as this is unsupported
           peekingIterator.next();
         } else {
           return true;

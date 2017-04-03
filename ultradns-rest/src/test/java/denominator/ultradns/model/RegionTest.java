@@ -69,5 +69,4 @@ public class RegionTest {
         Region region = new Region("South America", "SAM", "Region", 12);
         assertThat(region).isNotEqualTo("ARRGH");
     }
-
 }

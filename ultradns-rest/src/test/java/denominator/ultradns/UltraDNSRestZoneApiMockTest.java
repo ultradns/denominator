@@ -17,7 +17,7 @@ import static denominator.ultradns.UltraDNSMockResponse.GET_SOA_RESOURCE_RECORDS
 
 import static denominator.ultradns.UltraDNSRestException.INVALID_ZONE_NAME;
 
-public class UltraDNSRestRestZoneApiMockTest {
+public class UltraDNSRestZoneApiMockTest {
 
   @Rule
   public final MockUltraDNSRestServer server = new MockUltraDNSRestServer();

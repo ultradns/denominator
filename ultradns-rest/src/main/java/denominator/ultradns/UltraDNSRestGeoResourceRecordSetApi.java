@@ -344,7 +344,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
         }
       } else {
         int indexToDelete = -1;
-        String rData = StringUtils.join(record.getRdata(), " ");;
+        String rData = StringUtils.join(record.getRdata(), " ");
         try {
           List<RRSet> rrSets = api.getDirectionalDNSRecordsForHost(zoneName, record.getName(), record.getTypeCode()).getRrSets();
           if (rrSets != null && !rrSets.isEmpty()) {

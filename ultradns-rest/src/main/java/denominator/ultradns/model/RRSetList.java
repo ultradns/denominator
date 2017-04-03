@@ -14,27 +14,26 @@ public class RRSetList {
 
     private final String DIR_POOL_SCHEMA ="http://schemas.ultradns.com/DirPool.jsonschema";
 
-    public List<Record> buildRecords(){
+    /**
+     * Creation of ResourceRecord with rData
+     * @return List of Resource Record
+     */
+    public List<Record> buildRecords() {
         List<Record> records = new ArrayList<Record>();
         if (getRrSets() != null && !getRrSets().isEmpty()) {
             for (RRSet rrSet : getRrSets()){
-                if (!isDirectionalRecord(rrSet)) {
-                    /**
-                     * Creation of ResourceRecord with rData
-                     */
-                    if (rrSet.getRdata() != null && !rrSet.getRdata().isEmpty()) {
-                        for (String rData : rrSet.getRdata()) {
-                            Record r = new Record();
-                            r.setName(rrSet.getOwnerName());
-                            r.setTypeCode(rrSet.intValueOfRrtype());
-                            if (rrSet.getTtl() != null) {
-                                r.setTtl(rrSet.getTtl());
-                            }
-                            if (rData != null) {
-                                r.setRdata(Arrays.asList(rData.split("\\s")));
-                            }
-                            records.add(r);
+                if (!isDirectionalRecord(rrSet) && rrSet.getRdata() != null && !rrSet.getRdata().isEmpty()) {
+                    for (String rData : rrSet.getRdata()) {
+                        Record r = new Record();
+                        r.setName(rrSet.getOwnerName());
+                        r.setTypeCode(rrSet.intValueOfRrtype());
+                        if (rrSet.getTtl() != null) {
+                            r.setTtl(rrSet.getTtl());
                         }
+                        if (rData != null) {
+                            r.setRdata(Arrays.asList(rData.split("\\s")));
+                        }
+                        records.add(r);
                     }
                 }
             }
@@ -128,8 +127,8 @@ public class RRSetList {
             return records;
         }
         for (DirectionalRecord r : buildDirectionalRecords()) {
-            if ( (r.getGeoGroupName() != null && r.getGeoGroupName().equals(groupName))
-                    || (r.getIpGroupName() != null && r.getIpGroupName().equals(groupName)) ) {
+            if (r.getGeoGroupName() != null && r.getGeoGroupName().equals(groupName)
+                    || r.getIpGroupName() != null && r.getIpGroupName().equals(groupName)) {
                 records.add(r);
             }
         }
@@ -161,11 +160,9 @@ public class RRSetList {
     }
 
     private boolean isDirectionalRecord(RRSet rrSet) {
-        return (
-            rrSet.getProfile() != null
+        return rrSet.getProfile() != null
             && rrSet.getProfile().getContext() != null
-            && rrSet.getProfile().getContext().equals(DIR_POOL_SCHEMA)
-        );
+            && rrSet.getProfile().getContext().equals(DIR_POOL_SCHEMA);
     }
 
     public String getZoneName() {

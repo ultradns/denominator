@@ -24,7 +24,6 @@ import denominator.ultradns.model.Profile;
 import denominator.ultradns.model.DirectionalRecord;
 import denominator.ultradns.model.DirectionalGroup;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import static denominator.ResourceTypeToValue.lookup;
 import static denominator.common.Preconditions.checkArgument;
@@ -37,7 +36,6 @@ import static denominator.model.ResourceRecordSets.nameAndTypeEqualTo;
 import denominator.ResourceTypeToValue.ResourceTypes;
 
 final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetApi {
-  private static final Logger logger = Logger.getLogger(UltraDNSRestGeoResourceRecordSetApi.class);
   private static final Filter<ResourceRecordSet<?>> IS_GEO = new Filter<ResourceRecordSet<?>>() {
     @Override
     public boolean apply(ResourceRecordSet<?> in) {
@@ -322,7 +320,6 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
 
       try {
         Gson gson = new Gson();
-        logger.info("JSON is: \n" + gson.toJson(rDataInfo));
         api.updateDirectionalPoolRecord(zoneName, record.getName(), record.getType(), gson.toJson(rDataInfo), indexToUpdate);
       } catch (UltraDNSRestException e) {
         if (e.code() != UltraDNSRestException.PATH_NOT_FOUND_TO_PATCH) {

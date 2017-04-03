@@ -45,9 +45,9 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
   @Override
   public Iterator<ResourceRecordSet<?>> iterateByName(String name) {
     checkNotNull(name, "name");
-    final int ANY_RR_TYPE = 255;
+    final int anyRrType = 255;
     Iterator<Record> ordered = api
-            .getResourceRecordsOfDNameByType(zoneName, name, ANY_RR_TYPE)
+            .getResourceRecordsOfDNameByType(zoneName, name, anyRrType)
             .buildRecords()
             .iterator();
     return new GroupByRecordNameAndTypeCustomIterator(ordered);

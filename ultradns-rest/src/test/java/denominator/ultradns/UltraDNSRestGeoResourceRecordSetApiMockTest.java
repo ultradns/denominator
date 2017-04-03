@@ -392,7 +392,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
                 .containsRegion("India", "West Bengal");
     }
 
-    private String DIRECTIONAL_POOLS_RESPONSE = "{\n" +
+    private static final String DIRECTIONAL_POOLS_RESPONSE = "{\n" +
             "    \"zoneName\": \"denominator.io.\",\n" +
             "    \"rrSets\": [\n" +
             "        {\n" +
@@ -473,7 +473,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
             "    }\n" +
             "}\n";
 
-    private String GET_AVAILABLE_CONTINENTS_RESPONSE = "[\n" +
+    private static final String GET_AVAILABLE_CONTINENTS_RESPONSE = "[\n" +
             "    [\n" +
             "        {\n" +
             "            \"name\": \"Anonymous Proxy\",\n" +
@@ -514,7 +514,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
             "    ]\n" +
             "]";
 
-    private String GET_AVAILABLE_COUNTRIES_RESPONSE = "[\n" +
+    private static final String GET_AVAILABLE_COUNTRIES_RESPONSE = "[\n" +
             "    [\n" +
             "    ],\n" +
             "    [\n" +
@@ -583,7 +583,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
             "    ]\n" +
             "]";
 
-    private String GET_AVAILABLE_STATES_RESPONSE = "[\n" +
+    private static final String GET_AVAILABLE_STATES_RESPONSE = "[\n" +
             "    [\n" +
             "        {\n" +
             "            \"name\": \"Delhi\",\n" +

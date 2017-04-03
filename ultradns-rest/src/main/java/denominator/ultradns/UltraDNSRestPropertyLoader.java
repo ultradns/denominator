@@ -10,7 +10,7 @@ public class UltraDNSRestPropertyLoader {
 
     private static Properties applicationProperties;
     private static InputStream input = null;
-    private static final Logger logger = Logger.getLogger(UltraDNSRestPropertyLoader.class);
+    private static final Logger LOGGER = Logger.getLogger(UltraDNSRestPropertyLoader.class);
 
     private UltraDNSRestPropertyLoader() { }
 
@@ -24,14 +24,14 @@ public class UltraDNSRestPropertyLoader {
             applicationProperties.load(input);
             return applicationProperties;
         } catch (IOException e) {
-            logger.error("Error while loading application properties file !! Please check property configuration.");
+            LOGGER.error("Error while loading application properties file !! Please check property configuration.");
             throw new UltraDNSRestException(e.getMessage(), -1);
         } finally {
             if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    logger.error("Error while closing application properties Resource Stream !!");
+                    LOGGER.error("Error while closing application properties Resource Stream !!");
                     e.printStackTrace();
                 }
             }

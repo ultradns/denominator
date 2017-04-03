@@ -17,8 +17,8 @@ public class ZoneList {
     }
 
     public List<String> getZoneNames() {
-        if (getZones()!= null && !getZones().isEmpty()) {
-            for(Zone zone : getZones()){
+        if (getZones() != null && !getZones().isEmpty()) {
+            for (Zone zone : getZones()) {
                 zoneNames.add(zone.getProperties().getName());
             }
         }

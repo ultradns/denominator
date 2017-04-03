@@ -1,12 +1,7 @@
 package denominator.ultradns.model;
 
-import org.apache.log4j.Logger;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RRSet {
 
@@ -16,7 +11,7 @@ public class RRSet {
     private List<String> rdata = new ArrayList<String>();
     public Profile profile;
 
-    public RRSet(){}
+    public RRSet() { }
 
     public RRSet(Integer ttl, List<String> rdata) {
         this.ttl = ttl;
@@ -24,7 +19,7 @@ public class RRSet {
     }
 
     public int intValueOfRrtype() {
-        if ( rrtype!= null) {
+        if (rrtype != null) {
             return Integer.parseInt(rrtype.substring(rrtype.indexOf("(") + 1,
                     rrtype.indexOf(")")));
         }
@@ -32,7 +27,7 @@ public class RRSet {
     }
 
     public String stringValueOfRrtype() {
-        if ( rrtype!= null) {
+        if (rrtype != null) {
             return rrtype.substring(0, rrtype.indexOf(" "));
         }
         return "";

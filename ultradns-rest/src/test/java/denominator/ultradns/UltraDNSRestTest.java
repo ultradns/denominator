@@ -534,8 +534,8 @@ public class UltraDNSRestTest {
         mockApi().deleteLBPool(zoneName, typeCode, hostName);
     }
 
-    private RRSet getSampleRRSet(String ownerName, String rrtype, List<String> rdata){
-        RRSet rrSet= new RRSet(86400, rdata);
+    private RRSet getSampleRRSet(String ownerName, String rrtype, List<String> rdata) {
+        RRSet rrSet = new RRSet(86400, rdata);
         rrSet.setOwnerName(ownerName);
         rrSet.setRrtype(rrtype);
         return rrSet;

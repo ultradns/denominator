@@ -7,7 +7,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import com.google.gson.Gson;
 import denominator.ResourceRecordSetApi;
 import denominator.model.ResourceRecordSet;
 import denominator.ultradns.model.RRSet;
@@ -169,7 +168,7 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
       rrSet = rrSets.get(0);
       if (rrSet != null && rrSet.getRdata() != null) {
         int indexToDelete = rrSet.getRdata().indexOf(rData);
-        if (indexToDelete >= 0 ) {
+        if (indexToDelete >= 0) {
           try {
             api.deleteResourceRecord(zoneName, intType, name, indexToDelete);
           } catch (UltraDNSRestException e) {

@@ -44,7 +44,7 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
     @Override
     public boolean ok() {
         boolean isValid = System.currentTimeMillis() < expirationMillis;
-        if(!isValid) {
+        if (!isValid) {
             sessionValid.set(false);
         }
         return isValid;
@@ -87,12 +87,12 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
         } else {
             throw new IllegalArgumentException("Unsupported credential type: " + currentCreds);
         }
-        return session.login("password", username,password);
+        return session.login("password", username, password);
     }
 
     interface Session {
         @RequestLine("POST /authorization/token")
-        @Headers({"Content-Type: application/x-www-form-urlencoded"})
+        @Headers({ "Content-Type: application/x-www-form-urlencoded" })
         TokenResponse login(@Param("grant_type") String grantType, @Param("username") String userName, @Param("password") String password);
     }
 }

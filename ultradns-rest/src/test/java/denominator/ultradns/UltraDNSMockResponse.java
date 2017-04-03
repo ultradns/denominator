@@ -457,7 +457,7 @@ public class UltraDNSMockResponse {
             "}\n";
 
 
-    public static String getMockErrorResponse(int errorCode, String errorMessage){
+    public static String getMockErrorResponse(int errorCode, String errorMessage) {
         return
                 "[\n"
                         + "    {\n"

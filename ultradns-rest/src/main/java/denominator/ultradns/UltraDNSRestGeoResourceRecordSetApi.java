@@ -312,7 +312,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
       }
     }
 
-    if (indexToUpdate >= 0 ) {
+    if (indexToUpdate >= 0) {
       RDataInfo rDataInfo = rrSets.get(0).getProfile().getRdataInfo().get(indexToUpdate);
       GeoInfo geoInfo = rDataInfo.getGeoInfo();
       geoInfo.setCodes(ultraDNSRestGeoSupport.getTerritoryCodes(directionalGroup));
@@ -323,7 +323,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
       try {
         Gson gson = new Gson();
         logger.info("JSON is: \n" + gson.toJson(rDataInfo));
-        api.updateDirectionalPoolRecord(zoneName, record.getName(), record.getType(), gson.toJson(rDataInfo) ,indexToUpdate);
+        api.updateDirectionalPoolRecord(zoneName, record.getName(), record.getType(), gson.toJson(rDataInfo), indexToUpdate);
       } catch (UltraDNSRestException e) {
         if (e.code() != UltraDNSRestException.PATH_NOT_FOUND_TO_PATCH) {
           throw e;
@@ -358,7 +358,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
             throw e;
           }
         }
-        if (indexToDelete >= 0 ) {
+        if (indexToDelete >= 0) {
           try {
             api.deleteDirectionalPoolRecord(zoneName, record.getName(), record.getType(), indexToDelete);
           } catch (UltraDNSRestException e) {

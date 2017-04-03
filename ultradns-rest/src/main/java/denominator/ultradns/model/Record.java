@@ -11,7 +11,7 @@ public class Record {
     private List<String> rdata = new ArrayList<String>();
     private Profile profile;
 
-    public RRSet buildRRSet(){
+    public RRSet buildRRSet() {
         return new RRSet(getTtl(), getRdata());
     }
 

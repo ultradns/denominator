@@ -22,7 +22,7 @@ public class UltraDNSRestGeoSupport {
 
   private UltraDNSRest api = null;
 
-  public UltraDNSRestGeoSupport() {}
+  public UltraDNSRestGeoSupport() { }
 
   public UltraDNSRestGeoSupport(UltraDNSRest api) {
     this.api = api;
@@ -100,7 +100,7 @@ public class UltraDNSRestGeoSupport {
 
   private TreeSet<Region> getSortedSecondLevelRegions(Collection<Region> topLevelRegions) {
     TreeSet<Region> secondLevelRegions = new TreeSet<Region>();
-    for(Region topLevelRegion : topLevelRegions) {
+    for (Region topLevelRegion : topLevelRegions) {
       secondLevelRegions.addAll(topLevelRegion.getChildRegions());
     }
     return secondLevelRegions;
@@ -164,7 +164,7 @@ public class UltraDNSRestGeoSupport {
     Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
 
     Iterator<String> iterator = codes.iterator();
-    while(iterator.hasNext()) {
+    while (iterator.hasNext()) {
       String code = iterator.next();
       Collection<String> list = new ArrayList<String>();
       boolean codeFound = false;

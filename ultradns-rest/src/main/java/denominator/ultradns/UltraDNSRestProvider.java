@@ -125,11 +125,11 @@ public class UltraDNSRestProvider extends BasicProvider {
     return options;
   }
 
-  @dagger.Module(injects = DNSApiManager.class, complete = false, includes = {NothingToClose.class,
+  @dagger.Module(injects = DNSApiManager.class, complete = false, includes = { NothingToClose.class,
           UltraDNSRestGeoSupport.class,
           WeightedUnsupported.class,
           ConcatBasicAndQualifiedResourceRecordSets.class,
-          FeignModule.class})
+          FeignModule.class })
   public static final class Module {
 
     @Provides

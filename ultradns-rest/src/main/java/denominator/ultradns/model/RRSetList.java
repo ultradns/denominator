@@ -12,7 +12,7 @@ public class RRSetList {
     private String zoneName;
     private List<RRSet> rrSets;
 
-    private static final String DIR_POOL_SCHEMA ="http://schemas.ultradns.com/DirPool.jsonschema";
+    private static final String DIR_POOL_SCHEMA = "http://schemas.ultradns.com/DirPool.jsonschema";
 
     /**
      * Creation of ResourceRecord with rData
@@ -21,7 +21,7 @@ public class RRSetList {
     public List<Record> buildRecords() {
         List<Record> records = new ArrayList<Record>();
         if (getRrSets() != null && !getRrSets().isEmpty()) {
-            for (RRSet rrSet : getRrSets()){
+            for (RRSet rrSet : getRrSets()) {
                 if (!isDirectionalRecord(rrSet) && rrSet.getRdata() != null && !rrSet.getRdata().isEmpty()) {
                     for (String rData : rrSet.getRdata()) {
                         Record r = new Record();
@@ -41,7 +41,7 @@ public class RRSetList {
         return records;
     }
 
-    public List<DirectionalRecord> buildDirectionalRecords(){
+    public List<DirectionalRecord> buildDirectionalRecords() {
         List<DirectionalRecord> records = new ArrayList<DirectionalRecord>();
         if (getRrSets() != null && !getRrSets().isEmpty()) {
             for (RRSet rrSet : getRrSets()) {
@@ -52,7 +52,7 @@ public class RRSetList {
                     if (rrSet.getRdata() != null) {
                         rDataList = rrSet.getRdata();
                     }
-                    if (rrSet.getProfile() != null && rrSet.getProfile().getRdataInfo() != null ) {
+                    if (rrSet.getProfile() != null && rrSet.getProfile().getRdataInfo() != null) {
                         rDataInfoList = rrSet.getProfile().getRdataInfo();
                     }
 
@@ -123,7 +123,7 @@ public class RRSetList {
 
     public List<DirectionalRecord> getDirectionalRecordsByGroup(String groupName) {
         List<DirectionalRecord> records = new ArrayList<DirectionalRecord>();
-        if ( groupName == null || groupName.length() == 0 ) {
+        if (groupName == null || groupName.length() == 0) {
             return records;
         }
         for (DirectionalRecord r : buildDirectionalRecords()) {

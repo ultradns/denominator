@@ -5,7 +5,6 @@ import denominator.ultradns.model.AccountList;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.Record;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -19,8 +18,6 @@ import static denominator.common.Util.singletonIterator;
 public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
 
   private final UltraDNSRest api;
-
-  private static final Logger logger = Logger.getLogger(UltraDNSRestZoneApi.class);
 
   @Inject
   UltraDNSRestZoneApi(UltraDNSRest api) {
@@ -108,7 +105,7 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
     return Zone.create(name, name, soa.getTtl(), soa.getRdata().get(1));
   }
 
-  private String getCurrentAccountName(){
+  private String getCurrentAccountName() {
     AccountList accountList = api.getAccountsListOfUser();
     return accountList.getAccounts()
             .get(accountList.getAccounts().size() - 1)

@@ -2,8 +2,6 @@ package denominator.ultradns;
 
 import org.apache.log4j.Logger;
 
-import javax.inject.Singleton;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -14,7 +12,7 @@ public class UltraDNSRestPropertyLoader {
     private static InputStream input = null;
     private static final Logger logger = Logger.getLogger(UltraDNSRestPropertyLoader.class);
 
-    private UltraDNSRestPropertyLoader() {}
+    private UltraDNSRestPropertyLoader() { }
 
     public static Properties loadProperties() {
         try {
@@ -28,7 +26,7 @@ public class UltraDNSRestPropertyLoader {
         } catch (IOException e) {
             logger.error("Error while loading application properties file !! Please check property configuration.");
             throw new UltraDNSRestException(e.getMessage(), -1);
-        } finally{
+        } finally {
             if (input != null) {
                 try {
                     input.close();
@@ -41,7 +39,7 @@ public class UltraDNSRestPropertyLoader {
     }
 
     private static Properties getProperties() {
-        if(applicationProperties == null) {
+        if (applicationProperties == null) {
             applicationProperties = loadProperties();
         }
         return applicationProperties;

@@ -1,13 +1,19 @@
 package denominator.ultradns;
 
-import denominator.ultradns.model.*;
+import denominator.ultradns.model.Status;
+import denominator.ultradns.model.AccountList;
+import denominator.ultradns.model.ZoneList;
+import denominator.ultradns.model.RRSet;
+import denominator.ultradns.model.RRSetList;
+import denominator.ultradns.model.Region;
+import denominator.ultradns.model.DirectionalGroup;
 
 import feign.Body;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 
-import java.util.*;
+import java.util.Collection;
 
 @Headers("Content-Type: application/json")
 interface UltraDNSRest {

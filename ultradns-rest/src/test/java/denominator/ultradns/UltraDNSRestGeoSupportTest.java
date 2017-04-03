@@ -9,12 +9,9 @@ import denominator.Credentials;
 import feign.Feign;
 import denominator.ultradns.InvalidatableTokenProvider.Session;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static denominator.assertj.ModelAssertions.assertThat;
 
 public class UltraDNSRestGeoSupportTest {
 

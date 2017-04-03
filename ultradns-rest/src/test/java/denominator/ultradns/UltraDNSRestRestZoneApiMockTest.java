@@ -9,7 +9,12 @@ import denominator.ZoneApi;
 import denominator.model.Zone;
 
 import static denominator.assertj.ModelAssertions.assertThat;
-import static denominator.ultradns.UltraDNSMockResponse.*;
+
+import static denominator.ultradns.UltraDNSMockResponse.GET_ACCOUNTS_LIST_OF_USER_RESPONSE;
+import static denominator.ultradns.UltraDNSMockResponse.GET_ZONES_OF_ACCOUNT_PRESENT;
+import static denominator.ultradns.UltraDNSMockResponse.GET_ZONES_OF_ACCOUNT_ABSENT;
+import static denominator.ultradns.UltraDNSMockResponse.GET_SOA_RESOURCE_RECORDS;
+
 import static denominator.ultradns.UltraDNSRestException.INVALID_ZONE_NAME;
 
 public class UltraDNSRestRestZoneApiMockTest {

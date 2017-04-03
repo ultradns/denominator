@@ -21,8 +21,19 @@ import java.util.concurrent.atomic.AtomicReference;
 import static denominator.model.ResourceRecordSets.a;
 import static denominator.model.ResourceRecordSets.aaaa;
 import static denominator.model.ResourceRecordSets.ns;
-import static denominator.ultradns.UltraDNSMockResponse.*;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import static denominator.ultradns.UltraDNSMockResponse.GET_RESOURCE_RECORDS_PRESENT;
+import static denominator.ultradns.UltraDNSMockResponse.STATUS_SUCCESS;
+import static denominator.ultradns.UltraDNSMockResponse.RR_SET_WITH_NO_RECORDS;
+import static denominator.ultradns.UltraDNSMockResponse.RR_SET_WITH_ONE_RECORD;
+import static denominator.ultradns.UltraDNSMockResponse.RR_SET_WITH_NO_AAAA_RECORDS;
+import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_ONE_RESOURCE_RECORDS;
+import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_TWO_RESOURCE_RECORDS;
+import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_THREE_RESOURCE_RECORDS;
+import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_FOUR_RESOURCE_RECORDS;
+import static denominator.ultradns.UltraDNSMockResponse.RR_SET_LIST_WITH_ONE_NS_RECORD;
+import static denominator.ultradns.UltraDNSMockResponse.RR_SET_LIST_WITH_TWO_NS_RECORDS;
 
 public class UltraDNSRestResourceRecordSetApiMockTest {
 

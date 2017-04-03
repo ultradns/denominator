@@ -10,7 +10,6 @@ import java.util.TreeSet;
 
 import javax.inject.Named;
 
-import com.google.gson.Gson;
 import dagger.Module;
 import dagger.Provides;
 import denominator.ultradns.model.DirectionalGroup;

@@ -19,10 +19,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static denominator.ultradns.UltraDNSMockResponse.*;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
+
+import static denominator.ultradns.UltraDNSMockResponse.GET_ACCOUNTS_LIST_OF_USER;
+import static denominator.ultradns.UltraDNSMockResponse.GET_ZONES_OF_ACCOUNT_PRESENT;
+import static denominator.ultradns.UltraDNSMockResponse.GET_ZONES_OF_ACCOUNT_ABSENT;
+import static denominator.ultradns.UltraDNSMockResponse.GET_RESOURCE_RECORDS_PRESENT;
+import static denominator.ultradns.UltraDNSMockResponse.RR_SET_ABSENT;
+import static denominator.ultradns.UltraDNSMockResponse.STATUS_SUCCESS;
+import static denominator.ultradns.UltraDNSMockResponse.GET_DIRECTIONAL_POOLS_OF_ZONE;
 
 public class UltraDNSRestTest {
 

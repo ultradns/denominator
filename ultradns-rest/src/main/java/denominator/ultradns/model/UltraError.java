@@ -8,29 +8,24 @@ public class UltraError {
     private String errorMessage;
     private TreeMap<String, Object> errorData;
 
-    public UltraError(int errorCode, String errorMessage)
-    {
+    public UltraError(int errorCode, String errorMessage) {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
 
-    public final int getErrorCode()
-    {
+    public final int getErrorCode() {
         return this.errorCode;
     }
 
-    public final void setErrorCode(int errorCode)
-    {
+    public final void setErrorCode(int errorCode) {
         this.errorCode = errorCode;
     }
 
-    public final String getErrorMessage()
-    {
+    public final String getErrorMessage() {
         return this.errorMessage;
     }
 
-    public final void setErrorMessage(String errorMessage)
-    {
+    public final void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
 

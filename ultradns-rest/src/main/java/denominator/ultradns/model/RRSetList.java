@@ -12,7 +12,7 @@ public class RRSetList {
     private String zoneName;
     private List<RRSet> rrSets;
 
-    private final String DIR_POOL_SCHEMA ="http://schemas.ultradns.com/DirPool.jsonschema";
+    private static final String DIR_POOL_SCHEMA ="http://schemas.ultradns.com/DirPool.jsonschema";
 
     /**
      * Creation of ResourceRecord with rData
@@ -57,7 +57,7 @@ public class RRSetList {
                     }
 
                     /**
-                     * Creation of DirectionalDNSRecord with rData & rDataInfo mapping
+                     * Creation of DirectionalDNSRecord with rData and rDataInfo mapping
                      */
                     for (String rData : rDataList) {
                         DirectionalRecord r = new DirectionalRecord();
@@ -139,7 +139,7 @@ public class RRSetList {
         TreeSet<String> countryCodes = new TreeSet<String>();
         if (getRrSets() != null && !getRrSets().isEmpty()) {
             for (RRSet rrSet : getRrSets()) {
-                if(rrSet.getProfile() != null & rrSet.getProfile().getRdataInfo() != null) {
+                if (rrSet.getProfile() != null && rrSet.getProfile().getRdataInfo() != null) {
                     List<RDataInfo> rDataInfoList = rrSet.getProfile().getRdataInfo();
                     for (RDataInfo rd : rDataInfoList) {
                         if (rd.getGeoInfo() != null && rd.getGeoInfo().getName() != null
@@ -148,7 +148,7 @@ public class RRSetList {
                         }
                     }
                 }
-                if(rrSet.getProfile() != null & rrSet.getProfile().getNoResponse() != null) {
+                if (rrSet.getProfile() != null && rrSet.getProfile().getNoResponse() != null) {
                     GeoInfo geoInfo = rrSet.getProfile().getNoResponse().getGeoInfo();
                     if (geoInfo != null && geoInfo.getName() != null && geoInfo.getName().equals(groupName)) {
                         countryCodes = geoInfo.getCodes();

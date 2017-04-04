@@ -69,8 +69,9 @@ class UltraDNSRestRoundRobinPoolApi {
         case UltraDNSRestException.POOL_NOT_FOUND:
         case UltraDNSRestException.RESOURCE_RECORD_NOT_FOUND:
           return;
+        default:
+          throw e;
       }
-      throw e;
     }
   }
 }

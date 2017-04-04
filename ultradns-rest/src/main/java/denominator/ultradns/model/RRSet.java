@@ -9,7 +9,7 @@ public class RRSet {
     private String rrtype;
     private Integer ttl;
     private List<String> rdata = new ArrayList<String>();
-    public Profile profile;
+    private Profile profile;
 
     public RRSet() { }
 

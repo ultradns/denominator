@@ -65,8 +65,8 @@ public class UltraDNSRestTest {
 
         InvalidatableTokenProvider tokenProvider = new InvalidatableTokenProvider(provider,
                 session, credentials, sessionValid);
-        tokenProvider.lastCredentialsHashCode = credentials.get().hashCode();
-        tokenProvider.token = "token";
+        tokenProvider.setLastCredentialsHashCode(credentials.get().hashCode());
+        tokenProvider.setToken("token");
         sessionValid.set(true);
 
         return feign.newInstance(new UltraDNSRestTarget(new UltraDNSRestProvider() {

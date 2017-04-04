@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class UltraDNSRestPropertyLoader {
+public final class UltraDNSRestPropertyLoader {
 
     private static Properties applicationProperties;
     private static InputStream input = null;

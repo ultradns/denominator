@@ -43,7 +43,7 @@ class UltraDNSRestErrorDecoder implements ErrorDecoder {
       }
       reader.endObject();
       reader.close();
-      return new UltraDNSRestException(message.errorMessage, message.errorCode);
+      return new UltraDNSRestException(message.getErrorMessage(), message.getErrorCode());
     } catch (IOException ignored) {
       return FeignException.errorStatus(methodKey, response);
     } catch (Exception propagate) {

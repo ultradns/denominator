@@ -3,6 +3,7 @@ package denominator.ultradns;
 import feign.FeignException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -16,10 +17,17 @@ import static feign.Util.UTF_8;
 
 public class UltraDNSRestErrorDecoderTest {
 
+  private ErrorDecoder errors;
+
   @Rule
   public final ExpectedException thrown = ExpectedException.none();
 
-  ErrorDecoder errors = new UltraDNSRestErrorDecoder(new AtomicReference<Boolean>(false));
+
+  @Before()
+  public void setUp() throws Exception {
+    errors = new UltraDNSRestErrorDecoder(new AtomicReference<Boolean>(false));
+  }
+
 
   static Response errorResponse(String body) {
     return Response.create(500, "Server Error", Collections.<String, Collection<String>>emptyMap(), body, UTF_8);

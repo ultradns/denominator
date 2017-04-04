@@ -44,8 +44,8 @@ public class UltraDNSRestGeoSupportTest {
 
         InvalidatableTokenProvider tokenProvider = new InvalidatableTokenProvider(provider,
                 session, credentials, sessionValid);
-        tokenProvider.lastCredentialsHashCode = credentials.get().hashCode();
-        tokenProvider.token = "token";
+        tokenProvider.setLastCredentialsHashCode(credentials.get().hashCode());
+        tokenProvider.setToken("token");
         sessionValid.set(true);
 
         return feign.newInstance(new UltraDNSRestTarget(new UltraDNSRestProvider() {
@@ -102,7 +102,7 @@ public class UltraDNSRestGeoSupportTest {
                 .hasPath("/geoip/territories?codes=ANT-AQ%2CANT-BV%2CANT-TF%2COCN-AS%2COCN-AU%2COCN-CC%2COCN-CK%2COCN-CX%2COCN-FJ%2COCN-FM%2COCN-GU%2COCN-HM%2COCN-KI%2COCN-MH%2COCN-MP%2COCN-NC%2COCN-NF%2COCN-NR%2COCN-NU%2COCN-NZ%2COCN-PF%2COCN-PG%2COCN-PN%2COCN-PW%2COCN-SB%2COCN-TK%2COCN-TO%2COCN-TV%2COCN-U9%2COCN-UM%2COCN-VU%2COCN-WF%2COCN-WS%2CSAM-AR%2CSAM-BO%2CSAM-BR%2CSAM-CL%2CSAM-CO%2CSAM-EC%2CSAM-FK%2CSAM-GF%2CSAM-GS%2CSAM-GY%2CSAM-PE%2CSAM-PY%2CSAM-SR%2CSAM-U4%2CSAM-UY");
     }
 
-    static String getAvailableRegionsResponseTopLevel =
+    private static final String getAvailableRegionsResponseTopLevel =
             "[\n" +
                     "  [\n" +
                     "    {\n" +
@@ -144,7 +144,7 @@ public class UltraDNSRestGeoSupportTest {
                     "  ]\n" +
                     "]";
 
-    static String getAvailableRegionsResponseSecondLevel = "[\n" +
+    private static final String getAvailableRegionsResponseSecondLevel = "[\n" +
             "  [],\n" +
             "  [],\n" +
             "  [],\n" +
@@ -450,7 +450,7 @@ public class UltraDNSRestGeoSupportTest {
             "  ]\n" +
             "]";
 
-    static String getAvailableRegionsResponseThirdLevelPart01 = "[\n" +
+    private static final String getAvailableRegionsResponseThirdLevelPart01 = "[\n" +
             "  [],\n" +
             "  [],\n" +
             "  [],\n" +

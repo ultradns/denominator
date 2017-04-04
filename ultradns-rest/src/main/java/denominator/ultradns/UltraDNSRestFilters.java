@@ -23,7 +23,7 @@ final class UltraDNSRestFilters {
   /**
    * @see UltraDNSRestFilters#resourceTypeEqualTo(int)
    */
-  private static class ResourceTypeEqualToPredicate implements Filter<Record>, Serializable {
+  private static final class ResourceTypeEqualToPredicate implements Filter<Record>, Serializable {
 
     private static final long serialVersionUID = 0;
     private final int typeValue;
@@ -43,7 +43,7 @@ final class UltraDNSRestFilters {
     }
   }
 
-  private static class RecordIdEqualToPredicate implements Filter<Record>, Serializable {
+  private static final class RecordIdEqualToPredicate implements Filter<Record>, Serializable {
 
     private static final long serialVersionUID = 0;
     private final String id;

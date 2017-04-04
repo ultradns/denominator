@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class UltraDNSRestPropertyLoaderTest {
 
-    String propertyName;
+    private String propertyName;
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();

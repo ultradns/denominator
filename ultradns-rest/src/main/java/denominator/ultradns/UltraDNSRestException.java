@@ -93,8 +93,8 @@ class UltraDNSRestException extends FeignException {
 
   public static class Message {
 
-    int errorCode;
-    String errorMessage;
+    private int errorCode;
+    private String errorMessage;
 
     public void setErrorCode(int errorCode) {
       this.errorCode = errorCode;
@@ -104,11 +104,11 @@ class UltraDNSRestException extends FeignException {
       this.errorMessage = errorMessage;
     }
 
-    public int errorCode() {
+    public int getErrorCode() {
       return errorCode;
     }
 
-    public String errorMessage() {
+    public String getErrorMessage() {
       return errorMessage;
     }
 

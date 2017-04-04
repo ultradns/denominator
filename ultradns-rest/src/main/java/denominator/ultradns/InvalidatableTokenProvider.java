@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static denominator.common.Preconditions.checkNotNull;
 
 /**
- * gets the last auth token, expiring if the current time exceed token expiry time
+ * gets the last Auth token, expiring if the current time exceed token expiry time
  */
 public class InvalidatableTokenProvider implements Provider<String>, CheckConnection {
 
@@ -25,9 +25,10 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
     private final Provider<Credentials> credentials;
     private final AtomicReference<Boolean> sessionValid;
     private final long durationMillis;
-    transient volatile int lastCredentialsHashCode;
-    transient volatile long expirationMillis;
-    transient String token;
+    private transient volatile String lastUrl;
+    private transient volatile int lastCredentialsHashCode;
+    private transient volatile long expirationMillis;
+    private transient String token;
 
     @Inject
     InvalidatableTokenProvider(denominator.Provider provider, Session session,
@@ -43,7 +44,7 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
 
     @Override
     public boolean ok() {
-        boolean isValid = System.currentTimeMillis() < expirationMillis;
+        boolean isValid = System.currentTimeMillis() < getExpirationMillis();
         if (!isValid) {
             sessionValid.set(false);
         }
@@ -52,23 +53,27 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
 
     @Override
     public String get() {
+        String currentUrl = provider.url();
         Credentials currentCreds = credentials.get();
         long currentTime = System.currentTimeMillis();
 
-        if (needsRefresh(currentTime, currentCreds)) {
-            lastCredentialsHashCode = currentCreds.hashCode();
-            TokenResponse t = auth(currentCreds);
-            expirationMillis = currentTime + durationMillis;
-            token = t.getAccessToken();
+        if (needsRefresh(currentTime, currentCreds, currentUrl)) {
+            setLastUrl(currentUrl);
+            setLastCredentialsHashCode(currentCreds.hashCode());
+            TokenResponse tokenResponse = auth(currentCreds);
+            setExpirationMillis(currentTime + durationMillis);
+            String t = tokenResponse.getAccessToken();
+            setToken(t);
             sessionValid.set(true);
-            return token;
+            return t;
         }
-        return token;
+        return getToken();
     }
 
-    private boolean needsRefresh(long currentTime, Credentials currentCreds) {
-        return !sessionValid.get() || expirationMillis == 0 || currentTime - expirationMillis >= 0
-                || currentCreds.hashCode() != lastCredentialsHashCode;
+    private boolean needsRefresh(long currentTime, Credentials currentCreds, String currentUrl) {
+        return !sessionValid.get()
+            || !currentUrl.equals(getLastUrl()) || currentCreds.hashCode() != getLastCredentialsHashCode()
+            || getExpirationMillis() == 0 || currentTime - getExpirationMillis() >= 0;
     }
 
     private TokenResponse auth(Credentials currentCreds) {
@@ -94,5 +99,37 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
         @RequestLine("POST /authorization/token")
         @Headers({ "Content-Type: application/x-www-form-urlencoded" })
         TokenResponse login(@Param("grant_type") String grantType, @Param("username") String userName, @Param("password") String password);
+    }
+
+    public String getLastUrl() {
+        return lastUrl;
+    }
+
+    public void setLastUrl(String lastUrl) {
+        this.lastUrl = lastUrl;
+    }
+
+    public int getLastCredentialsHashCode() {
+        return lastCredentialsHashCode;
+    }
+
+    public void setLastCredentialsHashCode(int lastCredentialsHashCode) {
+        this.lastCredentialsHashCode = lastCredentialsHashCode;
+    }
+
+    public long getExpirationMillis() {
+        return expirationMillis;
+    }
+
+    public void setExpirationMillis(long expirationMillis) {
+        this.expirationMillis = expirationMillis;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

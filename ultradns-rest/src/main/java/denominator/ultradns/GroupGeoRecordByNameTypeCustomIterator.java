@@ -23,22 +23,19 @@ import static denominator.common.Util.toMap;
  * DirectionalPool.RecordType#IPV4} and {@link DirectionalPool.RecordType#IPV6} emit both address
  * ({@code A} or {@code AAAA}) and {@code CNAME} records.
  */
-class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordSet<?>> {
+public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordSet<?>> {
 
   private final Map<String, Geo> cache = new LinkedHashMap<String, Geo>();
-  private final UltraDNSRest api;
   private final PeekingIterator<DirectionalRecord> peekingIterator;
   private final String zoneName;
-  UltraDNSRestGeoSupport ultraDNSRestGeoSupport;
+  private final UltraDNSRestGeoSupport ultraDNSRestGeoSupport;
 
-  private GroupGeoRecordByNameTypeCustomIterator(UltraDNSRest api,
+  private GroupGeoRecordByNameTypeCustomIterator(UltraDNSRestGeoSupport ultraDNSRestGeoSupport,
                                                  Iterator<DirectionalRecord> sortedIterator,
-                                                 String zoneName,
-                                                 UltraDNSRestGeoSupport ultraDNSRestGeoSupport) {
-    this.api = api;
+                                                 String zoneName) {
+    this.ultraDNSRestGeoSupport = ultraDNSRestGeoSupport;
     this.peekingIterator = peekingIterator(sortedIterator);
     this.zoneName = zoneName;
-    this.ultraDNSRestGeoSupport = ultraDNSRestGeoSupport;
   }
 
   static boolean typeTTLAndGeoGroupEquals(DirectionalRecord actual, DirectionalRecord expected) {
@@ -133,7 +130,7 @@ class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordS
      *                       DirectionalRecord#group()}
      */
     Iterator<ResourceRecordSet<?>> create(Iterator<DirectionalRecord> sortedIterator, String name) {
-      return new GroupGeoRecordByNameTypeCustomIterator(api, sortedIterator, name, new UltraDNSRestGeoSupport(api));
+      return new GroupGeoRecordByNameTypeCustomIterator(new UltraDNSRestGeoSupport(api), sortedIterator, name);
     }
   }
 }

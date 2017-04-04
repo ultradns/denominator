@@ -6,7 +6,7 @@ import java.util.List;
 public class ZoneList {
 
     private List<Zone> zones;
-    List<String> zoneNames = new ArrayList<String>();
+    private List<String> zoneNames = new ArrayList<String>();
 
     public List<Zone> getZones() {
         return zones;

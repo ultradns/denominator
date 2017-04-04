@@ -2,7 +2,9 @@ package denominator.ultradns;
 
 import static java.lang.String.format;
 
-public class UltraDNSMockResponse {
+public final class UltraDNSMockResponse {
+
+    private UltraDNSMockResponse() { }
 
     public static final String STATUS_SUCCESS = "{\n" +
             "    \"message\": \"Successful\"\n" +

@@ -59,9 +59,9 @@ public class UltraDNSRestGeoSupportTest {
     @Test
     public void regions() throws Exception {
         server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setBody(getAvailableRegionsResponseTopLevel));
-        server.enqueue(new MockResponse().setBody(getAvailableRegionsResponseSecondLevel));
-        server.enqueue(new MockResponse().setBody(getAvailableRegionsResponseThirdLevelPart01));
+        server.enqueue(new MockResponse().setBody(GET_AVAILABLE_REGIONS_RESPONSE_TOP_LEVEL));
+        server.enqueue(new MockResponse().setBody(GET_AVAILABLE_REGIONS_RESPONSE_SECOND_LEVEL));
+        server.enqueue(new MockResponse().setBody(GET_AVAILABLE_REGIONS_RESPONSE_THIRD_LEVEL_PART_1));
 
         UltraDNSRest api = mockApi();
         UltraDNSRestGeoSupport ultraDNSRestGeoSupport =  new UltraDNSRestGeoSupport();
@@ -82,9 +82,9 @@ public class UltraDNSRestGeoSupportTest {
     @Test
     public void regionsAsRegions() throws Exception {
         server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setBody(getAvailableRegionsResponseTopLevel));
-        server.enqueue(new MockResponse().setBody(getAvailableRegionsResponseSecondLevel));
-        server.enqueue(new MockResponse().setBody(getAvailableRegionsResponseThirdLevelPart01));
+        server.enqueue(new MockResponse().setBody(GET_AVAILABLE_REGIONS_RESPONSE_TOP_LEVEL));
+        server.enqueue(new MockResponse().setBody(GET_AVAILABLE_REGIONS_RESPONSE_SECOND_LEVEL));
+        server.enqueue(new MockResponse().setBody(GET_AVAILABLE_REGIONS_RESPONSE_THIRD_LEVEL_PART_1));
 
         UltraDNSRest api = mockApi();
         UltraDNSRestGeoSupport ultraDNSRestGeoSupport =  new UltraDNSRestGeoSupport(api);
@@ -102,7 +102,7 @@ public class UltraDNSRestGeoSupportTest {
                 .hasPath("/geoip/territories?codes=ANT-AQ%2CANT-BV%2CANT-TF%2COCN-AS%2COCN-AU%2COCN-CC%2COCN-CK%2COCN-CX%2COCN-FJ%2COCN-FM%2COCN-GU%2COCN-HM%2COCN-KI%2COCN-MH%2COCN-MP%2COCN-NC%2COCN-NF%2COCN-NR%2COCN-NU%2COCN-NZ%2COCN-PF%2COCN-PG%2COCN-PN%2COCN-PW%2COCN-SB%2COCN-TK%2COCN-TO%2COCN-TV%2COCN-U9%2COCN-UM%2COCN-VU%2COCN-WF%2COCN-WS%2CSAM-AR%2CSAM-BO%2CSAM-BR%2CSAM-CL%2CSAM-CO%2CSAM-EC%2CSAM-FK%2CSAM-GF%2CSAM-GS%2CSAM-GY%2CSAM-PE%2CSAM-PY%2CSAM-SR%2CSAM-U4%2CSAM-UY");
     }
 
-    private static final String getAvailableRegionsResponseTopLevel =
+    private static final String GET_AVAILABLE_REGIONS_RESPONSE_TOP_LEVEL =
             "[\n" +
                     "  [\n" +
                     "    {\n" +
@@ -144,7 +144,7 @@ public class UltraDNSRestGeoSupportTest {
                     "  ]\n" +
                     "]";
 
-    private static final String getAvailableRegionsResponseSecondLevel = "[\n" +
+    private static final String GET_AVAILABLE_REGIONS_RESPONSE_SECOND_LEVEL = "[\n" +
             "  [],\n" +
             "  [],\n" +
             "  [],\n" +
@@ -450,7 +450,7 @@ public class UltraDNSRestGeoSupportTest {
             "  ]\n" +
             "]";
 
-    private static final String getAvailableRegionsResponseThirdLevelPart01 = "[\n" +
+    private static final String GET_AVAILABLE_REGIONS_RESPONSE_THIRD_LEVEL_PART_1 = "[\n" +
             "  [],\n" +
             "  [],\n" +
             "  [],\n" +

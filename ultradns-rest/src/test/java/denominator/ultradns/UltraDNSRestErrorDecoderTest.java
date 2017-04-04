@@ -23,7 +23,7 @@ public class UltraDNSRestErrorDecoderTest {
   public final ExpectedException thrown = ExpectedException.none();
 
 
-  @Before()
+  @Before
   public void setUp() throws Exception {
     errors = new UltraDNSRestErrorDecoder(new AtomicReference<Boolean>(false));
   }

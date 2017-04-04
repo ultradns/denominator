@@ -140,12 +140,12 @@ public class Region implements Comparable<Region> {
   public Map<String, Collection<String>> getRegionHierarchy() {
     Map<String, Collection<String>> regionNameSubRegionNames = new TreeMap<String, Collection<String>>();
     Collection<String> subRegionNames = new TreeSet<String>();
-    TreeSet<Region> childRegions = getChildRegions();
+    TreeSet<Region> childRegions1 = getChildRegions();
     if (this.isCountry()) {
-      if (childRegions == null || childRegions.size() == 0) {
+      if (childRegions1 == null || childRegions1.size() == 0) {
         subRegionNames.add(this.getName());
       } else {
-        for (Region childRegion : childRegions) {
+        for (Region childRegion : childRegions1) {
           subRegionNames.add(childRegion.getName());
         }
       }
@@ -154,12 +154,12 @@ public class Region implements Comparable<Region> {
         subRegionNames.add(this.getName());
       }
 
-      if (childRegions != null) {
-        for (Region childRegion : childRegions) {
+      if (childRegions1 != null) {
+        for (Region childRegion : childRegions1) {
           subRegionNames.add(childRegion.getName());
         }
 
-        for (Region childRegion : childRegions) {
+        for (Region childRegion : childRegions1) {
           Map<String, Collection<String>> childChildRegionHierarchy = childRegion.getRegionHierarchy();
           for (Map.Entry<String, Collection<String>> entry : childChildRegionHierarchy.entrySet()) {
             regionNameSubRegionNames.put(entry.getKey(), entry.getValue());
@@ -176,12 +176,12 @@ public class Region implements Comparable<Region> {
   public Map<Region, Collection<Region>> getRegionHierarchyAsRegions() {
     Map<Region, Collection<Region>> regionNameSubRegionNames = new TreeMap<Region, Collection<Region>>();
     Collection<Region> subRegionNames = new TreeSet<Region>();
-    TreeSet<Region> childRegions = getChildRegions();
+    TreeSet<Region> childRegions1 = getChildRegions();
     if (this.isCountry()) {
-      if (childRegions == null || childRegions.size() == 0) {
+      if (childRegions1 == null || childRegions1.size() == 0) {
         subRegionNames.add(this);
       } else {
-        for (Region childRegion : childRegions) {
+        for (Region childRegion : childRegions1) {
           subRegionNames.add(childRegion);
         }
       }
@@ -190,12 +190,12 @@ public class Region implements Comparable<Region> {
         subRegionNames.add(this);
       }
 
-      if (childRegions != null) {
-        for (Region childRegion : childRegions) {
+      if (childRegions1 != null) {
+        for (Region childRegion : childRegions1) {
           subRegionNames.add(childRegion);
         }
 
-        for (Region childRegion : childRegions) {
+        for (Region childRegion : childRegions1) {
           Map<Region, Collection<Region>> childChildRegionHierarchy = childRegion.getRegionHierarchyAsRegions();
           for (Map.Entry<Region, Collection<Region>> entry : childChildRegionHierarchy.entrySet()) {
             regionNameSubRegionNames.put(entry.getKey(), entry.getValue());

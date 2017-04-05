@@ -126,11 +126,11 @@ public class Region implements Comparable<Region> {
   }
 
   public boolean isRegion() {
-    return this.getType().equals("Region");
+    return "Region".equals(this.getType());
   }
 
   public boolean isCountry() {
-    return this.getType().equals("Country");
+    return "Country".equals(this.getType());
   }
 
   public int compareTo(Region region1) {

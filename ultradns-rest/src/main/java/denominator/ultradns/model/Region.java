@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 public class Region implements Comparable<Region> {
 
   private String name;
@@ -224,23 +227,36 @@ public class Region implements Comparable<Region> {
 
   @Override
   public boolean equals(Object object) {
-    if (object instanceof Region) {
-      Region region1 = (Region) object;
-      return this.hashCode() == region1.hashCode();
-    } else {
+    if (object == null) {
       return false;
     }
+    if (object == this) {
+      return true;
+    }
+    if (this.getClass() != object.getClass()) {
+      return false;
+    }
+
+    Region region1 = (Region) object;
+    return new EqualsBuilder()
+            .append(code, region1.code)
+            .append(name, region1.name)
+            .append(type, region1.type)
+            .append(id, region1.id)
+            .isEquals();
   }
 
   @Override
   public int hashCode() {
-    String str = "{";
-    str += "\"code\": \"" + this.code + "\"";
-    str += ", \"name\": \"" + this.name + "\"";
-    str += ", \"type\": \"" + this.type + "\"";
-    str += ", \"id\": " + this.id;
-    str += "}";
-    return str.hashCode();
+    int initialNonZeroOddNumber = 101;
+    int multiplierNonZeroOddNumber = 103;
+    return new HashCodeBuilder(
+            initialNonZeroOddNumber, multiplierNonZeroOddNumber)
+            .append(code)
+            .append(name)
+            .append(type)
+            .append(id)
+            .toHashCode();
   }
 
 }

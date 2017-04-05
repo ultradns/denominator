@@ -16,7 +16,7 @@ class NetworkConnection implements CheckConnection {
   @Override
   public boolean ok() {
     try {
-      return "GOOD".equals(api.getNeustarNetworkStatus().getMessage().toUpperCase());
+      return "GOOD".equalsIgnoreCase(api.getNeustarNetworkStatus().getMessage());
     } catch (RuntimeException e) {
       return false;
     }

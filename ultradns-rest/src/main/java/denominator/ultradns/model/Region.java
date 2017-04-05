@@ -21,6 +21,9 @@ public class Region implements Comparable<Region> {
   private Region parentRegion;
   private TreeSet<Region> childRegions;
 
+  private static final int INITIAL_NON_ZERO_ODD_NUMBER = 101;
+  private static final int MULTIPLIER_NON_ZERO_ODD_NUMBER = 103;
+
   public Region(String name, String code, String type, int id) {
     this.name = name;
     this.code = code;
@@ -248,10 +251,8 @@ public class Region implements Comparable<Region> {
 
   @Override
   public int hashCode() {
-    int initialNonZeroOddNumber = 101;
-    int multiplierNonZeroOddNumber = 103;
     return new HashCodeBuilder(
-            initialNonZeroOddNumber, multiplierNonZeroOddNumber)
+            INITIAL_NON_ZERO_ODD_NUMBER, MULTIPLIER_NON_ZERO_ODD_NUMBER)
             .append(code)
             .append(name)
             .append(type)

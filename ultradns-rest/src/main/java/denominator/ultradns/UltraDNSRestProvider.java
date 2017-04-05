@@ -21,6 +21,7 @@ import denominator.config.ConcatBasicAndQualifiedResourceRecordSets;
 import denominator.config.NothingToClose;
 import denominator.config.WeightedUnsupported;
 import denominator.profile.GeoResourceRecordSetApi;
+import denominator.ultradns.util.PropertyUtil;
 import feign.Feign;
 import feign.Logger;
 import feign.Request.Options;
@@ -45,7 +46,7 @@ public class UltraDNSRestProvider extends BasicProvider {
    * @param url if empty or null use default
    */
   public UltraDNSRestProvider(String url) {
-    this.url = StringUtils.isEmpty(url) ? UltraDNSRestPropertyLoader.getProperty("ultradns.rest.url") : url;
+    this.url = StringUtils.isEmpty(url) ? PropertyUtil.getProperty("ultradns.rest.url") : url;
   }
 
   @Override
@@ -206,8 +207,8 @@ public class UltraDNSRestProvider extends BasicProvider {
        * to 10 minutes to complete.
        */
       Options options = new Options(
-              Integer.parseInt(UltraDNSRestPropertyLoader.getProperty("feign.connect.timeout.millis")),
-              Integer.parseInt(UltraDNSRestPropertyLoader.getProperty("feign.read.timeout.millis"))
+              Integer.parseInt(PropertyUtil.getProperty("feign.connect.timeout.millis")),
+              Integer.parseInt(PropertyUtil.getProperty("feign.read.timeout.millis"))
           );
 
       return Feign.builder()

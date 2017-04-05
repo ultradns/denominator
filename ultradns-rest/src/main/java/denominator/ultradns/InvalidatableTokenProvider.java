@@ -3,6 +3,7 @@ package denominator.ultradns;
 import denominator.CheckConnection;
 import denominator.Credentials;
 import denominator.ultradns.model.TokenResponse;
+import denominator.ultradns.util.PropertyUtil;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -38,8 +39,7 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
         this.session = session;
         this.credentials = credentials;
         this.sessionValid = sessionValid;
-        this.durationMillis = Long.parseLong(UltraDNSRestPropertyLoader
-                .getProperty("ultradns.rest.token.expiry.millis"));
+        this.durationMillis = Long.parseLong(PropertyUtil.getProperty("ultradns.rest.token.expiry.millis"));
     }
 
     @Override

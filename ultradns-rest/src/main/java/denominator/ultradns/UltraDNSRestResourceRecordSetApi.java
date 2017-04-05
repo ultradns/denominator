@@ -11,6 +11,7 @@ import denominator.ResourceRecordSetApi;
 import denominator.model.ResourceRecordSet;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.Record;
+import denominator.ultradns.util.RRSetUtil;
 import org.apache.commons.lang.StringUtils;
 
 import static denominator.ResourceTypeToValue.lookup;
@@ -35,9 +36,9 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
 
   @Override
   public Iterator<ResourceRecordSet<?>> iterator() {
-    Iterator<Record> orderedRecords = api
+    Iterator<Record> orderedRecords = RRSetUtil.buildRecords(api
             .getResourceRecordsOfZone(zoneName)
-            .buildRecords()
+            .rrSets())
             .iterator();
     return new GroupByRecordNameAndTypeCustomIterator(orderedRecords);
   }
@@ -46,9 +47,9 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
   public Iterator<ResourceRecordSet<?>> iterateByName(String name) {
     checkNotNull(name, "name");
     final int anyRrType = 255;
-    Iterator<Record> ordered = api
+    Iterator<Record> ordered = RRSetUtil.buildRecords(api
             .getResourceRecordsOfDNameByType(zoneName, name, anyRrType)
-            .buildRecords()
+            .rrSets())
             .iterator();
     return new GroupByRecordNameAndTypeCustomIterator(ordered);
   }
@@ -69,9 +70,9 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
     int typeValue = checkNotNull(lookup(type), "typeValue for %s", type);
     List<Record> records = null;
     try {
-      records = api
+      records = RRSetUtil.buildRecords(api
               .getResourceRecordsOfDNameByType(zoneName, name, typeValue)
-              .buildRecords();
+              .rrSets());
     } catch (UltraDNSRestException e) {
       if (e.code() == UltraDNSRestException.DATA_NOT_FOUND ||
           e.code() == UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND) {

@@ -6,6 +6,7 @@ import denominator.ultradns.model.DirectionalRecord;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.RRSetList;
 import denominator.ultradns.model.Region;
+import denominator.ultradns.util.RRSetUtil;
 import feign.Feign;
 import org.junit.Rule;
 import org.junit.Test;
@@ -580,8 +581,8 @@ public class UltraDNSRestTest {
         server.enqueue(new MockResponse().setBody(GET_DIRECTIONAL_POOLS_OF_ZONE));
         server.enqueue(new MockResponse());
 
-        List<DirectionalRecord> records = mockApi().getDirectionalDNSRecordsForHost(
-                "test-zone-1.com.", "dir_pool_1.test-zone-1.com.", 1).buildDirectionalRecords();
+        List<DirectionalRecord> records = RRSetUtil.buildDirectionalRecords(mockApi().getDirectionalDNSRecordsForHost(
+                "test-zone-1.com.", "dir_pool_1.test-zone-1.com.", 1).rrSets());
 
         assertThat(records).extracting("name", "geoGroupName", "ipGroupName", "noResponseRecord")
                 .containsExactly(

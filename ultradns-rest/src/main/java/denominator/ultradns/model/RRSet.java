@@ -18,7 +18,7 @@ public class RRSet {
         this.rdata = rdata;
     }
 
-    public int intValueOfRrtype() {
+   /* public int intValueOfRrtype() {
         if (rrtype != null) {
             return Integer.parseInt(rrtype.substring(rrtype.indexOf("(") + 1,
                     rrtype.indexOf(")")));
@@ -31,7 +31,7 @@ public class RRSet {
             return rrtype.substring(0, rrtype.indexOf(" "));
         }
         return "";
-    }
+    }*/
 
     public String getOwnerName() {
         return ownerName;

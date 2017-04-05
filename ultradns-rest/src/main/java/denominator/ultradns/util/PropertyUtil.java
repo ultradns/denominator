@@ -1,23 +1,27 @@
-package denominator.ultradns;
+package denominator.ultradns.util;
 
+import denominator.ultradns.UltraDNSRestException;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public final class UltraDNSRestPropertyLoader {
+/**
+ * This will load application properties from application configuration file.
+ */
+public final class PropertyUtil {
 
     private static Properties applicationProperties;
     private static InputStream input = null;
-    private static final Logger LOGGER = Logger.getLogger(UltraDNSRestPropertyLoader.class);
+    private static final Logger LOGGER = Logger.getLogger(PropertyUtil.class);
 
-    private UltraDNSRestPropertyLoader() { }
+    private PropertyUtil() { }
 
     public static Properties loadProperties() {
         try {
             applicationProperties = new Properties();
-            input = UltraDNSRestPropertyLoader.class.getResourceAsStream("/application.properties");
+            input = PropertyUtil.class.getResourceAsStream("/application.properties");
             if (input == null) {
                 throw new UltraDNSRestException("Unable to load application properties file !!", -1);
             }

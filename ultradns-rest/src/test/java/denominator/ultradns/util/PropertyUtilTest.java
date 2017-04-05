@@ -1,12 +1,13 @@
-package denominator.ultradns;
+package denominator.ultradns.util;
 
+import denominator.ultradns.UltraDNSRestException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class UltraDNSRestPropertyLoaderTest {
+public class PropertyUtilTest {
 
     private String propertyName;
 
@@ -16,7 +17,7 @@ public class UltraDNSRestPropertyLoaderTest {
     @Test
     public void testWhenPropertyPresent() throws Exception {
         propertyName = "ultradns.rest.url";
-        assertThat(UltraDNSRestPropertyLoader.getProperty(propertyName)).isEqualTo("https://test-restapi.ultradns.com/v2");
+        assertThat(PropertyUtil.getProperty(propertyName)).isEqualTo("https://test-restapi.ultradns.com/v2");
     }
 
     @Test
@@ -26,6 +27,6 @@ public class UltraDNSRestPropertyLoaderTest {
         thrown.expect(UltraDNSRestException.class);
         thrown.expectMessage("Could not load property with name " + propertyName + " !! Please check property configuration.");
 
-        assertThat(UltraDNSRestPropertyLoader.getProperty(propertyName)).isEqualTo("https://test-restapi.ultradns.com/v2");
+        assertThat(PropertyUtil.getProperty(propertyName)).isEqualTo("https://test-restapi.ultradns.com/v2");
     }
 }

@@ -14,6 +14,7 @@ import dagger.Module;
 import dagger.Provides;
 import denominator.ultradns.model.DirectionalGroup;
 import denominator.ultradns.model.Region;
+import denominator.ultradns.util.RRSetUtil;
 import org.apache.commons.lang.StringUtils;
 
 @Module(injects = UltraDNSRestGeoResourceRecordSetApi.Factory.class, complete = false)
@@ -141,8 +142,9 @@ public class UltraDNSRestGeoSupport {
 
   public DirectionalGroup getDirectionalDNSGroupByName(String zoneName, String hostName, int rrType, String groupName) {
 
-    TreeSet<String> codes = api.getDirectionalDNSRecordsForHost(zoneName, hostName, rrType)
-            .getDirectionalGroupDetails(groupName);
+    TreeSet<String> codes = RRSetUtil.getDirectionalGroupDetails(
+            api.getDirectionalDNSRecordsForHost(zoneName, hostName, rrType).rrSets(),
+            groupName);
 
     Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
 

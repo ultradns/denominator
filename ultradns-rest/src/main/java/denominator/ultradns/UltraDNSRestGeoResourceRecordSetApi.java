@@ -23,6 +23,8 @@ import denominator.ultradns.model.GeoInfo;
 import denominator.ultradns.model.Profile;
 import denominator.ultradns.model.DirectionalRecord;
 import denominator.ultradns.model.DirectionalGroup;
+import denominator.ultradns.util.RRSetUtil;
+import denominator.ResourceTypeToValue.ResourceTypes;
 import org.apache.commons.lang.StringUtils;
 
 import static denominator.ResourceTypeToValue.lookup;
@@ -33,7 +35,6 @@ import static denominator.common.Util.filter;
 import static denominator.common.Util.nextOrNull;
 import static denominator.common.Util.toMap;
 import static denominator.model.ResourceRecordSets.nameAndTypeEqualTo;
-import denominator.ResourceTypeToValue.ResourceTypes;
 
 final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetApi {
   private static final Filter<ResourceRecordSet<?>> IS_GEO = new Filter<ResourceRecordSet<?>>() {
@@ -80,7 +81,9 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
   @Override
   public Iterator<ResourceRecordSet<?>> iterator() {
     List<Iterable<ResourceRecordSet<?>>> eachPool = new ArrayList<Iterable<ResourceRecordSet<?>>>();
-    final Map<String, Integer> nameAndType = api.getDirectionalPoolsOfZone(zoneName).getNameAndType();
+    final Map<String, Integer> nameAndType = RRSetUtil.getNameAndType(api
+            .getDirectionalPoolsOfZone(zoneName)
+            .rrSets());
     for (final String poolName : nameAndType.keySet()) {
       eachPool.add(new Iterable<ResourceRecordSet<?>>() {
         public Iterator<ResourceRecordSet<?>> iterator() {
@@ -153,8 +156,9 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
   private Iterator<DirectionalRecord> recordsForNameTypeAndQualifier(String name, String type,
                                                                                   String qualifier) {
     try {
-      return api.getDirectionalDNSRecordsForHost(zoneName, name, dirType(type))
-              .getDirectionalRecordsByGroup(qualifier).iterator();
+      return RRSetUtil.getDirectionalRecordsByGroup(
+              api.getDirectionalDNSRecordsForHost(zoneName, name, dirType(type)).rrSets(),
+              qualifier).iterator();
     } catch (UltraDNSRestException e) {
       switch (e.code()) {
         case UltraDNSRestException.GROUP_NOT_FOUND:
@@ -249,7 +253,9 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
                                                                             int dirType) {
     List<DirectionalRecord> list;
     try {
-      list = api.getDirectionalDNSRecordsForHost(zoneName, name, dirType).buildDirectionalRecords();
+      list = RRSetUtil.buildDirectionalRecords(api
+              .getDirectionalDNSRecordsForHost(zoneName, name, dirType)
+              .rrSets());
     } catch (UltraDNSRestException e) {
       if (e.code() == UltraDNSRestException.DIRECTIONALPOOL_NOT_FOUND) {
         list = Collections.emptyList();

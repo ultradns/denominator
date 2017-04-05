@@ -4,6 +4,8 @@ import denominator.model.Zone;
 import denominator.ultradns.model.AccountList;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.Record;
+import denominator.ultradns.util.RRSetUtil;
+import denominator.ultradns.util.ZoneUtil;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
@@ -29,8 +31,12 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
    */
   @Override
   public Iterator<Zone> iterator() {
-    final Iterator<String> delegate = api.getZonesOfAccount(getCurrentAccountName())
-            .getZoneNames().iterator();
+    final String accountName = getCurrentAccountName();
+    List<String> zoneNames = new ArrayList<String>();
+    if (accountName != null) {
+      zoneNames = ZoneUtil.getZoneNames(api.getZonesOfAccount(accountName).getZones());
+    }
+    final Iterator<String> delegate = zoneNames.iterator();
     return new Iterator<Zone>() {
       @Override
       public boolean hasNext() {
@@ -99,7 +105,7 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
   }
 
   private Zone fromSOA(String name) {
-    List<Record> soas = api.getResourceRecordsOfDNameByType(name, name, 6).buildRecords();
+    List<Record> soas = RRSetUtil.buildRecords(api.getResourceRecordsOfDNameByType(name, name, 6).rrSets());
     checkState(!soas.isEmpty(), "SOA record for zone %s was not present", name);
     Record soa = soas.get(0);
     return Zone.create(name, name, soa.getTtl(), soa.getRdata().get(1));
@@ -107,9 +113,12 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
 
   private String getCurrentAccountName() {
     AccountList accountList = api.getAccountsListOfUser();
-    return accountList.getAccounts()
-            .get(accountList.getAccounts().size() - 1)
-            .getAccountName();
+    if (accountList.getAccounts() != null && !accountList.getAccounts().isEmpty()) {
+      return accountList.getAccounts()
+              .get(accountList.getAccounts().size() - 1)
+              .getAccountName();
+    }
+    return null;
   }
 
   private String formatEmail(String email) {

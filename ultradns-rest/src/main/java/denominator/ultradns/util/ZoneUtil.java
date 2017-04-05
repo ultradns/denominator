@@ -10,7 +10,7 @@ public final class ZoneUtil {
     private ZoneUtil() { }
 
     /**
-     * Extract zone names from zone list
+     * Extract zone names from zone list.
      * @param zones
      * @return List of zone name
      */

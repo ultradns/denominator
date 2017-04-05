@@ -1,6 +1,6 @@
 package denominator.ultradns.util;
 
-public class Constants {
+public final class Constants {
 
     private Constants() { }
 

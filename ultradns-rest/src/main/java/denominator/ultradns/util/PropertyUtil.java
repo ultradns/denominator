@@ -52,7 +52,8 @@ public final class PropertyUtil {
     public static String getProperty(String propertyName) {
         String propertyValue = getProperties().getProperty(propertyName);
         if (propertyValue == null) {
-            throw new UltraDNSRestException("Could not load property with name " + propertyName + " !! Please check property configuration.", -1);
+            throw new UltraDNSRestException("Could not load property with name " + propertyName
+                    + " !! Please check property configuration.", -1);
         }
         return propertyValue;
     }

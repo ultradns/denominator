@@ -25,7 +25,7 @@ public final class RRSetUtil {
     private RRSetUtil() { }
 
     /**
-     * Creation of ResourceRecord with rData
+     * Creation of ResourceRecord with rData.
      * @return List of Resource Record
      */
     public static List<Record> buildRecords(List<RRSet> rrSets) {

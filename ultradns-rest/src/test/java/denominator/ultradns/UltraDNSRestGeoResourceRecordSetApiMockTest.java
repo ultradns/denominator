@@ -17,6 +17,13 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import static denominator.ultradns.UltraDNSRestException.DIRECTIONAL_NOT_ENABLED;
+import static denominator.ultradns.UltraDNSMockResponse.GEO_SUPPORTED_REGIONS_SIZE;
+import static denominator.ultradns.UltraDNSMockResponse.TTL_200;
+import static denominator.ultradns.UltraDNSMockResponse.TTL_500;
+import static denominator.ultradns.UltraDNSMockResponse.TTL_300;
+import static denominator.ultradns.UltraDNSMockResponse.TTL_100;
+import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 
 public class UltraDNSRestGeoResourceRecordSetApiMockTest {
 
@@ -29,7 +36,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     @Test
     public void apiWhenUnsupported() throws Exception {
         server.enqueueSessionResponse();
-        server.enqueueError(500, DIRECTIONAL_NOT_ENABLED,
+        server.enqueueError(SC_INTERNAL_SERVER_ERROR, DIRECTIONAL_NOT_ENABLED,
                 "Directional feature not Enabled or Directional migration is not done.");
 
         assertThat(server.connect().api().geoRecordSetsInZone("denominator.io.")).isNull();
@@ -45,7 +52,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
         enqueueAvailableRegionsResponse();
 
         GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
-        assertThat(api.supportedRegions()).hasSize(15);
+        assertThat(api.supportedRegions()).hasSize(GEO_SUPPORTED_REGIONS_SIZE);
 
         server.assertSessionRequest();
         assertAvailableRegionsRequest();
@@ -150,7 +157,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
                 .name("test_directional_pool.denominator.io.")
                 .type("A")
                 .qualifier("Europe")
-                .ttl(200)
+                .ttl(TTL_200)
                 .add(AData.create("2.2.2.2"))
                 .geo(Geo.create(new LinkedHashMap<String, Collection<String>>() {
                     {
@@ -192,7 +199,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
                 .name("test_directional_pool.denominator.io.")
                 .type("A")
                 .qualifier("Europe")
-                .ttl(200)
+                .ttl(TTL_200)
                 .add(AData.create("2.2.2.2"))
                 .geo(Geo.create(new LinkedHashMap<String, Collection<String>>() {
                     {
@@ -240,7 +247,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
                 .name("test_directional_pool.denominator.io.")
                 .type("A")
                 .qualifier("Europe")
-                .ttl(500)
+                .ttl(TTL_500)
                 .add(AData.create("2.2.2.2"))
                 .geo(Geo.create(new LinkedHashMap<String, Collection<String>>() {
                     {
@@ -273,7 +280,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
         server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
         server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
         server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
-        server.enqueueError(400, UltraDNSRestException.POOL_ALREADY_EXISTS,
+        server.enqueueError(SC_BAD_REQUEST, UltraDNSRestException.POOL_ALREADY_EXISTS,
                 "Pool already created for this host name : dir_pool_1.test-zone-1.com.");
         enqueueAvailableRegionsResponse();
         server.enqueue(new MockResponse().setBody(
@@ -287,7 +294,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
                 .name("test_directional_pool.denominator.io.")
                 .type("A")
                 .qualifier("Europe")
-                .ttl(500)
+                .ttl(TTL_500)
                 .add(AData.create("7.7.7.7"))
                 .geo(Geo.create(new LinkedHashMap<String, Collection<String>>() {
                     {
@@ -366,7 +373,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
                 .hasName("test_directional_pool.denominator.io.")
                 .hasType("A")
                 .hasQualifier("NorthAmerica")
-                .hasTtl(100)
+                .hasTtl(TTL_100)
                 .containsExactlyRecords(AData.create("1.1.1.1"))
                 .containsRegion("North America", "United States", "U.S. Virgin Islands");
     }
@@ -376,7 +383,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
                 .hasName("test_directional_pool.denominator.io.")
                 .hasType("A")
                 .hasQualifier("Europe")
-                .hasTtl(200)
+                .hasTtl(TTL_200)
                 .containsExactlyRecords(AData.create("2.2.2.2"))
                 .containsRegion("Europe", "Spain", "United Kingdom - England, Northern Ireland, Scotland, Wales", "Sweden");
     }
@@ -386,7 +393,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
                 .hasName("test_directional_pool.denominator.io.")
                 .hasType("A")
                 .hasQualifier("Asia")
-                .hasTtl(300)
+                .hasTtl(TTL_300)
                 .containsExactlyRecords(AData.create("3.3.3.3"))
                 .containsRegion("Asia", "India", "Japan")
                 .containsRegion("India", "West Bengal");

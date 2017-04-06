@@ -6,6 +6,42 @@ public final class UltraDNSMockResponse {
 
     private UltraDNSMockResponse() { }
 
+    public static final int TTL_100 = 100;
+
+    public static final int TTL_200 = 200;
+
+    public static final int TTL_300 = 300;
+
+    public static final int TTL_500 = 500;
+
+    public static final int TTL_86400 = 86400;
+
+    public static final int TTL_3600 = 3600;
+
+    public static final int TTL_2400 = 2400;
+
+    public static final int TTL_4800 = 4800;
+
+    public static final int TTL_122 = 122;
+
+    public static final int TTL_50 = 50;
+
+    public static final int TTL_3601 = 3601;
+
+    public static final int GEO_SUPPORTED_REGIONS_SIZE = 15;
+
+    public static final int RESOURCE_RECORDS_COUNT = 7;
+
+    public static final int RESOURCE_RECORD_TYPE = 7;
+
+    public static final int REGION_CODE_A1 = 315;
+
+    public static final int REGION_CODE_A2 = 316;
+
+    public static final int REGION_CODE_A3 = 331;
+
+    public static final int REGION_CODE_NAM = 338;
+
     public static final String STATUS_SUCCESS = "{\n" +
             "    \"message\": \"Successful\"\n" +
             "}\n";

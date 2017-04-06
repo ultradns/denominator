@@ -21,8 +21,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static denominator.model.ResourceRecordSets.a;
 import static denominator.model.ResourceRecordSets.aaaa;
 import static denominator.model.ResourceRecordSets.ns;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import static denominator.ultradns.UltraDNSMockResponse.GET_RESOURCE_RECORDS_PRESENT;
 import static denominator.ultradns.UltraDNSMockResponse.STATUS_SUCCESS;
 import static denominator.ultradns.UltraDNSMockResponse.RR_SET_WITH_NO_RECORDS;
@@ -34,6 +32,14 @@ import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_THREE_RESOURCE
 import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_FOUR_RESOURCE_RECORDS;
 import static denominator.ultradns.UltraDNSMockResponse.RR_SET_LIST_WITH_ONE_NS_RECORD;
 import static denominator.ultradns.UltraDNSMockResponse.RR_SET_LIST_WITH_TWO_NS_RECORDS;
+import static denominator.ultradns.UltraDNSMockResponse.TTL_86400;
+import static denominator.ultradns.UltraDNSMockResponse.TTL_3600;
+import static denominator.ultradns.UltraDNSMockResponse.TTL_2400;
+import static denominator.ultradns.UltraDNSMockResponse.TTL_4800;
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 
 public class UltraDNSRestResourceRecordSetApiMockTest {
 
@@ -80,7 +86,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
 
     server.enqueueSessionResponse();
     server.enqueue(new MockResponse()
-            .setResponseCode(404)
+            .setResponseCode(SC_NOT_FOUND)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.ZONE_NOT_FOUND,
                     "Zone does not exist in the system.")));
@@ -113,7 +119,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
 
     server.enqueueSessionResponse();
     server.enqueue(new MockResponse()
-            .setResponseCode(404)
+            .setResponseCode(SC_NOT_FOUND)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.DATA_NOT_FOUND,
                     "Data not found.")));
@@ -132,7 +138,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     ResourceRecordSetApi api = server.connect().api()
             .basicRecordSetsInZone("denominator.io.");
     ResourceRecordSet<AData> aDataResourceRecordSet = a(
-            "pool_2.denominator.io.", 86400,
+            "pool_2.denominator.io.", TTL_86400,
             Arrays.asList("1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4",
                     "5.5.5.5", "6.6.6.6", "7.7.7.7"));
     assertThat(api.iterateByName("pool_2.denominator.io."))
@@ -148,7 +154,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
   public void getByNameAndTypeWhenAbsent() throws Exception {
     server.enqueueSessionResponse();
     server.enqueue(new MockResponse()
-            .setResponseCode(404)
+            .setResponseCode(SC_NOT_FOUND)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.DATA_NOT_FOUND,
                     "Data not found.")));
@@ -171,7 +177,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     ResourceRecordSetApi api = server.connect().api()
             .basicRecordSetsInZone("denominator.io.");
     ResourceRecordSet<AData> aDataResourceRecordSet = a(
-            "pool_2.denominator.io.", 86400,
+            "pool_2.denominator.io.", TTL_86400,
             Arrays.asList("1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4",
                     "5.5.5.5", "6.6.6.6", "7.7.7.7"));
     assertThat(api.getByNameAndType("pool_2.denominator.io.", "A"))
@@ -190,7 +196,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueueSessionResponse();
     // Response to the request to get the RR Sets in the pool.
     server.enqueue(new MockResponse()
-            .setResponseCode(404)
+            .setResponseCode(SC_NOT_FOUND)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.ZONE_NOT_FOUND,
                     "Zone does not exist in the system.")));
@@ -205,7 +211,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueueSessionResponse();
     // Response to the request to get the RR Sets in the pool.
     server.enqueue(new MockResponse()
-            .setResponseCode(404)
+            .setResponseCode(SC_NOT_FOUND)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.DATA_NOT_FOUND,
                     "Data not found.")));
@@ -215,7 +221,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
 
     ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.put(a("www.denominator.io.", 3600, "192.0.2.1"));
+    api.put(a("www.denominator.io.", TTL_3600, "192.0.2.1"));
 
     server.assertSessionRequest();
 
@@ -258,7 +264,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     // Response to the request to create the pool. It will be a 400 bad
     // request since the pool is already created.
     server.enqueue(new MockResponse()
-            .setResponseCode(400)
+            .setResponseCode(SC_BAD_REQUEST)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.POOL_ALREADY_EXISTS,
                     "Pool already created for this host name : " +
@@ -268,7 +274,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
 
     ResourceRecordSetApi api = server.connect().api()
             .basicRecordSetsInZone("denominator.io.");
-    api.put(a("www.denominator.io.", 3600, "192.0.2.1"));
+    api.put(a("www.denominator.io.", TTL_3600, "192.0.2.1"));
 
     server.assertSessionRequest();
 
@@ -311,7 +317,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     // Response to the request to create the pool. It will be a 400 bad
     // request since the pool is already created.
     server.enqueue(new MockResponse()
-            .setResponseCode(400)
+            .setResponseCode(SC_BAD_REQUEST)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.POOL_ALREADY_EXISTS,
                     "Pool already created for this host name : " +
@@ -321,7 +327,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
 
     ResourceRecordSetApi api = server.connect().api()
             .basicRecordSetsInZone("denominator.io.");
-    api.put(a("www.denominator.io.", 3600, Arrays.asList("192.0.2.1", "198.51.100.1")));
+    api.put(a("www.denominator.io.", TTL_3600, Arrays.asList("192.0.2.1", "198.51.100.1")));
 
     server.assertSessionRequest();
 
@@ -361,7 +367,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueueSessionResponse();
     // Response to the request to get the RR Sets in the pool.
     server.enqueue(new MockResponse()
-            .setResponseCode(404)
+            .setResponseCode(SC_NOT_FOUND)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.DATA_NOT_FOUND,
                     "Data not found.")));
@@ -372,7 +378,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
 
     ResourceRecordSetApi api = server.connect().api()
             .basicRecordSetsInZone("denominator.io.");
-    api.put(aaaa("www.denominator.io.", 3600, "3FFE:0B80:0447:0001:0000:0000:0000:0001"));
+    api.put(aaaa("www.denominator.io.", TTL_3600, "3FFE:0B80:0447:0001:0000:0000:0000:0001"));
 
     server.assertSessionRequest();
 
@@ -415,7 +421,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     // Response to the request to create the pool. It will be a 400 bad
     // request since the pool is already created.
     server.enqueue(new MockResponse()
-            .setResponseCode(400)
+            .setResponseCode(SC_BAD_REQUEST)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.POOL_ALREADY_EXISTS,
                     "Pool already created for this host name : " +
@@ -425,7 +431,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
 
     ResourceRecordSetApi api = server.connect().api()
             .basicRecordSetsInZone("denominator.io.");
-    api.put(aaaa("www.denominator.io.", 3600, "3FFE:0B80:0447:0001:0000:0000:0000:0001"));
+    api.put(aaaa("www.denominator.io.", TTL_3600, "3FFE:0B80:0447:0001:0000:0000:0000:0001"));
 
     server.assertSessionRequest();
 
@@ -465,7 +471,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueueSessionResponse();
     // Response to UltraDNSRestResourceRecordSetApi#recordsByNameAndType(name, type)
     server.enqueue(new MockResponse()
-            .setResponseCode(404)
+            .setResponseCode(SC_NOT_FOUND)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND,
                     "Cannot find resource record data for the input zone, " +
@@ -493,7 +499,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
     // Response to UltraDNSRest#deleteLBPool(zoneName, hostName, typeCode)
     server.enqueue(new MockResponse()
-            .setResponseCode(404)
+            .setResponseCode(SC_NOT_FOUND)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND,
                     "Cannot find resource record data for the input zone, " +
@@ -532,7 +538,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse().setBody(POOL_WITH_ONE_RESOURCE_RECORDS));
     // Response to UltraDNSRestResourceRecordSetApi#getResourceRecordsOfDNameByType(zoneName, name, intType)
     server.enqueue(new MockResponse()
-            .setResponseCode(404)
+            .setResponseCode(SC_NOT_FOUND)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND,
                     "Cannot find resource record data for the input zone, " +
@@ -558,7 +564,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse().setBody(POOL_WITH_ONE_RESOURCE_RECORDS));
     // Response to the request to delete a resource record.
     server.enqueue(new MockResponse()
-            .setResponseCode(400)
+            .setResponseCode(SC_BAD_REQUEST)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.PATH_NOT_FOUND_TO_PATCH,
                     "Cannot find resource record data for the input zone, " +
@@ -687,7 +693,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueueSessionResponse();
     // Response to the request to get the RR Sets in the pool.
     server.enqueue(new MockResponse()
-            .setResponseCode(404)
+            .setResponseCode(SC_NOT_FOUND)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(
                     UltraDNSRestException.DATA_NOT_FOUND,
                     "Data not found.")));
@@ -695,7 +701,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
 
     ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.put(ns("www.denominator.io.", 3600, "ns1.denominator.io."));
+    api.put(ns("www.denominator.io.", TTL_3600, "ns1.denominator.io."));
 
     server.assertSessionRequest();
 
@@ -727,7 +733,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
 
     ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.put(ns("www.denominator.io.", 2400, Arrays.asList("ns1.denominator.io.", "ns2.denominator.io.")));
+    api.put(ns("www.denominator.io.", TTL_2400, Arrays.asList("ns1.denominator.io.", "ns2.denominator.io.")));
 
     server.assertSessionRequest();
 
@@ -772,7 +778,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
 
     ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.put(ns("www.denominator.io.", 4800, "ns1.denominator.io."));
+    api.put(ns("www.denominator.io.", TTL_4800, "ns1.denominator.io."));
 
     server.assertSessionRequest();
 

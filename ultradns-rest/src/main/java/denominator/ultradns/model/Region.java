@@ -139,6 +139,7 @@ public class Region implements Comparable<Region> {
     return "Country".equals(this.getType());
   }
 
+  @Override
   public int compareTo(Region region1) {
     return this.getName().compareTo(region1.getName());
   }

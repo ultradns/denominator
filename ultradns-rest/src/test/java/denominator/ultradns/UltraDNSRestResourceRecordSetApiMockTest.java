@@ -18,6 +18,8 @@ import denominator.ultradns.InvalidatableTokenProvider.Session;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
+import denominator.ResourceTypeToValue.ResourceTypes;
+
 import static denominator.model.ResourceRecordSets.a;
 import static denominator.model.ResourceRecordSets.aaaa;
 import static denominator.model.ResourceRecordSets.ns;
@@ -162,7 +164,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     ResourceRecordSetApi api = server.connect().api()
             .basicRecordSetsInZone("denominator.io.");
     // This calls the UltraDNS#getResourceRecordsOfDNameByType().
-    api.getByNameAndType("www.denominator.io.", "A");
+    api.getByNameAndType("www.denominator.io.", ResourceTypes.A.name());
     server.assertSessionRequest();
     server.assertRequest()
             .hasMethod("GET")
@@ -180,7 +182,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
             "pool_2.denominator.io.", TTL_86400,
             Arrays.asList("1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4",
                     "5.5.5.5", "6.6.6.6", "7.7.7.7"));
-    assertThat(api.getByNameAndType("pool_2.denominator.io.", "A"))
+    assertThat(api.getByNameAndType("pool_2.denominator.io.", ResourceTypes.A.name()))
             .isEqualTo(aDataResourceRecordSet);
     server.assertSessionRequest();
     server.assertRequest()
@@ -203,7 +205,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
 
     ResourceRecordSetApi api = server.connect().api()
             .basicRecordSetsInZone("denominator.io.");
-    api.getByNameAndType("www.denominator.io.", "A");
+    api.getByNameAndType("www.denominator.io.", ResourceTypes.A.name());
   }
 
   @Test
@@ -478,7 +480,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
                             "record type and owner combination.")));
 
     ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.deleteByNameAndType("pool_2.denominator.io.", "A");
+    api.deleteByNameAndType("pool_2.denominator.io.", ResourceTypes.A.name());
 
     server.assertSessionRequest();
 
@@ -506,7 +508,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
                             "record type and owner combination.")));
 
     ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.deleteByNameAndType("pool_2.denominator.io.", "A");
+    api.deleteByNameAndType("pool_2.denominator.io.", ResourceTypes.A.name());
 
     server.assertSessionRequest();
 
@@ -545,7 +547,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
                             "record type and owner combination.")));
 
     ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.deleteByNameAndType("pool_2.denominator.io.", "A");
+    api.deleteByNameAndType("pool_2.denominator.io.", ResourceTypes.A.name());
 
     server.assertSessionRequest();
 
@@ -573,7 +575,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
 
     ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.deleteByNameAndType("pool_2.denominator.io.", "A");
+    api.deleteByNameAndType("pool_2.denominator.io.", ResourceTypes.A.name());
 
     server.assertSessionRequest();
 
@@ -625,7 +627,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
 
     ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.deleteByNameAndType("pool_2.denominator.io.", "A");
+    api.deleteByNameAndType("pool_2.denominator.io.", ResourceTypes.A.name());
 
     server.assertSessionRequest();
 

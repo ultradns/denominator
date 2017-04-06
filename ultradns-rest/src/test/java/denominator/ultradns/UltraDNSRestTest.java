@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import denominator.ResourceTypeToValue.ResourceTypes;
+
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
@@ -611,11 +613,11 @@ public class UltraDNSRestTest {
                 );
         assertThat(records).extracting("type", "ttl", "rdata")
                 .containsExactly(
-                        tuple("A", TTL_86400, asList("1.1.1.1")),
-                        tuple("A", TTL_50, asList("2.2.2.2")),
-                        tuple("A", TTL_100, asList("3.3.3.3")),
-                        tuple("A", TTL_122, asList("6.6.6.6")),
-                        tuple("A", 0, asList("No Data Response"))
+                        tuple(ResourceTypes.A.name(), TTL_86400, asList("1.1.1.1")),
+                        tuple(ResourceTypes.A.name(), TTL_50, asList("2.2.2.2")),
+                        tuple(ResourceTypes.A.name(), TTL_100, asList("3.3.3.3")),
+                        tuple(ResourceTypes.A.name(), TTL_122, asList("6.6.6.6")),
+                        tuple(ResourceTypes.A.name(), 0, asList("No Data Response"))
                 );
 
         server.assertSessionRequest();
@@ -644,7 +646,7 @@ public class UltraDNSRestTest {
         server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
         server.enqueue(new MockResponse());
 
-        assertThat(mockApi().addDirectionalPool("test-zone-1.com.", "dir_pool_1.test-zone-1.com.", "A")
+        assertThat(mockApi().addDirectionalPool("test-zone-1.com.", "dir_pool_1.test-zone-1.com.", ResourceTypes.A.name())
                 .getMessage()).isEqualTo("Successful");
 
         server.assertSessionRequest();
@@ -663,7 +665,7 @@ public class UltraDNSRestTest {
                 getMockErrorResponse(UltraDNSRestException.POOL_ALREADY_EXISTS,
                         "Pool already created for this host name  :  dir_pool_2.test-zone-1.com.")));
 
-        mockApi().addDirectionalPool("test-zone-1.com.", "dir_pool_1.test-zone-1.com.", "A");
+        mockApi().addDirectionalPool("test-zone-1.com.", "dir_pool_1.test-zone-1.com.", ResourceTypes.A.name());
     }
 
 

@@ -24,6 +24,7 @@ import static denominator.ultradns.UltraDNSMockResponse.TTL_300;
 import static denominator.ultradns.UltraDNSMockResponse.TTL_100;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
+import denominator.ResourceTypeToValue.ResourceTypes;
 
 public class UltraDNSRestGeoResourceRecordSetApiMockTest {
 
@@ -128,7 +129,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
 
         GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
         Iterator<ResourceRecordSet<?>> iterator = api.iterateByNameAndType("test_directional_pool.denominator.io.",
-                "A");
+                ResourceTypes.A.name());
 
         assertNorthAmerica(iterator.next());
         assertEurope(iterator.next());
@@ -156,7 +157,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
         ResourceRecordSet<AData> europe = ResourceRecordSet
                 .<AData>builder()
                 .name("test_directional_pool.denominator.io.")
-                .type("A")
+                .type(ResourceTypes.A.name())
                 .qualifier("Europe")
                 .ttl(TTL_200)
                 .add(AData.create("2.2.2.2"))
@@ -199,7 +200,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
         ResourceRecordSet<AData> europe = ResourceRecordSet
                 .<AData>builder()
                 .name("test_directional_pool.denominator.io.")
-                .type("A")
+                .type(ResourceTypes.A.name())
                 .qualifier("Europe")
                 .ttl(TTL_200)
                 .add(AData.create("2.2.2.2"))
@@ -247,7 +248,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
         ResourceRecordSet<AData> europe = ResourceRecordSet
                 .<AData>builder()
                 .name("test_directional_pool.denominator.io.")
-                .type("A")
+                .type(ResourceTypes.A.name())
                 .qualifier("Europe")
                 .ttl(TTL_500)
                 .add(AData.create("2.2.2.2"))
@@ -294,7 +295,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
         ResourceRecordSet<AData> europe = ResourceRecordSet
                 .<AData>builder()
                 .name("test_directional_pool.denominator.io.")
-                .type("A")
+                .type(ResourceTypes.A.name())
                 .qualifier("Europe")
                 .ttl(TTL_500)
                 .add(AData.create("7.7.7.7"))
@@ -374,7 +375,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     private void assertNorthAmerica(ResourceRecordSet<?> actual) {
         assertThat(actual)
                 .hasName("test_directional_pool.denominator.io.")
-                .hasType("A")
+                .hasType(ResourceTypes.A.name())
                 .hasQualifier("NorthAmerica")
                 .hasTtl(TTL_100)
                 .containsExactlyRecords(AData.create("1.1.1.1"))
@@ -384,7 +385,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     private void assertEurope(ResourceRecordSet<?> actual) {
         assertThat(actual)
                 .hasName("test_directional_pool.denominator.io.")
-                .hasType("A")
+                .hasType(ResourceTypes.A.name())
                 .hasQualifier("Europe")
                 .hasTtl(TTL_200)
                 .containsExactlyRecords(AData.create("2.2.2.2"))
@@ -395,7 +396,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     private void assertAsia(ResourceRecordSet<?> actual) {
         assertThat(actual)
                 .hasName("test_directional_pool.denominator.io.")
-                .hasType("A")
+                .hasType(ResourceTypes.A.name())
                 .hasQualifier("Asia")
                 .hasTtl(TTL_300)
                 .containsExactlyRecords(AData.create("3.3.3.3"))

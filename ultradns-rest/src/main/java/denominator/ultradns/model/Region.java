@@ -66,7 +66,7 @@ public class Region implements Comparable<Region> {
     return this.parentRegion;
   }
 
-  public void setParent(Region region) {
+  public void setParentRegion(Region region) {
     this.parentRegion = region;
     this.setEffectiveCode();
     this.setEffectiveCodeForGeo();
@@ -79,7 +79,7 @@ public class Region implements Comparable<Region> {
   public void setChildRegions(Collection<Region> regions) {
     this.childRegions = new TreeSet<Region>(regions);
     for (Region childRegion : childRegions) {
-      childRegion.setParent(this);
+      childRegion.setParentRegion(this);
     }
   }
 

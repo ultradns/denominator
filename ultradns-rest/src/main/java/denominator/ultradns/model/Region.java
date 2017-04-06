@@ -2,8 +2,6 @@ package denominator.ultradns.model;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -142,78 +140,6 @@ public class Region implements Comparable<Region> {
   @Override
   public int compareTo(Region region1) {
     return this.getName().compareTo(region1.getName());
-  }
-
-  public Map<String, Collection<String>> getRegionHierarchy() {
-    Map<String, Collection<String>> regionNameSubRegionNames = new TreeMap<String, Collection<String>>();
-    Collection<String> subRegionNames = new TreeSet<String>();
-    TreeSet<Region> childRegions1 = getChildRegions();
-    if (this.isCountry()) {
-      if (childRegions1 == null || childRegions1.size() == 0) {
-        subRegionNames.add(this.getName());
-      } else {
-        for (Region childRegion : childRegions1) {
-          subRegionNames.add(childRegion.getName());
-        }
-      }
-    } else {
-      if (this.isRegion()) {
-        subRegionNames.add(this.getName());
-      }
-
-      if (childRegions1 != null) {
-        for (Region childRegion : childRegions1) {
-          subRegionNames.add(childRegion.getName());
-        }
-
-        for (Region childRegion : childRegions1) {
-          Map<String, Collection<String>> childChildRegionHierarchy = childRegion.getRegionHierarchy();
-          for (Map.Entry<String, Collection<String>> entry : childChildRegionHierarchy.entrySet()) {
-            regionNameSubRegionNames.put(entry.getKey(), entry.getValue());
-          }
-        }
-      }
-    }
-    if (subRegionNames.size() > 0) {
-      regionNameSubRegionNames.put(this.getName(), subRegionNames);
-    }
-    return regionNameSubRegionNames;
-  }
-
-  public Map<Region, Collection<Region>> getRegionHierarchyAsRegions() {
-    Map<Region, Collection<Region>> regionNameSubRegionNames = new TreeMap<Region, Collection<Region>>();
-    Collection<Region> subRegionNames = new TreeSet<Region>();
-    TreeSet<Region> childRegions1 = getChildRegions();
-    if (this.isCountry()) {
-      if (childRegions1 == null || childRegions1.size() == 0) {
-        subRegionNames.add(this);
-      } else {
-        for (Region childRegion : childRegions1) {
-          subRegionNames.add(childRegion);
-        }
-      }
-    } else {
-      if (this.isRegion()) {
-        subRegionNames.add(this);
-      }
-
-      if (childRegions1 != null) {
-        for (Region childRegion : childRegions1) {
-          subRegionNames.add(childRegion);
-        }
-
-        for (Region childRegion : childRegions1) {
-          Map<Region, Collection<Region>> childChildRegionHierarchy = childRegion.getRegionHierarchyAsRegions();
-          for (Map.Entry<Region, Collection<Region>> entry : childChildRegionHierarchy.entrySet()) {
-            regionNameSubRegionNames.put(entry.getKey(), entry.getValue());
-          }
-        }
-      }
-    }
-    if (subRegionNames.size() > 0) {
-      regionNameSubRegionNames.put(this, subRegionNames);
-    }
-    return regionNameSubRegionNames;
   }
 
   @Override

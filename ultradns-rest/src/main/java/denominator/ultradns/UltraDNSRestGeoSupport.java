@@ -15,6 +15,7 @@ import dagger.Provides;
 import denominator.ultradns.model.DirectionalGroup;
 import denominator.ultradns.model.Region;
 import denominator.ultradns.util.RRSetUtil;
+import denominator.ultradns.util.RegionUtil;
 import org.apache.commons.lang.StringUtils;
 
 @Module(injects = UltraDNSRestGeoResourceRecordSetApi.Factory.class, complete = false)
@@ -36,7 +37,7 @@ public class UltraDNSRestGeoSupport {
 
     Collection<Region> topLevelRegions = buildRegionHierarchyByCallingUltraDNSRest(api1);
     for (Region topLevelRegion : topLevelRegions) {
-      Map<String, Collection<String>> regionHierarchy = topLevelRegion.getRegionHierarchy();
+      Map<String, Collection<String>> regionHierarchy = RegionUtil.getRegionHierarchy(topLevelRegion);
       for (Map.Entry<String, Collection<String>> regionSubregions : regionHierarchy.entrySet()) {
         availableRegions.put(regionSubregions.getKey(), regionSubregions.getValue());
       }
@@ -49,7 +50,7 @@ public class UltraDNSRestGeoSupport {
 
     Collection<Region> topLevelRegions = buildRegionHierarchyByCallingUltraDNSRest(api);
     for (Region topLevelRegion : topLevelRegions) {
-      Map<Region, Collection<Region>> regionHierarchy = topLevelRegion.getRegionHierarchyAsRegions();
+      Map<Region, Collection<Region>> regionHierarchy = RegionUtil.getRegionHierarchyAsRegions(topLevelRegion);
       for (Map.Entry<Region, Collection<Region>> regionSubregions : regionHierarchy.entrySet()) {
         availableRegions.put(regionSubregions.getKey(), regionSubregions.getValue());
       }

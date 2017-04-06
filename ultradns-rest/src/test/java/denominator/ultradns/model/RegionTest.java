@@ -3,7 +3,6 @@ package denominator.ultradns.model;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.TreeSet;
 
 import static denominator.assertj.ModelAssertions.assertThat;
 

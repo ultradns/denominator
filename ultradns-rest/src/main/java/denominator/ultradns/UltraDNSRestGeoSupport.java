@@ -24,6 +24,7 @@ public class UltraDNSRestGeoSupport {
   private UltraDNSRest api = null;
 
   static final int MAX_EFFECTIVE_CODES_PER_API_CALL = 100;
+
   public UltraDNSRestGeoSupport() { }
 
   public UltraDNSRestGeoSupport(UltraDNSRest api) {

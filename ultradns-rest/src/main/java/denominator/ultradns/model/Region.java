@@ -99,17 +99,6 @@ public class Region implements Comparable<Region> {
     }
   }
 
-  public String[] getEffectiveCodesOfChildRegions() {
-    String[] childRegionEffectiveCodes = new String[this.getChildRegions().size()];
-    int i = 0;
-    for (Region region : this.getChildRegions()) {
-      childRegionEffectiveCodes[i] = region.getEffectiveCode();
-      i++;
-    }
-    Arrays.sort(childRegionEffectiveCodes);
-    return childRegionEffectiveCodes;
-  }
-
   public String getEffectiveCodeForGeo() {
     if (this.effectiveCodeForGeo == null && this.code != null) {
       this.setEffectiveCodeForGeo();

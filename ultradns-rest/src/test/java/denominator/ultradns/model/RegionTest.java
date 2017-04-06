@@ -53,11 +53,14 @@ public class RegionTest {
         Region mexico = new Region("Mexico", "MX", "Country", MX_ID);
         Region canada = new Region("Canada", "CA", "Country", CA_ID);
         nam.setChildRegions(Arrays.asList(usa, mexico, canada));
-        TreeSet<String> tmpExpectedEffectiveCodes = new TreeSet<String>(Arrays.asList("NAM-CA", "NAM-MX", "NAM-US"));
-        String[] expectedEffectiveCodes = new String[tmpExpectedEffectiveCodes.size()];
-        tmpExpectedEffectiveCodes.toArray(expectedEffectiveCodes);
-        assertThat(nam.getEffectiveCodesOfChildRegions()).isEqualTo(expectedEffectiveCodes);
 
+        // Check if effective codes are set properly for the child regions.
+        assertThat(usa.getEffectiveCode()).isEqualTo("NAM-US");
+        assertThat(mexico.getEffectiveCode()).isEqualTo("NAM-MX");
+        assertThat(canada.getEffectiveCode()).isEqualTo("NAM-CA");
+
+        // Check if effective codes for geo are set properly for a region,
+        // its children and its grandchildren.
         assertThat(nam.getEffectiveCodeForGeo()).isEqualTo("NAM");
         assertThat(usa.getEffectiveCodeForGeo()).isEqualTo("US");
         Region virginiaInUsa = new Region("Virginia", "VA", "State", VA_ID);

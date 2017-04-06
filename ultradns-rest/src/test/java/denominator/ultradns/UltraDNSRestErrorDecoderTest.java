@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static denominator.ultradns.UltraDNSRestException.ZONE_NOT_FOUND;
 import static feign.Util.UTF_8;
+import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 
 public class UltraDNSRestErrorDecoderTest {
 
@@ -30,9 +31,9 @@ public class UltraDNSRestErrorDecoderTest {
 
 
   static Response errorResponse(String body) {
-    return Response.create(500, "Server Error", Collections.<String, Collection<String>>emptyMap(), body, UTF_8);
+    return Response.create(SC_INTERNAL_SERVER_ERROR, "Server Error", Collections.<String, Collection<String>>emptyMap()
+            , body, UTF_8);
   }
-
   @Test
   public void testDecode() throws Exception {
     thrown.expect(FeignException.class);

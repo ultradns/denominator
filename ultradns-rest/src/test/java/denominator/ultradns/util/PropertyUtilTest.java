@@ -25,7 +25,8 @@ public class PropertyUtilTest {
         propertyName = "ultradns.rest.new.cte";
 
         thrown.expect(UltraDNSRestException.class);
-        thrown.expectMessage("Could not load property with name " + propertyName + " !! Please check property configuration.");
+        thrown.expectMessage("Could not load property with name " + propertyName +
+                " !! Please check property configuration.");
 
         assertThat(PropertyUtil.getProperty(propertyName)).isEqualTo("https://test-restapi.ultradns.com/v2");
     }

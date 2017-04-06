@@ -5,7 +5,7 @@ import feign.FeignException;
 public class UltraDNSRestException extends FeignException {
 
   /**
-   * System Error
+   * System Error.
    */
   static final int SYSTEM_ERROR = 9999;
   /**
@@ -27,15 +27,15 @@ public class UltraDNSRestException extends FeignException {
 
   // there are 51002 potential codes. These are the ones we are handling.
   /**
-   * No Pool or Multiple pools of same type exists for the PoolName
+   * No Pool or Multiple pools of same type exists for the PoolName.
    */
   static final int DIRECTIONALPOOL_NOT_FOUND = 2142;
   /**
-   * Invalid zone name
+   * Invalid zone name.
    */
   static final int INVALID_ZONE_NAME = 2507;
   /**
-   * Directional Pool Record does not exist in the system
+   * Directional Pool Record does not exist in the system.
    */
   static final int DIRECTIONALPOOL_RECORD_NOT_FOUND = 2705;
   /**
@@ -67,7 +67,7 @@ public class UltraDNSRestException extends FeignException {
    */
   static final int DATA_NOT_FOUND = 70002;
   /**
-   * Invalid input: record data - Invalid address: <address>
+   * Invalid input: record data - Invalid address: <address>.
    */
   static final int INVALID_ADDRESS_IN_RECORD_DATA = 53005;
   /**
@@ -75,7 +75,7 @@ public class UltraDNSRestException extends FeignException {
    */
   static final int RESOURCE_RECORD_POOL_NOT_FOUND = 56001;
   /**
-   * No such path in target JSON document
+   * No such path in target JSON document.
    */
   static final int PATH_NOT_FOUND_TO_PATCH = 170001;
 

@@ -202,9 +202,9 @@ public class UltraDNSRestProvider extends BasicProvider {
     Feign feign(Logger logger, Logger.Level logLevel, UltraDNSRestErrorDecoder errorDecoder) {
 
       /**
-       * {@link UltraDNSRest#updateDirectionalPoolRecord(UltraDNSRest.DirectionalRecord, UltraDNSRest.DirectionalGroup)} and {@link
-       * UltraDNSRest#addDirectionalPoolRecord(UltraDNSRest.DirectionalRecord, UltraDNSRest.DirectionalGroup, String)} can take up
-       * to 10 minutes to complete.
+       * {@link UltraDNSRest#updateDirectionalPoolRecord(UltraDNSRest.DirectionalRecord, UltraDNSRest.DirectionalGroup)}
+       * and {@link UltraDNSRest#addDirectionalPoolRecord(UltraDNSRest.DirectionalRecord, UltraDNSRest.DirectionalGroup,
+       * String)} can take up to 10 minutes to complete.
        */
       Options options = new Options(
               Integer.parseInt(PropertyUtil.getProperty("feign.connect.timeout.millis")),

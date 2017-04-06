@@ -50,7 +50,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
   public final ExpectedException thrown = ExpectedException.none();
 
   /**
-   * Mock API to call UltraDNSRest Endpoint
+   * Mock API to call UltraDNSRest Endpoint.
    */
   @Before
   public void mockServer() {

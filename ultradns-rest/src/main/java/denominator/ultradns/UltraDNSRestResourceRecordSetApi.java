@@ -19,6 +19,7 @@ import static denominator.common.Preconditions.checkArgument;
 import static denominator.common.Preconditions.checkNotNull;
 import static denominator.common.Util.nextOrNull;
 import static denominator.common.Util.toMap;
+import denominator.ResourceTypeToValue.ResourceTypes;
 
 final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceRecordSetApi {
 
@@ -46,9 +47,8 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
   @Override
   public Iterator<ResourceRecordSet<?>> iterateByName(String name) {
     checkNotNull(name, "name");
-    final int anyRrType = 255;
     Iterator<Record> ordered = RRSetUtil.buildRecords(api
-            .getResourceRecordsOfDNameByType(zoneName, name, anyRrType)
+            .getResourceRecordsOfDNameByType(zoneName, name, ResourceTypes.ALL.code())
             .rrSets())
             .iterator();
     return new GroupByRecordNameAndTypeCustomIterator(ordered);

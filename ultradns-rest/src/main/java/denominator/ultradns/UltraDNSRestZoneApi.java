@@ -16,6 +16,7 @@ import java.util.List;
 
 import static denominator.common.Preconditions.checkState;
 import static denominator.common.Util.singletonIterator;
+import denominator.ResourceTypeToValue.ResourceTypes;
 
 public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
 
@@ -80,15 +81,18 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
       }
     }
 
-    RRSet soa = api.getResourceRecordsOfDNameByType(zone.name(), zone.name(), 6).getRrSets().get(0);
+    RRSet soa = api.getResourceRecordsOfDNameByType(zone.name(), zone.name(),
+            ResourceTypes.SOA.code()).getRrSets().get(0);
     soa.setTtl(zone.ttl());
     List<String> rDataList = Arrays.asList(soa.getRdata().get(0).split("\\s"));
-    rDataList.set(1, formatEmail(zone.email()));
-    rDataList.set(6, String.valueOf(zone.ttl()));
+    final int emailIndex = 1;
+    final int ttlIndex = 6;
+    rDataList.set(emailIndex, formatEmail(zone.email()));
+    rDataList.set(ttlIndex, String.valueOf(zone.ttl()));
     List<String> newRDataList = new ArrayList<String>();
     newRDataList.add(StringUtils.join(rDataList, " "));
     soa.setRdata(newRDataList);
-    api.updateResourceRecord(zone.name(), 6, zone.name(), soa);
+    api.updateResourceRecord(zone.name(), ResourceTypes.SOA.code(), zone.name(), soa);
 
     return zone.name();
   }
@@ -105,7 +109,8 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
   }
 
   private Zone fromSOA(String name) {
-    List<Record> soas = RRSetUtil.buildRecords(api.getResourceRecordsOfDNameByType(name, name, 6).rrSets());
+    List<Record> soas = RRSetUtil.buildRecords(api.getResourceRecordsOfDNameByType(name, name,
+            ResourceTypes.SOA.code()).rrSets());
     checkState(!soas.isEmpty(), "SOA record for zone %s was not present", name);
     Record soa = soas.get(0);
     return Zone.create(name, name, soa.getTtl(), soa.getRdata().get(1));

@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static denominator.common.Preconditions.checkNotNull;
 
 /**
- * gets the last Auth token, expiring if the current time exceed token expiry time
+ * gets the last Auth token, expiring if the current time exceed token expiry time.
  */
 public class InvalidatableTokenProvider implements Provider<String>, CheckConnection {
 
@@ -98,7 +98,8 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
     interface Session {
         @RequestLine("POST /authorization/token")
         @Headers({ "Content-Type: application/x-www-form-urlencoded" })
-        TokenResponse login(@Param("grant_type") String grantType, @Param("username") String userName, @Param("password") String password);
+        TokenResponse login(@Param("grant_type") String grantType, @Param("username") String userName,
+                            @Param("password") String password);
     }
 
     public String getLastUrl() {

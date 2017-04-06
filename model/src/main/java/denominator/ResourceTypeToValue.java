@@ -145,12 +145,21 @@ public class ResourceTypeToValue {
     /**
      * for Responsible Person
      */
-    RP(17);
+    RP(17),
+
+    /**
+     * A request for all records the server/cache has available.
+     */
+    ALL(255);
 
     private final int value;
 
     ResourceTypes(int value) {
       this.value = value;
+    }
+
+    public int code() {
+      return value;
     }
   }
 }

@@ -127,7 +127,8 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
         enqueueDirectionalDNSGroupByName();
 
         GeoResourceRecordSetApi api = server.connect().api().geoRecordSetsInZone("denominator.io.");
-        Iterator<ResourceRecordSet<?>> iterator = api.iterateByNameAndType("test_directional_pool.denominator.io.", "A");
+        Iterator<ResourceRecordSet<?>> iterator = api.iterateByNameAndType("test_directional_pool.denominator.io.",
+                "A");
 
         assertNorthAmerica(iterator.next());
         assertEurope(iterator.next());
@@ -161,7 +162,8 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
                 .add(AData.create("2.2.2.2"))
                 .geo(Geo.create(new LinkedHashMap<String, Collection<String>>() {
                     {
-                        put("Europe", Arrays.asList("Spain", "United Kingdom - England, Northern Ireland, Scotland, Wales", "Sweden"));
+                        put("Europe", Arrays.asList("Spain", "United Kingdom - England, Northern Ireland, " +
+                                "Scotland, Wales", "Sweden"));
                     }
                 })).build();
 
@@ -365,7 +367,8 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     private void assertAvailableRegionsRequest() throws InterruptedException {
         server.assertRequest("GET", "/geoip/territories?codes=", "");
         server.assertRequest("GET", "/geoip/territories?codes=A1%2CA2%2CA3%2CASI%2CEUR%2CNAM", "");
-        server.assertRequest("GET", "/geoip/territories?codes=ASI-IN%2CASI-JP%2CASI-MY%2CEUR-ES%2CEUR-GB%2CEUR-SE%2CNAM-U3%2CNAM-US", "");
+        server.assertRequest("GET",
+                "/geoip/territories?codes=ASI-IN%2CASI-JP%2CASI-MY%2CEUR-ES%2CEUR-GB%2CEUR-SE%2CNAM-U3%2CNAM-US", "");
     }
 
     private void assertNorthAmerica(ResourceRecordSet<?> actual) {
@@ -385,7 +388,8 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
                 .hasQualifier("Europe")
                 .hasTtl(TTL_200)
                 .containsExactlyRecords(AData.create("2.2.2.2"))
-                .containsRegion("Europe", "Spain", "United Kingdom - England, Northern Ireland, Scotland, Wales", "Sweden");
+                .containsRegion("Europe", "Spain", "United Kingdom - England, Northern Ireland, Scotland," +
+                        " Wales", "Sweden");
     }
 
     private void assertAsia(ResourceRecordSet<?> actual) {

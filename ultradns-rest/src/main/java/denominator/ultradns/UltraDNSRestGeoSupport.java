@@ -22,6 +22,7 @@ public class UltraDNSRestGeoSupport {
 
   private UltraDNSRest api = null;
 
+  static final int MAX_EFFECTIVE_CODES_PER_API_CALL = 100;
   public UltraDNSRestGeoSupport() { }
 
   public UltraDNSRestGeoSupport(UltraDNSRest api) {
@@ -30,10 +31,10 @@ public class UltraDNSRestGeoSupport {
 
   @Provides
   @Named("geo")
-  Map<String, Collection<String>> regions(UltraDNSRest api) {
+  Map<String, Collection<String>> regions(UltraDNSRest api1) {
     Map<String, Collection<String>> availableRegions = new TreeMap<String, Collection<String>>();
 
-    Collection<Region> topLevelRegions = buildRegionHierarchyByCallingUltraDNSRest(api);
+    Collection<Region> topLevelRegions = buildRegionHierarchyByCallingUltraDNSRest(api1);
     for (Region topLevelRegion : topLevelRegions) {
       Map<String, Collection<String>> regionHierarchy = topLevelRegion.getRegionHierarchy();
       for (Map.Entry<String, Collection<String>> regionSubregions : regionHierarchy.entrySet()) {
@@ -57,13 +58,13 @@ public class UltraDNSRestGeoSupport {
     return availableRegions;
   }
 
-  private Collection<Region> buildRegionHierarchyByCallingUltraDNSRest(UltraDNSRest api) {
-    Collection<Collection<Region>> response = api.getAvailableRegions("");
+  private Collection<Region> buildRegionHierarchyByCallingUltraDNSRest(UltraDNSRest api2) {
+    Collection<Collection<Region>> response = api2.getAvailableRegions("");
     Collection<Region> topLevelRegions = response.iterator().next();
     TreeSet<String> sortedEffectiveCodes = getSortedEffectiveCodes(topLevelRegions);
     String commaSeparatedCodes = getCommaSeparatedEffectiveCodes(sortedEffectiveCodes);
 
-    response = api.getAvailableRegions(commaSeparatedCodes);
+    response = api2.getAvailableRegions(commaSeparatedCodes);
     Iterator<Collection<Region>> responseIterator = response.iterator();
     for (String effectiveCode : sortedEffectiveCodes) {
       Region region1 = regionGiven(effectiveCode, topLevelRegions);
@@ -77,16 +78,17 @@ public class UltraDNSRestGeoSupport {
     sortedEffectiveCodes.toArray(sortedEffectiveCodesArr);
     // The REST API endpoint for "api.getAvailableRegions(commaSeparatedCodes)" accepts utmost
     // 100 effective codes. So, sending the effective codes in batches of 100.
-    for (int minIdx = 0; minIdx < sortedEffectiveCodesArr.length; minIdx += 100) {
-      int maxIdx = minIdx + 100;
+    for (int minIdx = 0; minIdx < sortedEffectiveCodesArr.length; minIdx += MAX_EFFECTIVE_CODES_PER_API_CALL) {
+      int maxIdx = minIdx + MAX_EFFECTIVE_CODES_PER_API_CALL;
       if (maxIdx > sortedEffectiveCodesArr.length) {
         maxIdx = sortedEffectiveCodesArr.length - 1;
       }
       String startEffectiveCode = sortedEffectiveCodesArr[minIdx];
       String endEffectiveCode = sortedEffectiveCodesArr[maxIdx];
-      TreeSet<String> subSetOfSortedEffectiveCodes = new TreeSet<String>(sortedEffectiveCodes.subSet(startEffectiveCode, endEffectiveCode));
+      TreeSet<String> subSetOfSortedEffectiveCodes = new TreeSet<String>(sortedEffectiveCodes.subSet(startEffectiveCode,
+              endEffectiveCode));
       commaSeparatedCodes = getCommaSeparatedEffectiveCodes(subSetOfSortedEffectiveCodes);
-      response = api.getAvailableRegions(commaSeparatedCodes);
+      response = api2.getAvailableRegions(commaSeparatedCodes);
       responseIterator = response.iterator();
       for (String effectiveCode : subSetOfSortedEffectiveCodes) {
         Region region1 = regionGiven(effectiveCode, topLevelRegions);

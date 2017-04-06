@@ -109,7 +109,8 @@ public class UltraDNSRestZoneApiMockTest {
     server.assertRequest()
             .hasMethod("POST")
             .hasPath("/zones")
-            .hasBody("{\"properties\": {\"name\": \"denominator.io.\", \"accountName\": \"npp-rest-test1\", \"type\": \"PRIMARY\"}, " +
+            .hasBody("{\"properties\": {\"name\": \"denominator.io.\", \"accountName\": \"npp-rest-test1\"," +
+                    " \"type\": \"PRIMARY\"}, " +
                     "\"primaryCreateInfo\": {\"forceImport\": false, \"createType\": \"NEW\"}}");
     server.assertRequest()
             .hasMethod("GET")
@@ -139,7 +140,8 @@ public class UltraDNSRestZoneApiMockTest {
     server.assertRequest()
             .hasMethod("POST")
             .hasPath("/zones")
-            .hasBody("{\"properties\": {\"name\": \"denominator.io.\", \"accountName\": \"npp-rest-test1\", \"type\": \"PRIMARY\"}, " +
+            .hasBody("{\"properties\": {\"name\": \"denominator.io.\", \"accountName\": \"npp-rest-test1\"," +
+                    " \"type\": \"PRIMARY\"}, " +
                     "\"primaryCreateInfo\": {\"forceImport\": false, \"createType\": \"NEW\"}}");
     server.assertRequest()
             .hasMethod("GET")

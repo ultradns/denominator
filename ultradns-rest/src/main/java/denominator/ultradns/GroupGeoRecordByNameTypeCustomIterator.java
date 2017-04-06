@@ -46,7 +46,7 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
   }
 
   /**
-   * skips no response records as they aren't portable
+   * skips no response records as they aren't portable.
    */
   @Override
   public boolean hasNext() {

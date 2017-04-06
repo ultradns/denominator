@@ -56,7 +56,7 @@ public class UltraDNSRestTest {
     public final ExpectedException thrown = ExpectedException.none();
 
     /**
-     * Mock API to call UltraDNSRest Endpoint
+     * Mock API to call UltraDNSRest Endpoint.
      * @return
      */
     UltraDNSRest mockApi() {
@@ -451,7 +451,9 @@ public class UltraDNSRestTest {
                     "}" +
                 "}";
         server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setResponseCode(SC_BAD_REQUEST).setBody(UltraDNSMockResponse.getMockErrorResponse(UltraDNSRestException.POOL_ALREADY_EXISTS, "Pool already created for this host name : h2.denominator.io.")));
+        server.enqueue(new MockResponse().setResponseCode(SC_BAD_REQUEST).setBody(UltraDNSMockResponse
+                .getMockErrorResponse(UltraDNSRestException.POOL_ALREADY_EXISTS,
+                        "Pool already created for this host name : h2.denominator.io.")));
         mockApi().addRRLBPool(zoneName, hostName, typeCode, expectedBody);
     }
 
@@ -617,7 +619,8 @@ public class UltraDNSRestTest {
                 );
 
         server.assertSessionRequest();
-        server.assertRequest("GET", "/zones/test-zone-1.com./rrsets/1/dir_pool_1.test-zone-1.com.?q=kind%3ADIR_POOLS", "");
+        server.assertRequest("GET", "/zones/test-zone-1.com./rrsets/1/dir_pool_1.test-zone-1.com.?q=kind%3ADIR_POOLS",
+                "");
     }
 
     @Test
@@ -631,7 +634,8 @@ public class UltraDNSRestTest {
                 .getRrSets()).isEmpty();
 
         server.assertSessionRequest();
-        server.assertRequest("GET", "/zones/denominator.io./rrsets/1/dir_pool_1_www.denominator.io.?q=kind%3ADIR_POOLS", "");
+        server.assertRequest("GET", "/zones/denominator.io./rrsets/1/dir_pool_1_www.denominator.io.?q=kind%3ADIR_POOLS"
+                , "");
     }
 
     @Test
@@ -646,7 +650,8 @@ public class UltraDNSRestTest {
         server.assertSessionRequest();
         server.assertRequest("POST",
                 "/zones/test-zone-1.com./rrsets/A/dir_pool_1.test-zone-1.com.",
-                "{\"profile\": {\"@context\": \"http://schemas.ultradns.com/DirPool.jsonschema\", \"description\": \"A\"}}");
+                "{\"profile\": {\"@context\": \"http://schemas.ultradns.com/DirPool.jsonschema\"," +
+                        " \"description\": \"A\"}}");
     }
 
     @Test
@@ -655,7 +660,8 @@ public class UltraDNSRestTest {
 
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse().setResponseCode(SC_BAD_REQUEST).setBody(UltraDNSMockResponse.
-                getMockErrorResponse(UltraDNSRestException.POOL_ALREADY_EXISTS, "Pool already created for this host name  :  dir_pool_2.test-zone-1.com.")));
+                getMockErrorResponse(UltraDNSRestException.POOL_ALREADY_EXISTS,
+                        "Pool already created for this host name  :  dir_pool_2.test-zone-1.com.")));
 
         mockApi().addDirectionalPool("test-zone-1.com.", "dir_pool_1.test-zone-1.com.", "A");
     }

@@ -49,9 +49,9 @@ final class MockUltraDNSRestServer extends UltraDNSRestProvider implements TestR
     return ListCredentials.from(username, password);
   }
 
-  MockUltraDNSRestServer credentials(String username, String password) {
-    this.username = username;
-    this.password = password;
+  MockUltraDNSRestServer credentials(String username1, String password1) {
+    this.username = username1;
+    this.password = password1;
     this.sessionResponse = "{\n"
                             + "  \"tokenType\": \"Bearer\",\n"
                             + format("  \"refreshToken\": \"%s\",\n", refreshToken)

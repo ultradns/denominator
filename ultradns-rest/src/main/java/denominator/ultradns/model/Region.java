@@ -1,6 +1,5 @@
 package denominator.ultradns.model;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.TreeSet;
 

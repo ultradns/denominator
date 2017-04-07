@@ -421,7 +421,7 @@ public class UltraDNSRestTest {
     @Test
     public void getRegionsByIdAndName() throws Exception {
         server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setBody(getAvailableRegionsResponse));
+        server.enqueue(new MockResponse().setBody(GET_AVAILABLE_REGIONS_RESPONSE));
 
         Region anonymousProxy = new Region("Anonymous Proxy", "A1", "Country", REGION_CODE_A1);
         Region satelliteProvider = new Region("Satellite Provider", "A2", "Country", REGION_CODE_A2);
@@ -658,7 +658,7 @@ public class UltraDNSRestTest {
                 "[{\"op\": \"remove\", \"path\": \"/rdata/0\"}]");
     }
 
-    static String getAvailableRegionsResponse =
+    private static final String GET_AVAILABLE_REGIONS_RESPONSE =
             "[\n" +
                     "  [\n" +
                     "    {\n" +

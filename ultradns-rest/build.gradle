@@ -27,6 +27,7 @@ dependencies {
   testCompile 'junit:junit:4.12'
   testCompile 'org.assertj:assertj-core:1.7.1' // last version supporting JDK 7
   testCompile 'com.squareup.okhttp:mockwebserver:2.5.0'
+  checkstyle 'com.puppycrawl.tools:checkstyle:6.5'
 }
 
 jacoco {

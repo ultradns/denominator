@@ -131,6 +131,12 @@ interface UltraDNSRest {
                             @Param("profile") String profileJson);
 
   /**
+   * Delete a pool given the zone name, type code and hostname.
+   *
+   * @param zoneName zone in which the pool is present in.
+   * @param typeCode integer value of type of the pool.
+   * @param hostName hostname in which the pool is present in.
+   *
    * @throws UltraDNSRestException with code {@link UltraDNSRestException#POOL_NOT_FOUND} and {@link
    *                           UltraDNSRestException#RESOURCE_RECORD_NOT_FOUND}.
    */
@@ -140,9 +146,12 @@ interface UltraDNSRest {
                     @Param("hostName") String hostName);
 
   /**
+   * Get the child regions given an optional comma-separated region codes.
    *
-   * @param codes Can be an empty string. Can be a comma-separated list of region codes.
-   * @return
+   * @param codes Can be an empty string. Can be a comma-separated list of
+   *              region codes. If the codes is empty, the top level
+   *              regions are returned.
+   * @return A list of list of region objects.
    */
   @RequestLine("GET /geoip/territories?codes={codes}")
   Collection<Collection<Region>> getAvailableRegions(@Param("codes") String codes);
@@ -152,6 +161,8 @@ interface UltraDNSRest {
   DirectionalGroup getDirectionalDNSGroupDetails(@Param("GroupId") String groupId);
 
   /**
+   * Add a record to a directional pool given the zone name, hostname, pool record type and rrset.
+   *
    * @throws UltraDNSRestException with code {@link UltraDNSRestException#POOL_RECORD_ALREADY_EXISTS}.
    */
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")

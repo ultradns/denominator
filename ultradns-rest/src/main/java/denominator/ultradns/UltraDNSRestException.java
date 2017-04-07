@@ -67,7 +67,7 @@ public class UltraDNSRestException extends FeignException {
    */
   static final int DATA_NOT_FOUND = 70002;
   /**
-   * Invalid input: record data - Invalid address: <address>.
+   * Invalid input: record data - Invalid address: 1.1.1.1.
    */
   static final int INVALID_ADDRESS_IN_RECORD_DATA = 53005;
   /**

@@ -7,7 +7,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class RegionUtil {
+public final class RegionUtil {
+
+    // This class is not supposed to be instantiated.
+    private RegionUtil() { }
+
     public static Map<String, Collection<String>> getRegionHierarchy(Region region) {
         Map<String, Collection<String>> regionNameSubRegionNames = new
                 TreeMap<String, Collection<String>>();

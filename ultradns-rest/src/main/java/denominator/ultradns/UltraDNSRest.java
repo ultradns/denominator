@@ -99,16 +99,6 @@ interface UltraDNSRest {
                               @Param("hostName") String hostName,
                               @Param("index") int index);
 
-  /**
-   * Returns the blah blah FIXME
-   *
-   * @param zoneName Typically ends with a period character (i.e, `.`).
-   * @param typeCode Should be an integer between 1 and 257.
-   * @return
-   */
-  @RequestLine("GET /zones/{zoneName}/rrsets/{typeCode}?q=kind:RD_POOLS")
-  RRSetList getLoadBalancingPoolsByZone(@Param("zoneName") String zoneName, @Param("typeCode") int typeCode);
-
   @RequestLine("POST /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
   @Body("{requestBody}")
   void addRRLBPool(@Param("zoneName") String zoneName,

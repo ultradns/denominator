@@ -342,47 +342,6 @@ public class UltraDNSRestTest {
     }
 
     @Test
-    public void testGetLoadBalancingPoolsByZoneWhichIsPresent() throws Exception {
-        final String zoneName = "denominator.io.";
-        final int typeCode = 1;
-        final String expectedPath = "/zones/" + zoneName + "/rrsets/" + typeCode + "?q=kind%3ARD_POOLS";
-        server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setBody(GET_RESOURCE_RECORDS_PRESENT));
-        final RRSetList rrSetList = mockApi().getLoadBalancingPoolsByZone(zoneName, typeCode);
-        server.assertSessionRequest();
-        server.assertRequest()
-                .hasMethod("GET")
-                .hasPath(expectedPath);
-        assertThat(rrSetList.getRrSets().size()).isEqualTo(1);
-    }
-
-    @Test
-    public void testGetLoadBalancingPoolsByZoneWhichDoesNotHavePools() throws Exception {
-        thrown.expect(UltraDNSRestException.class);
-        thrown.expectMessage("Data not found.");
-
-        final String zoneName = "denominator-2.io.";
-        final int typeCode = 1;
-        server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setResponseCode(SC_NOT_FOUND).setBody(UltraDNSMockResponse
-                .getMockErrorResponse(UltraDNSRestException.DATA_NOT_FOUND, "Data not found.")));
-        mockApi().getLoadBalancingPoolsByZone(zoneName, typeCode);
-    }
-
-    @Test
-    public void testGetLoadBalancingPoolsByZoneWhichIsAbsent() throws Exception {
-        thrown.expect(UltraDNSRestException.class);
-        thrown.expectMessage("Zone does not exist in the system.");
-
-        final String zoneName = "denominator-3.io.";
-        final int typeCode = 1;
-        server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setResponseCode(SC_NOT_FOUND).setBody(UltraDNSMockResponse
-                .getMockErrorResponse(UltraDNSRestException.ZONE_NOT_FOUND, "Zone does not exist in the system.")));
-        mockApi().getLoadBalancingPoolsByZone(zoneName, typeCode);
-    }
-
-    @Test
     public void createRRPoolInZoneForNameAndType() throws Exception {
         final String zoneName = "denominator.io.";
         final String hostName = "h1.denominator.io.";

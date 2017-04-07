@@ -605,7 +605,8 @@ public class UltraDNSRestTest {
         server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
         server.enqueue(new MockResponse());
 
-        assertThat(mockApi().addDirectionalPool("test-zone-1.com.", "dir_pool_1.test-zone-1.com.", ResourceTypes.A.name())
+        assertThat(mockApi().addDirectionalPool("test-zone-1.com.",
+                "dir_pool_1.test-zone-1.com.", ResourceTypes.A.name())
                 .getMessage()).isEqualTo("Successful");
 
         server.assertSessionRequest();

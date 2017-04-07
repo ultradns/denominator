@@ -46,6 +46,10 @@ interface UltraDNSRest {
                          @Param("createType") final String createType);
 
   /**
+   * Delete a zone given the zone name.
+   *
+   * @param zoneName The zone that has to be deleted.
+   *
    * @throws UltraDNSRestException with code {@link UltraDNSRestException#ZONE_NOT_FOUND}.
    */
   @RequestLine("DELETE /zones/{zoneName}")

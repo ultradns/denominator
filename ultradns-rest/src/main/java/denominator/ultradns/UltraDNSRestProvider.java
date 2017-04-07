@@ -43,6 +43,8 @@ public class UltraDNSRestProvider extends BasicProvider {
   }
 
   /**
+   * Construct the UltraDNSRestProvider given a URL.
+   *
    * @param url if empty or null use default
    */
   public UltraDNSRestProvider(String url) {

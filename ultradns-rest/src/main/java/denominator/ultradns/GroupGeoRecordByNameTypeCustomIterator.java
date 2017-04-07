@@ -124,6 +124,8 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
     }
 
     /**
+     * Construct a custom iterator from directional record iterator & zone name.
+     *
      * @param sortedIterator only contains records with the same {@link DirectionalRecord#name()},
      *                       sorted by {@link DirectionalRecord#type()}, {@link
      *                       DirectionalRecord#getGeolocationGroup()} or {@link

@@ -35,7 +35,6 @@ import static denominator.common.Util.filter;
 import static denominator.common.Util.nextOrNull;
 import static denominator.common.Util.toMap;
 import static denominator.model.ResourceRecordSets.nameAndTypeEqualTo;
-import denominator.ResourceTypeToValue.ResourceTypes;
 
 final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetApi {
   private static final Filter<ResourceRecordSet<?>> IS_GEO = new Filter<ResourceRecordSet<?>>() {
@@ -165,8 +164,9 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
         case UltraDNSRestException.GROUP_NOT_FOUND:
         case UltraDNSRestException.DIRECTIONALPOOL_NOT_FOUND:
           return Collections.<DirectionalRecord>emptyList().iterator();
+        default:
+          throw e;
       }
-      throw e;
     }
   }
 

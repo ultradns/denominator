@@ -18,21 +18,6 @@ public class RRSet {
         this.rdata = rdata;
     }
 
-   /* public int intValueOfRrtype() {
-        if (rrtype != null) {
-            return Integer.parseInt(rrtype.substring(rrtype.indexOf("(") + 1,
-                    rrtype.indexOf(")")));
-        }
-        return 0;
-    }
-
-    public String stringValueOfRrtype() {
-        if (rrtype != null) {
-            return rrtype.substring(0, rrtype.indexOf(" "));
-        }
-        return "";
-    }*/
-
     public String getOwnerName() {
         return ownerName;
     }

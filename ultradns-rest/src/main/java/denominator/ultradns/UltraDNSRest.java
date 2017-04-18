@@ -6,7 +6,6 @@ import denominator.ultradns.model.ZoneList;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.RRSetList;
 import denominator.ultradns.model.Region;
-import denominator.ultradns.model.DirectionalGroup;
 
 import feign.Body;
 import feign.Headers;
@@ -156,36 +155,6 @@ interface UltraDNSRest {
   @RequestLine("GET /geoip/territories?codes={codes}")
   Collection<Collection<Region>> getAvailableRegions(@Param("codes") String codes);
 
-  @RequestLine("POST")
-  @Body("<v01:getDirectionalDNSGroupDetails><GroupId>{GroupId}</GroupId></v01:getDirectionalDNSGroupDetails>")
-  DirectionalGroup getDirectionalDNSGroupDetails(@Param("GroupId") String groupId);
-
-  /**
-   * Add a record to a directional pool given the zone name, hostname, pool record type and rrset.
-   *
-   * @throws UltraDNSRestException with code {@link UltraDNSRestException#POOL_RECORD_ALREADY_EXISTS}.
-   */
-  @RequestLine("PATCH /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
-  Status addDirectionalPoolRecord(@Param("zoneName") String zoneName,
-                                  @Param("hostName") String hostName,
-                                  @Param("poolRecordType") String type,
-                                  RRSet rrSet);
-
-  @Headers("Content-Type: application/json-patch+json")
-  @RequestLine("PATCH /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
-  @Body("%5B" +
-          "%7B" +
-            "\"op\": \"replace\", " +
-            "\"path\": \"/profile/rdataInfo/{index}\", " +
-            "\"value\": {rDataInfo}" +
-          "%7D" +
-        "%5D")
-  void updateDirectionalPoolRecord(@Param("zoneName") String zoneName,
-                                   @Param("hostName") String name,
-                                   @Param("poolRecordType") String type,
-                                   @Param("rDataInfo") String rDataInfo,
-                                   @Param("index") int index);
-
   @RequestLine("GET /zones/{zoneName}/rrsets/?q=kind:DIR_POOLS")
   RRSetList getDirectionalPoolsOfZone(@Param("zoneName") String zoneName);
 
@@ -204,6 +173,13 @@ interface UltraDNSRest {
   Status addDirectionalPool(@Param("zoneName") String zoneName,
                             @Param("hostName") String name,
                             @Param("poolRecordType") String type);
+
+
+  @RequestLine("PUT /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
+  Status updateDirectionalPool(@Param("zoneName") String zoneName,
+                               @Param("hostName") String name,
+                               @Param("poolRecordType") String type,
+                               RRSet rrSet);
 
   @Headers("Content-Type: application/json-patch+json")
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")

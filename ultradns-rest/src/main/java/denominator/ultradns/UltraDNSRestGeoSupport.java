@@ -207,36 +207,32 @@ public class UltraDNSRestGeoSupport {
     return regionToTerritories;
   }
 
-  public TreeSet<String> getTerritoryCodes(DirectionalGroup directionalGroup) {
-    TreeSet<String> territoryCodes = new TreeSet<String>();
+  public TreeSet<String> getTerritoryCodes(Map<String, Collection<String>> regionToTerritories) {
+    final TreeSet<String> territoryCodes = new TreeSet<String>();
+    final Set<Region> regions = new TreeSet<Region>();
+    final Set<String> regionNames = new TreeSet<String>();
 
-    if (directionalGroup.getRegionToTerritories() != null && !directionalGroup.getRegionToTerritories().isEmpty()) {
-      Map<String, Collection<String>> regionToTerritories = directionalGroup.getRegionToTerritories();
-      Set<Region> regions = new TreeSet<Region>();
-      Set<String> regionNames = new TreeSet<String>();
+    for (Map.Entry<Region, Collection<Region>> entry : regionsAsRegions().entrySet()) {
+      regions.add(entry.getKey());
+      regions.addAll(entry.getValue());
+    }
 
-      for (Map.Entry<Region, Collection<Region>> entry : regionsAsRegions().entrySet()) {
-        regions.add(entry.getKey());
-        regions.addAll(entry.getValue());
-      }
+    for (Map.Entry<String, Collection<String>> regionToTerritory : regionToTerritories.entrySet()) {
+      regionNames.addAll(regionToTerritory.getValue());
+    }
 
-      for (Map.Entry<String, Collection<String>> regionToTerritory : regionToTerritories.entrySet()) {
-        regionNames.addAll(regionToTerritory.getValue());
-      }
-
-      Iterator<String> regionNamesIterator = regionNames.iterator();
-      while (regionNamesIterator.hasNext()) {
-        String regionName = regionNamesIterator.next();
-        Iterator<Region> regionsIterator = regions.iterator();
-        while (regionsIterator.hasNext()) {
-          Region region = regionsIterator.next();
-          if (regionName.equals(region.getName())) {
-            territoryCodes.add(region.getEffectiveCodeForGeo());
-            break;
-          }
+    Iterator<String> regionNamesIterator = regionNames.iterator();
+    while (regionNamesIterator.hasNext()) {
+      String regionName = regionNamesIterator.next();
+      Iterator<Region> regionsIterator = regions.iterator();
+      while (regionsIterator.hasNext()) {
+        Region region = regionsIterator.next();
+        if (regionName.equals(region.getName())) {
+          territoryCodes.add(region.getEffectiveCodeForGeo());
+          break;
         }
       }
     }
-    return territoryCodes;
+  return territoryCodes;
   }
 }

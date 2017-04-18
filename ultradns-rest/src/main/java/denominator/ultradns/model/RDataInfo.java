@@ -5,6 +5,7 @@ public class RDataInfo {
     private GeoInfo geoInfo;
     private IpInfo ipInfo;
     private Integer ttl;
+    private String type;
 
     public GeoInfo getGeoInfo() {
         return geoInfo;
@@ -28,5 +29,13 @@ public class RDataInfo {
 
     public void setTtl(Integer ttl) {
         this.ttl = ttl;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

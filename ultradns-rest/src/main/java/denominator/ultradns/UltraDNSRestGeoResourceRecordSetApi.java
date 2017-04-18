@@ -1,28 +1,28 @@
 package denominator.ultradns;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.google.gson.Gson;
 import dagger.Lazy;
 import denominator.Provider;
 import denominator.common.Filter;
 import denominator.model.ResourceRecordSet;
 import denominator.profile.GeoResourceRecordSetApi;
 import denominator.ultradns.model.RRSet;
+import denominator.ultradns.model.RRSetList;
 import denominator.ultradns.model.RDataInfo;
 import denominator.ultradns.model.GeoInfo;
 import denominator.ultradns.model.Profile;
 import denominator.ultradns.model.DirectionalRecord;
-import denominator.ultradns.model.DirectionalGroup;
+import denominator.ultradns.util.Constants;
 import denominator.ultradns.util.RRSetUtil;
 import denominator.ResourceTypeToValue.ResourceTypes;
 import org.apache.commons.lang.StringUtils;
@@ -33,7 +33,6 @@ import static denominator.common.Preconditions.checkNotNull;
 import static denominator.common.Util.concat;
 import static denominator.common.Util.filter;
 import static denominator.common.Util.nextOrNull;
-import static denominator.common.Util.toMap;
 import static denominator.model.ResourceRecordSets.nameAndTypeEqualTo;
 
 final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetApi {
@@ -44,7 +43,6 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
     }
   };
   private static final int DEFAULT_TTL = 300;
-
   private final Collection<String> supportedTypes;
   private final Lazy<Map<String, Collection<String>>> regions;
   private final UltraDNSRest api;
@@ -170,6 +168,12 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
     }
   }
 
+  /**
+   * This method will update Geo Records for a combination
+   * of owner, resource type & group.
+   * @param rrset contains the {@code rdata} elements ensure exist. If {@link
+   *              ResourceRecordSet#ttl() ttl} is not present, zone default is used.
+   */
   @Override
   public void put(ResourceRecordSet<?> rrset) {
     checkNotNull(rrset, "rrset was null");
@@ -178,68 +182,84 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
     checkArgument(supportedTypes.contains(rrset.type()), "%s not a supported type for geo: %s",
             rrset.type(), supportedTypes);
 
-    int ttlToApply = rrset.ttl() != null ? rrset.ttl() : DEFAULT_TTL;
-    String group = rrset.qualifier();
-    Map<String, Collection<String>> regions1 = rrset.geo().regions();
+    final String ownerName = rrset.name();
+    final String type = rrset.type();
 
-    DirectionalGroup directionalGroup = new DirectionalGroup();
-    directionalGroup.setName(group);
-    directionalGroup.setRegionToTerritories(regions1);
+    final List<Map<String, Object>> recordsLeftToCreate = new ArrayList<Map<String, Object>>(rrset.records());
+    final int ttlToApply = rrset.ttl() != null ? rrset.ttl() : DEFAULT_TTL;
+    final String groupName = rrset.qualifier();
+    final TreeSet<String> geoCodes = ultraDNSRestGeoSupport.getTerritoryCodes(rrset.geo().regions());
 
-    List<Map<String, Object>> recordsLeftToCreate = new ArrayList<Map<String, Object>>(rrset.records());
-    Iterator<DirectionalRecord> iterator = recordsByNameTypeAndQualifier(rrset.name(), rrset.type(), group);
+    RRSetList rrSetList = null;
+    try {
+      rrSetList = api.getDirectionalDNSRecordsForHost(zoneName, ownerName, RRSetUtil.directionalRecordType(type));
+    } catch (UltraDNSRestException e) {
+      if (e.code() != UltraDNSRestException.DATA_NOT_FOUND) {
+        throw e;
+      }
+    }
 
-    while (iterator.hasNext()) {
-      DirectionalRecord record = iterator.next();
-      Map<String, Object> rdata = toMap(record.getType(), record.getRdata());
+    if (rrSetList == null) {
+      // Creating new pool with new records.
+      final RRSet newRRSet = new RRSet();
+      final List<String> newRData = new ArrayList<String>();
+      final List<RDataInfo> newRDataInfoList = new ArrayList<RDataInfo>();
 
-      if (recordsLeftToCreate.contains(rdata)) {
-        recordsLeftToCreate.remove(rdata);
-        boolean shouldUpdate = false;
-        if (ttlToApply != record.getTtl()) {
-          record.setTtl(ttlToApply);
-          shouldUpdate = true;
-        } else {
-          directionalGroup = ultraDNSRestGeoSupport.getDirectionalDNSGroupByName(zoneName, record.getName(),
-                  RRSetUtil.directionalRecordType(record.getType()), record.getGeoGroupName());
-          if (!regions1.equals(directionalGroup.getRegionToTerritories())) {
-            directionalGroup.setRegionToTerritories(regions1);
-            shouldUpdate = true;
+      for (Map<String, Object> record: recordsLeftToCreate) {
+        for (Map.Entry<String, Object> r1 : record.entrySet()) {
+          newRData.add((String) r1.getValue());
+          newRDataInfoList.add(createRDataInfo(type, ttlToApply, groupName, geoCodes));
+        }
+      }
+      newRRSet.setOwnerName(ownerName);
+      newRRSet.setRdata(newRData);
+      newRRSet.setProfile(new Profile(Constants.DIRECTIONAL_POOL_SCHEMA, "", newRDataInfoList));
+      try {
+        api.createResourceRecord(zoneName, RRSetUtil.directionalRecordType(type), ownerName, newRRSet);
+      } catch (UltraDNSRestException e) {
+          throw e;
+      }
+    } else {
+      // Updating the existing pool records.
+      final RRSet rs = rrSetList.getRrSets().get(0);
+      final List<String> rdata = rs.getRdata();
+      final Profile profile = rs.getProfile();
+      final List<RDataInfo> rdataInfoList = profile.getRdataInfo();
+
+      for (Map<String, Object> record: recordsLeftToCreate) {
+        for (Map.Entry<String, Object> r2 : record.entrySet()) {
+          String data = ((String) r2.getValue());
+          int index = rdata.indexOf(data);
+          if (index >= 0) {
+            rdataInfoList.set(index, createRDataInfo(type, ttlToApply, groupName, geoCodes));
+          } else {
+            rdata.add(data);
+            rdataInfoList.add(createRDataInfo(type, ttlToApply, groupName, geoCodes));
           }
         }
-        if (shouldUpdate) {
-            updateDirectionalPoolRecord(zoneName, record, directionalGroup);
-        }
-      } else {
-        deleteDirectionalPoolRecord(record);
       }
-    }
-
-    if (!recordsLeftToCreate.isEmpty()) {
-      String poolName = rrset.name();
+      rs.setRdata(rdata);
+      profile.setRdataInfo(rdataInfoList);
+      rs.setProfile(profile);
       try {
-        String type = rrset.type();
-        if (ResourceTypes.CNAME.name().equals(type)) {
-          type = ResourceTypes.A.name();
-        }
-        api.addDirectionalPool(zoneName, poolName, type);
+        api.updateDirectionalPool(zoneName, ownerName, type, rs);
       } catch (UltraDNSRestException e) {
-        if (e.code() != UltraDNSRestException.POOL_ALREADY_EXISTS) {
-          throw e;
-        }
-      }
-
-      DirectionalRecord record = new DirectionalRecord();
-      record.setType(rrset.type());
-      record.setTtl(ttlToApply);
-
-      for (Map<String, Object> rdata : recordsLeftToCreate) {
-        for (Object rDatum : rdata.values()) {
-          record.getRdata().add(rDatum.toString());
-        }
-        addDirectionalPoolRecord(zoneName, poolName, record, directionalGroup);
+        throw e;
       }
     }
+  }
+
+  private RDataInfo createRDataInfo(String type, int ttlToApply, String groupName, TreeSet<String> geoCodes) {
+    final GeoInfo geoInfo = new GeoInfo();
+    geoInfo.setName(groupName);
+    geoInfo.setCodes(geoCodes);
+
+    final RDataInfo rdi = new RDataInfo();
+    rdi.setGeoInfo(geoInfo);
+    rdi.setTtl(ttlToApply);
+    rdi.setType(type);
+
+    return rdi;
   }
 
   @Override
@@ -265,78 +285,6 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
       }
     }
     return iteratorFactory.create(list.iterator(), zoneName);
-  }
-
-  private void addDirectionalPoolRecord(String zoneName1, String hostName,
-                                        DirectionalRecord record, DirectionalGroup directionalGroup) {
-
-    List<String> rdata = record.getRdata();
-
-    GeoInfo geoInfo = new GeoInfo();
-    geoInfo.setCodes(ultraDNSRestGeoSupport.getTerritoryCodes(directionalGroup));
-    geoInfo.setName(directionalGroup.getName());
-
-    RDataInfo rDataInfo = new RDataInfo();
-    rDataInfo.setGeoInfo(geoInfo);
-    List<RDataInfo> rDataInfos = Arrays.asList(rDataInfo);
-
-    Profile profile = new Profile();
-    profile.setRdataInfo(rDataInfos);
-
-    RRSet rrSet = new RRSet();
-    rrSet.setProfile(profile);
-    rrSet.setRdata(rdata);
-
-    try {
-      api.addDirectionalPoolRecord(zoneName1, hostName, record.getType(), rrSet);
-    } catch (UltraDNSRestException e) {
-      throw e;
-    }
-  }
-
-  public void updateDirectionalPoolRecord(String zoneName2, DirectionalRecord record,
-                                          DirectionalGroup directionalGroup) {
-    int indexToUpdate = -1;
-    String rData = "";
-    int intType = lookup(record.getType());
-    List<RRSet> rrSets = new ArrayList<RRSet>();
-
-    if (record.getRdata() != null && !record.getRdata().isEmpty()) {
-      rData = StringUtils.join(record.getRdata(), " ");
-    }
-
-    try {
-      rrSets = api.getDirectionalDNSRecordsForHost(zoneName2, record.getName(), intType).getRrSets();
-      if (rrSets != null && !rrSets.isEmpty()) {
-        RRSet rrSet = rrSets.get(0);
-        if (rrSet != null && rrSet.getRdata() != null) {
-          indexToUpdate = rrSet.getRdata().indexOf(rData);
-        }
-      }
-    } catch (UltraDNSRestException e) {
-      if (e.code() != UltraDNSRestException.DATA_NOT_FOUND) {
-        throw e;
-      }
-    }
-
-    if (indexToUpdate >= 0) {
-      RDataInfo rDataInfo = rrSets.get(0).getProfile().getRdataInfo().get(indexToUpdate);
-      GeoInfo geoInfo = rDataInfo.getGeoInfo();
-      geoInfo.setCodes(ultraDNSRestGeoSupport.getTerritoryCodes(directionalGroup));
-      geoInfo.setName(directionalGroup.getName());
-      rDataInfo.setGeoInfo(geoInfo);
-      rDataInfo.setTtl(record.getTtl());
-
-      try {
-        Gson gson = new Gson();
-        api.updateDirectionalPoolRecord(zoneName2, record.getName(), record.getType(), gson.toJson(rDataInfo),
-                indexToUpdate);
-      } catch (UltraDNSRestException e) {
-        if (e.code() != UltraDNSRestException.PATH_NOT_FOUND_TO_PATCH) {
-          throw e;
-        }
-      }
-    }
   }
 
   private void deleteDirectionalPoolRecord(DirectionalRecord record) {

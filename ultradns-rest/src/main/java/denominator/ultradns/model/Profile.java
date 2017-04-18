@@ -14,6 +14,14 @@ public class Profile {
     private List<RDataInfo> rdataInfo;
     private NoResponse noResponse;
 
+    public Profile() { }
+
+    public Profile(String context, String description, List<RDataInfo> rdataInfo) {
+        this.context = context;
+        this.description = description;
+        this.rdataInfo = rdataInfo;
+    }
+
     public String getContext() {
         return context;
     }

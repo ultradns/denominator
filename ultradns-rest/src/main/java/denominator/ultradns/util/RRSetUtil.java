@@ -1,5 +1,6 @@
 package denominator.ultradns.util;
 
+import denominator.ResourceTypeToValue;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.Record;
 import denominator.ultradns.model.DirectionalRecord;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.TreeSet;
 
+import static denominator.ResourceTypeToValue.lookup;
 import static denominator.ultradns.util.Constants.DIRECTIONAL_POOL_SCHEMA;
 
 /**
@@ -188,6 +190,17 @@ public final class RRSetUtil {
             return rrType.substring(0, rrType.indexOf(" "));
         }
         return "";
+    }
+
+    public static int directionalRecordType(String type) {
+        if (ResourceTypeToValue.ResourceTypes.A.name().equals(type)
+                || ResourceTypeToValue.ResourceTypes.CNAME.name().equals(type)) {
+            return lookup(ResourceTypeToValue.ResourceTypes.A.name());
+        } else if (ResourceTypeToValue.ResourceTypes.AAAA.name().equals(type)) {
+            return lookup(ResourceTypeToValue.ResourceTypes.AAAA.name());
+        } else {
+            return lookup(type);
+        }
     }
 
 }

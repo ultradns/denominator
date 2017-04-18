@@ -122,7 +122,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
       // retain original type (this will filter out CNAMEs)
       return filter(iterator, filter);
     } else {
-      return iteratorForDNameAndDirectionalType(name, dirType(type));
+      return iteratorForDNameAndDirectionalType(name, RRSetUtil.directionalRecordType(type));
     }
   }
 
@@ -157,7 +157,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
                                                                                   String qualifier) {
     try {
       return RRSetUtil.getDirectionalRecordsByGroup(
-              api.getDirectionalDNSRecordsForHost(zoneName, name, dirType(type)).rrSets(),
+              api.getDirectionalDNSRecordsForHost(zoneName, name, RRSetUtil.directionalRecordType(type)).rrSets(),
               qualifier).iterator();
     } catch (UltraDNSRestException e) {
       switch (e.code()) {
@@ -201,7 +201,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
           shouldUpdate = true;
         } else {
           directionalGroup = ultraDNSRestGeoSupport.getDirectionalDNSGroupByName(zoneName, record.getName(),
-                  dirType(record.getType()), record.getGeoGroupName());
+                  RRSetUtil.directionalRecordType(record.getType()), record.getGeoGroupName());
           if (!regions1.equals(directionalGroup.getRegionToTerritories())) {
             directionalGroup.setRegionToTerritories(regions1);
             shouldUpdate = true;
@@ -376,16 +376,6 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
           }
         }
       }
-    }
-  }
-
-  public int dirType(String type) {
-    if (ResourceTypes.A.name().equals(type) || ResourceTypes.CNAME.name().equals(type)) {
-      return lookup(ResourceTypes.A.name());
-    } else if (ResourceTypes.AAAA.name().equals(type)) {
-      return lookup(ResourceTypes.AAAA.name());
-    } else {
-      return lookup(type);
     }
   }
 

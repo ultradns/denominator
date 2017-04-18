@@ -11,9 +11,8 @@ import denominator.model.ResourceRecordSet;
 import denominator.model.ResourceRecordSet.Builder;
 import denominator.model.profile.Geo;
 import denominator.ultradns.model.DirectionalRecord;
-import denominator.ResourceTypeToValue.ResourceTypes;
+import denominator.ultradns.util.RRSetUtil;
 
-import static denominator.ResourceTypeToValue.lookup;
 import static denominator.common.Util.peekingIterator;
 import static denominator.common.Util.toMap;
 
@@ -82,7 +81,7 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
     final String key = record.getName() + "||" + record.getType() + "||" + record.getGeoGroupName();
     if (!cache.containsKey(key)) {
       Geo profile = Geo.create(ultraDNSRestGeoSupport.getDirectionalDNSGroupByName(zoneName, record.getName(),
-              dirType(record.getType()), record.getGeoGroupName()).getRegionToTerritories());
+              RRSetUtil.directionalRecordType(record.getType()), record.getGeoGroupName()).getRegionToTerritories());
       cache.put(key, profile);
     }
 
@@ -97,16 +96,6 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
       }
     }
     return builder.build();
-  }
-
-  public int dirType(String type) {
-    if (ResourceTypes.A.name().equals(type) || ResourceTypes.CNAME.name().equals(type)) {
-      return lookup(ResourceTypes.A.name());
-    } else if (ResourceTypes.AAAA.name().equals(type)) {
-      return lookup(ResourceTypes.AAAA.name());
-    } else {
-      return lookup(type);
-    }
   }
 
   @Override

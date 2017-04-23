@@ -1,4 +1,4 @@
-package denominator.ultradns;
+package denominator.ultradns.service.auth;
 
 import denominator.CheckConnection;
 import denominator.Credentials;
@@ -32,7 +32,7 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
     private transient String token;
 
     @Inject
-    InvalidatableTokenProvider(denominator.Provider provider, Session session,
+    public InvalidatableTokenProvider(denominator.Provider provider, Session session,
                                Provider<Credentials> credentials,
                                AtomicReference<Boolean> sessionValid) {
         this.provider = provider;
@@ -95,7 +95,7 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
         return session.login("password", username, password);
     }
 
-    interface Session {
+    public interface Session {
         @RequestLine("POST /authorization/token")
         @Headers({ "Content-Type: application/x-www-form-urlencoded" })
         TokenResponse login(@Param("grant_type") String grantType, @Param("username") String userName,

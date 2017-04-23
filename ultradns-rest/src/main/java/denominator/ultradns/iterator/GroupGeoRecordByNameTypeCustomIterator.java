@@ -1,4 +1,4 @@
-package denominator.ultradns.iterators;
+package denominator.ultradns.iterator;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -10,8 +10,8 @@ import denominator.common.PeekingIterator;
 import denominator.model.ResourceRecordSet;
 import denominator.model.ResourceRecordSet.Builder;
 import denominator.model.profile.Geo;
-import denominator.ultradns.UltraDNSRest;
-import denominator.ultradns.UltraDNSRestGeoSupport;
+import denominator.ultradns.service.integration.UltraDNSRest;
+import denominator.ultradns.service.UltraDNSRestGeoSupport;
 import denominator.ultradns.model.DirectionalRecord;
 import denominator.ultradns.util.RRSetUtil;
 
@@ -19,10 +19,8 @@ import static denominator.common.Util.peekingIterator;
 import static denominator.common.Util.toMap;
 
 /**
- * Generally, this iterator will produce {@link ResourceRecordSet} for only a single record type.
- * However, there are special cases where this can produce multiple. For example, {@link
- * DirectionalPool.RecordType#IPV4} and {@link DirectionalPool.RecordType#IPV6} emit both address
- * ({@code A} or {@code AAAA}) and {@code CNAME} records.
+ * Generally, this iterator will produce ResourceRecordSet for only a single record type.
+ * However, there are special cases where this can produce multiple.
  */
 public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<ResourceRecordSet<?>> {
 
@@ -116,11 +114,7 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
 
     /**
      * Construct a custom iterator from directional record iterator & zone name.
-     *
-     * @param sortedIterator only contains records with the same {@link DirectionalRecord#name()},
-     *                       sorted by {@link DirectionalRecord#type()}, {@link
-     *                       DirectionalRecord#getGeolocationGroup()} or {@link
-     *                       DirectionalRecord#group()}
+     * @param sortedIterator only contains records with the same.
      */
     public Iterator<ResourceRecordSet<?>> create(Iterator<DirectionalRecord> sortedIterator, String name) {
       return new GroupGeoRecordByNameTypeCustomIterator(new UltraDNSRestGeoSupport(api), sortedIterator, name);

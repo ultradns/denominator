@@ -1,6 +1,6 @@
 package denominator.ultradns.util;
 
-import denominator.ultradns.UltraDNSRestException;
+import denominator.ultradns.exception.UltraDNSRestException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

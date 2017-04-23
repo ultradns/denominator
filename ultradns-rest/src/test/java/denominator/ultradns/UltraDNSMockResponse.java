@@ -1,5 +1,15 @@
 package denominator.ultradns;
 
+import denominator.Credentials;
+import denominator.ultradns.service.auth.InvalidatableTokenProvider;
+import denominator.ultradns.service.auth.SessionTarget;
+import denominator.ultradns.service.auth.UltraDNSRestTarget;
+import denominator.ultradns.service.decoder.UltraDNSRestErrorDecoder;
+import denominator.ultradns.service.integration.UltraDNSRest;
+import feign.Feign;
+
+import java.util.concurrent.atomic.AtomicReference;
+
 import static java.lang.String.format;
 
 public final class UltraDNSMockResponse {
@@ -41,6 +51,53 @@ public final class UltraDNSMockResponse {
     public static final int REGION_CODE_A3 = 331;
 
     public static final int REGION_CODE_NAM = 338;
+
+    /**
+     * Mock API to call UltraDNSRest Endpoint.
+     * @return
+     */
+    public static UltraDNSRest getUltraApi(final MockUltraDNSRestServer server) {
+        UltraDNSRestProvider.FeignModule module = new UltraDNSRestProvider.FeignModule();
+        UltraDNSRestProvider provider = new UltraDNSRestProvider() {
+            @Override
+            public String url() {
+                return server.url();
+            }
+        };
+        javax.inject.Provider<Credentials> credentials = new javax.inject.Provider<Credentials>() {
+            @Override
+            public Credentials get() {
+                return server.credentials();
+            }
+
+        };
+        AtomicReference<Boolean> sessionValid = module.sessionValid();
+        UltraDNSRestErrorDecoder errorDecoder = new UltraDNSRestErrorDecoder(sessionValid);
+        Feign feign = module.feign(module.logger(), module.logLevel(), errorDecoder);
+        InvalidatableTokenProvider.Session session = feign.newInstance(new SessionTarget(provider));
+
+        InvalidatableTokenProvider tokenProvider = new InvalidatableTokenProvider(provider,
+                session, credentials, sessionValid);
+        tokenProvider.setLastCredentialsHashCode(credentials.get().hashCode());
+        tokenProvider.setToken("token");
+        sessionValid.set(true);
+
+        return feign.newInstance(new UltraDNSRestTarget(new UltraDNSRestProvider() {
+            @Override
+            public String url() {
+                return server.url();
+            }
+        }, tokenProvider));
+    }
+
+    public static String getMockErrorResponse(int errorCode, String errorMessage) {
+        return "[\n" +
+                    "{\n" +
+                        format("\"errorCode\": %s,\n", errorCode) +
+                        format("\"errorMessage\": \"%s\"\n", errorMessage) +
+                    "}\n" +
+                "]\n";
+    }
 
     public static final String STATUS_SUCCESS = "{\n" +
             "    \"message\": \"Successful\"\n" +
@@ -437,17 +494,6 @@ public final class UltraDNSMockResponse {
             "        \"returnedCount\": 1\n" +
             "    }\n" +
             "}\n";
-
-
-    public static String getMockErrorResponse(int errorCode, String errorMessage) {
-        return
-                "[\n"
-                        + "    {\n"
-                        + format("        \"errorCode\": %s,\n", errorCode)
-                        + format("        \"errorMessage\": \"%s\"\n", errorMessage)
-                        + "    }\n"
-                        + "]\n";
-    }
 
     public static final String GET_ZONES_OF_ACCOUNT_PRESENT = "{\n" +
             "    \"queryInfo\": {\n" +

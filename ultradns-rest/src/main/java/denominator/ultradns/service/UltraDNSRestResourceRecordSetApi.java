@@ -1,4 +1,4 @@
-package denominator.ultradns;
+package denominator.ultradns.service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,7 +9,9 @@ import javax.inject.Inject;
 
 import denominator.ResourceRecordSetApi;
 import denominator.model.ResourceRecordSet;
-import denominator.ultradns.iterators.GroupByRecordNameAndTypeCustomIterator;
+import denominator.ultradns.service.integration.UltraDNSRest;
+import denominator.ultradns.exception.UltraDNSRestException;
+import denominator.ultradns.iterator.GroupByRecordNameAndTypeCustomIterator;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.Record;
 import denominator.ultradns.util.RRSetUtil;
@@ -22,7 +24,7 @@ import static denominator.common.Util.nextOrNull;
 import static denominator.common.Util.toMap;
 import denominator.ResourceTypeToValue.ResourceTypes;
 
-final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceRecordSetApi {
+public final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceRecordSetApi {
 
   private static final int DEFAULT_TTL = 300;
   private final UltraDNSRest api;
@@ -189,7 +191,7 @@ final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceReco
     }
   }
 
-  static final class Factory implements denominator.ResourceRecordSetApi.Factory {
+  public static final class Factory implements denominator.ResourceRecordSetApi.Factory {
 
     private final UltraDNSRest api;
 

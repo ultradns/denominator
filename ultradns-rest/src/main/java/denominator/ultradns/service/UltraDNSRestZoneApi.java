@@ -1,6 +1,8 @@
-package denominator.ultradns;
+package denominator.ultradns.service;
 
 import denominator.model.Zone;
+import denominator.ultradns.service.integration.UltraDNSRest;
+import denominator.ultradns.exception.UltraDNSRestException;
 import denominator.ultradns.model.AccountList;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.Record;

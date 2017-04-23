@@ -1,4 +1,4 @@
-package denominator.ultradns;
+package denominator.ultradns.service.auth;
 
 import denominator.Provider;
 import feign.Request;
@@ -11,7 +11,7 @@ public class SessionTarget implements Target<InvalidatableTokenProvider.Session>
     private final Provider provider;
 
     @Inject
-    SessionTarget(Provider provider) {
+    public SessionTarget(Provider provider) {
         this.provider = provider;
     }
 

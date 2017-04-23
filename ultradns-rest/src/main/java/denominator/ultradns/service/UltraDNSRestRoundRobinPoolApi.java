@@ -1,4 +1,4 @@
-package denominator.ultradns;
+package denominator.ultradns.service;
 
 import java.util.List;
 import java.util.Map;
@@ -8,8 +8,10 @@ import static denominator.common.Preconditions.checkNotNull;
 import static denominator.common.Preconditions.checkState;
 
 import denominator.ResourceTypeToValue.ResourceTypes;
+import denominator.ultradns.service.integration.UltraDNSRest;
+import denominator.ultradns.exception.UltraDNSRestException;
 
-class UltraDNSRestRoundRobinPoolApi {
+public class UltraDNSRestRoundRobinPoolApi {
 
   private final UltraDNSRest api;
   private final String zoneName;

@@ -1,24 +1,23 @@
-package denominator.ultradns;
+package denominator.ultradns.service.integration;
 
 import com.squareup.okhttp.mockwebserver.MockResponse;
-import denominator.Credentials;
+import denominator.ultradns.MockUltraDNSRestServer;
+import denominator.ultradns.UltraDNSMockResponse;
+import denominator.ultradns.exception.UltraDNSRestException;
 import denominator.ultradns.model.DirectionalRecord;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.RRSetList;
 import denominator.ultradns.model.Region;
 import denominator.ultradns.util.RRSetUtil;
-import feign.Feign;
 import org.junit.Rule;
 import org.junit.Test;
 
-import denominator.ultradns.InvalidatableTokenProvider.Session;
 import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import denominator.ResourceTypeToValue.ResourceTypes;
 
@@ -62,37 +61,7 @@ public class UltraDNSRestTest {
      * @return
      */
     UltraDNSRest mockApi() {
-        UltraDNSRestProvider.FeignModule module = new UltraDNSRestProvider.FeignModule();
-        UltraDNSRestProvider provider = new UltraDNSRestProvider() {
-            @Override
-            public String url() {
-                return server.url();
-            }
-        };
-        javax.inject.Provider<Credentials> credentials = new javax.inject.Provider<Credentials>() {
-            @Override
-            public Credentials get() {
-                return server.credentials();
-            }
-
-        };
-        AtomicReference<Boolean> sessionValid = module.sessionValid();
-        UltraDNSRestErrorDecoder errorDecoder = new UltraDNSRestErrorDecoder(sessionValid);
-        Feign feign = module.feign(module.logger(), module.logLevel(), errorDecoder);
-        Session session = feign.newInstance(new SessionTarget(provider));
-
-        InvalidatableTokenProvider tokenProvider = new InvalidatableTokenProvider(provider,
-                session, credentials, sessionValid);
-        tokenProvider.setLastCredentialsHashCode(credentials.get().hashCode());
-        tokenProvider.setToken("token");
-        sessionValid.set(true);
-
-        return feign.newInstance(new UltraDNSRestTarget(new UltraDNSRestProvider() {
-            @Override
-            public String url() {
-                return server.url();
-            }
-        }, tokenProvider));
+        return UltraDNSMockResponse.getUltraApi(server);
     }
 
     @Test

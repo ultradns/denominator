@@ -1,5 +1,6 @@
-package denominator.ultradns;
+package denominator.ultradns.service.decoder;
 
+import denominator.ultradns.UltraDNSMockResponse;
 import feign.FeignException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
@@ -12,7 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static denominator.ultradns.UltraDNSRestException.ZONE_NOT_FOUND;
+import static denominator.ultradns.exception.UltraDNSRestException.ZONE_NOT_FOUND;
 import static feign.Util.UTF_8;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 

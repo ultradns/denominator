@@ -1,4 +1,4 @@
-package denominator.ultradns.iterators;
+package denominator.ultradns.iterator;
 
 import java.util.Iterator;
 import java.util.Map;

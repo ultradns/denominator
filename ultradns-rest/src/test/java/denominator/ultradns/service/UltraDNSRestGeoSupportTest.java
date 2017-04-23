@@ -1,17 +1,15 @@
-package denominator.ultradns;
+package denominator.ultradns.service;
 
 import com.squareup.okhttp.mockwebserver.MockResponse;
+import denominator.ultradns.MockUltraDNSRestServer;
+import denominator.ultradns.UltraDNSMockResponse;
 import denominator.ultradns.model.Region;
+import denominator.ultradns.service.integration.UltraDNSRest;
 import org.junit.Rule;
 import org.junit.Test;
 
-import denominator.Credentials;
-import feign.Feign;
-import denominator.ultradns.InvalidatableTokenProvider.Session;
-
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class UltraDNSRestGeoSupportTest {
 
@@ -23,37 +21,7 @@ public class UltraDNSRestGeoSupportTest {
      * @return
      */
     UltraDNSRest mockApi() {
-        UltraDNSRestProvider.FeignModule module = new UltraDNSRestProvider.FeignModule();
-        UltraDNSRestProvider provider = new UltraDNSRestProvider() {
-            @Override
-            public String url() {
-                return server.url();
-            }
-        };
-        javax.inject.Provider<Credentials> credentials = new javax.inject.Provider<Credentials>() {
-            @Override
-            public Credentials get() {
-                return server.credentials();
-            }
-
-        };
-        AtomicReference<Boolean> sessionValid = module.sessionValid();
-        UltraDNSRestErrorDecoder errorDecoder = new UltraDNSRestErrorDecoder(sessionValid);
-        Feign feign = module.feign(module.logger(), module.logLevel(), errorDecoder);
-        Session session = feign.newInstance(new SessionTarget(provider));
-
-        InvalidatableTokenProvider tokenProvider = new InvalidatableTokenProvider(provider,
-                session, credentials, sessionValid);
-        tokenProvider.setLastCredentialsHashCode(credentials.get().hashCode());
-        tokenProvider.setToken("token");
-        sessionValid.set(true);
-
-        return feign.newInstance(new UltraDNSRestTarget(new UltraDNSRestProvider() {
-            @Override
-            public String url() {
-                return server.url();
-            }
-        }, tokenProvider));
+        return UltraDNSMockResponse.getUltraApi(server);
     }
 
     @Test

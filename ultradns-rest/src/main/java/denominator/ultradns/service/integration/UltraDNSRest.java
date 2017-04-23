@@ -1,4 +1,4 @@
-package denominator.ultradns;
+package denominator.ultradns.service.integration;
 
 import denominator.ultradns.model.Status;
 import denominator.ultradns.model.AccountList;
@@ -46,10 +46,7 @@ public interface UltraDNSRest {
 
   /**
    * Delete a zone given the zone name.
-   *
    * @param zoneName The zone that has to be deleted.
-   *
-   * @throws UltraDNSRestException with code {@link UltraDNSRestException#ZONE_NOT_FOUND}.
    */
   @RequestLine("DELETE /zones/{zoneName}")
   void deleteZone(@Param("zoneName") final String zoneName);
@@ -135,9 +132,6 @@ public interface UltraDNSRest {
    * @param zoneName zone in which the pool is present in.
    * @param typeCode integer value of type of the pool.
    * @param hostName hostname in which the pool is present in.
-   *
-   * @throws UltraDNSRestException with code {@link UltraDNSRestException#POOL_NOT_FOUND} and {@link
-   *                           UltraDNSRestException#RESOURCE_RECORD_NOT_FOUND}.
    */
   @RequestLine("DELETE /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
   void deleteLBPool(@Param("zoneName") String zoneName,

@@ -1,4 +1,4 @@
-package denominator.ultradns;
+package denominator.ultradns.exception;
 
 import feign.FeignException;
 
@@ -7,77 +7,77 @@ public class UltraDNSRestException extends FeignException {
   /**
    * System Error.
    */
-  static final int SYSTEM_ERROR = 9999;
+  public static final int SYSTEM_ERROR = 9999;
   /**
    * Zone does not exist in the system.
    */
-  static final int ZONE_NOT_FOUND = 1801;
+  public static final int ZONE_NOT_FOUND = 1801;
   /**
    * Zone already exists in the system.
    */
-  static final int ZONE_ALREADY_EXISTS = 1802;
+  public static final int ZONE_ALREADY_EXISTS = 1802;
   /**
    * No resource record with GUID found in the system.
    */
-  static final int RESOURCE_RECORD_NOT_FOUND = 2103;
+  public static final int RESOURCE_RECORD_NOT_FOUND = 2103;
   /**
    * Resource record exists with the same name and type.
    */
-  static final int RESOURCE_RECORD_ALREADY_EXISTS = 2111;
+  public static final int RESOURCE_RECORD_ALREADY_EXISTS = 2111;
 
   // there are 51002 potential codes. These are the ones we are handling.
   /**
    * No Pool or Multiple pools of same type exists for the PoolName.
    */
-  static final int DIRECTIONALPOOL_NOT_FOUND = 2142;
+  public static final int DIRECTIONALPOOL_NOT_FOUND = 2142;
   /**
    * Invalid zone name.
    */
-  static final int INVALID_ZONE_NAME = 2507;
+  public static final int INVALID_ZONE_NAME = 2507;
   /**
    * Directional Pool Record does not exist in the system.
    */
-  static final int DIRECTIONALPOOL_RECORD_NOT_FOUND = 2705;
+  public static final int DIRECTIONALPOOL_RECORD_NOT_FOUND = 2705;
   /**
    * Pool does not exist in the system.
    */
-  static final int POOL_NOT_FOUND = 2911;
+  public static final int POOL_NOT_FOUND = 2911;
   /**
    * Pool already created for the given rrGUID.
    */
-  static final int POOL_ALREADY_EXISTS = 2912;
+  public static final int POOL_ALREADY_EXISTS = 2912;
   /**
    * Group does not exist.
    */
-  static final int GROUP_NOT_FOUND = 4003;
+  public static final int GROUP_NOT_FOUND = 4003;
   /**
    * Directional feature not Enabled or Directional migration is not done.
    */
-  static final int DIRECTIONAL_NOT_ENABLED = 4006;
+  public static final int DIRECTIONAL_NOT_ENABLED = 4006;
   /**
    * Resource Record already exists.
    */
-  static final int POOL_RECORD_ALREADY_EXISTS = 4009;
+  public static final int POOL_RECORD_ALREADY_EXISTS = 4009;
   /**
    * Invalid_grant:Token not found, expired or invalid.
    */
-  static final int INVALID_GRANT = 60001;
+  public static final int INVALID_GRANT = 60001;
   /**
    * Data not found.
    */
-  static final int DATA_NOT_FOUND = 70002;
+  public static final int DATA_NOT_FOUND = 70002;
   /**
    * Invalid input: record data - Invalid address: 1.1.1.1.
    */
-  static final int INVALID_ADDRESS_IN_RECORD_DATA = 53005;
+  public static final int INVALID_ADDRESS_IN_RECORD_DATA = 53005;
   /**
    * Cannot find resource record data for the input zone, record type and owner combination.
    */
-  static final int RESOURCE_RECORD_POOL_NOT_FOUND = 56001;
+  public static final int RESOURCE_RECORD_POOL_NOT_FOUND = 56001;
   /**
    * No such path in target JSON document.
    */
-  static final int PATH_NOT_FOUND_TO_PATCH = 170001;
+  public static final int PATH_NOT_FOUND_TO_PATCH = 170001;
 
   private static final long serialVersionUID = 1L;
   private final int code;

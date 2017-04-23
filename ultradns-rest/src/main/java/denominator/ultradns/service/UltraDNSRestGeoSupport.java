@@ -1,4 +1,4 @@
-package denominator.ultradns;
+package denominator.ultradns.service;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -12,6 +12,7 @@ import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
+import denominator.ultradns.service.integration.UltraDNSRest;
 import denominator.ultradns.model.DirectionalGroup;
 import denominator.ultradns.model.Region;
 import denominator.ultradns.util.RRSetUtil;

@@ -1,4 +1,4 @@
-package denominator.ultradns;
+package denominator.ultradns.service;
 
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import static denominator.assertj.ModelAssertions.assertThat;
@@ -6,17 +6,18 @@ import denominator.model.ResourceRecordSet;
 import denominator.model.profile.Geo;
 import denominator.model.rdata.AData;
 import denominator.profile.GeoResourceRecordSetApi;
+import denominator.ultradns.MockUltraDNSRestServer;
+import denominator.ultradns.exception.UltraDNSRestException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import static denominator.ultradns.UltraDNSRestException.DIRECTIONAL_NOT_ENABLED;
+import static denominator.ultradns.exception.UltraDNSRestException.DIRECTIONAL_NOT_ENABLED;
 import static denominator.ultradns.UltraDNSMockResponse.GEO_SUPPORTED_REGIONS_SIZE;
 import static denominator.ultradns.UltraDNSMockResponse.TTL_200;
 import static denominator.ultradns.UltraDNSMockResponse.TTL_500;

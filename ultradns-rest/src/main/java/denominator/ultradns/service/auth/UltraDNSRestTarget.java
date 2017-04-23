@@ -1,19 +1,20 @@
-package denominator.ultradns;
+package denominator.ultradns.service.auth;
 
 import denominator.Provider;
+import denominator.ultradns.service.integration.UltraDNSRest;
 import feign.Request;
 import feign.RequestTemplate;
 import feign.Target;
 
 import javax.inject.Inject;
 
-class UltraDNSRestTarget implements Target<UltraDNSRest> {
+public class UltraDNSRestTarget implements Target<UltraDNSRest> {
 
   private final Provider provider;
   private final InvalidatableTokenProvider lazyToken;
 
   @Inject
-  UltraDNSRestTarget(Provider provider, InvalidatableTokenProvider lazyToken) {
+  public UltraDNSRestTarget(Provider provider, InvalidatableTokenProvider lazyToken) {
     this.provider = provider;
     this.lazyToken = lazyToken;
   }

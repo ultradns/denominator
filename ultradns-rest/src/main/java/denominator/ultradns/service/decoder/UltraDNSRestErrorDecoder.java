@@ -1,4 +1,4 @@
-package denominator.ultradns;
+package denominator.ultradns.service.decoder;
 
 import com.google.gson.stream.JsonReader;
 
@@ -8,16 +8,17 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 
 import com.google.gson.stream.JsonToken;
+import denominator.ultradns.exception.UltraDNSRestException;
 import feign.FeignException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 
-class UltraDNSRestErrorDecoder implements ErrorDecoder {
+public class UltraDNSRestErrorDecoder implements ErrorDecoder {
 
   private AtomicReference<Boolean> sessionValid;
 
   @Inject
-  UltraDNSRestErrorDecoder(AtomicReference<Boolean> sessionValid) {
+  public UltraDNSRestErrorDecoder(AtomicReference<Boolean> sessionValid) {
     this.sessionValid = sessionValid;
   }
 

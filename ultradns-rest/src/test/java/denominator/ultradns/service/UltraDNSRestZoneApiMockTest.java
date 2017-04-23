@@ -1,7 +1,10 @@
-package denominator.ultradns;
+package denominator.ultradns.service;
 
 import com.squareup.okhttp.mockwebserver.MockResponse;
 
+import denominator.ultradns.MockUltraDNSRestServer;
+import denominator.ultradns.UltraDNSMockResponse;
+import denominator.ultradns.exception.UltraDNSRestException;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -20,7 +23,7 @@ import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 
-import static denominator.ultradns.UltraDNSRestException.INVALID_ZONE_NAME;
+import static denominator.ultradns.exception.UltraDNSRestException.INVALID_ZONE_NAME;
 
 public class UltraDNSRestZoneApiMockTest {
 

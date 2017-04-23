@@ -1,22 +1,19 @@
-package denominator.ultradns;
+package denominator.ultradns.service;
 
 import com.squareup.okhttp.mockwebserver.MockResponse;
 
 import denominator.model.ResourceRecordSet;
 import denominator.model.rdata.AData;
-import org.junit.Before;
+import denominator.ultradns.MockUltraDNSRestServer;
+import denominator.ultradns.UltraDNSMockResponse;
+import denominator.ultradns.exception.UltraDNSRestException;
 import org.junit.Rule;
 import org.junit.Test;
 
 import denominator.ResourceRecordSetApi;
 import org.junit.rules.ExpectedException;
-import denominator.Credentials;
-import feign.Feign;
-
-import denominator.ultradns.InvalidatableTokenProvider.Session;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
 
 import denominator.ResourceTypeToValue.ResourceTypes;
 
@@ -50,36 +47,6 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
 
   @Rule
   public final ExpectedException thrown = ExpectedException.none();
-
-  /**
-   * Mock API to call UltraDNSRest Endpoint.
-   */
-  @Before
-  public void mockServer() {
-    UltraDNSRestProvider.FeignModule module = new UltraDNSRestProvider.FeignModule();
-    UltraDNSRestProvider provider = new UltraDNSRestProvider() {
-      @Override
-      public String url() {
-        return server.url();
-      }
-    };
-    javax.inject.Provider<Credentials> credentials = new javax.inject.Provider<Credentials>() {
-      @Override
-      public Credentials get() {
-        return server.credentials();
-      }
-    };
-    AtomicReference<Boolean> sessionValid = module.sessionValid();
-    UltraDNSRestErrorDecoder errorDecoder = new UltraDNSRestErrorDecoder(sessionValid);
-    Feign feign = module.feign(module.logger(), module.logLevel(), errorDecoder);
-    Session session = feign.newInstance(new SessionTarget(provider));
-
-    InvalidatableTokenProvider tokenProvider = new InvalidatableTokenProvider(provider,
-            session, credentials, sessionValid);
-    tokenProvider.setLastCredentialsHashCode(credentials.get().hashCode());
-    tokenProvider.setToken("token");
-    sessionValid.set(true);
-  }
 
   @Test
   public void listWhenNoneMatch() throws Exception {

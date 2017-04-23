@@ -1,4 +1,4 @@
-package denominator.ultradns;
+package denominator.ultradns.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,7 +16,9 @@ import denominator.Provider;
 import denominator.common.Filter;
 import denominator.model.ResourceRecordSet;
 import denominator.profile.GeoResourceRecordSetApi;
-import denominator.ultradns.iterators.GroupGeoRecordByNameTypeCustomIterator;
+import denominator.ultradns.service.integration.UltraDNSRest;
+import denominator.ultradns.exception.UltraDNSRestException;
+import denominator.ultradns.iterator.GroupGeoRecordByNameTypeCustomIterator;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.RRSetList;
 import denominator.ultradns.model.RDataInfo;
@@ -36,7 +38,7 @@ import static denominator.common.Util.filter;
 import static denominator.common.Util.nextOrNull;
 import static denominator.model.ResourceRecordSets.nameAndTypeEqualTo;
 
-final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetApi {
+public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetApi {
   private static final Filter<ResourceRecordSet<?>> IS_GEO = new Filter<ResourceRecordSet<?>>() {
     @Override
     public boolean apply(ResourceRecordSet<?> in) {
@@ -328,7 +330,7 @@ final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetA
     }
   }
 
-  static final class Factory implements GeoResourceRecordSetApi.Factory {
+  public static final class Factory implements GeoResourceRecordSetApi.Factory {
 
     private final Collection<String> supportedTypes;
     private final Lazy<Map<String, Collection<String>>> regions;

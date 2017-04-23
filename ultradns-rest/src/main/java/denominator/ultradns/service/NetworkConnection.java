@@ -1,10 +1,11 @@
-package denominator.ultradns;
+package denominator.ultradns.service;
 
 import javax.inject.Inject;
 
 import denominator.CheckConnection;
+import denominator.ultradns.service.integration.UltraDNSRest;
 
-class NetworkConnection implements CheckConnection {
+public class NetworkConnection implements CheckConnection {
 
   private final UltraDNSRest api;
 

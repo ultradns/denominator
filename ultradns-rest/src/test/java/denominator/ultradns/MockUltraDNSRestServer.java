@@ -19,7 +19,7 @@ import static denominator.Credentials.ListCredentials;
 import static denominator.assertj.MockWebServerAssertions.assertThat;
 import static java.lang.String.format;
 
-final class MockUltraDNSRestServer extends UltraDNSRestProvider implements TestRule {
+public final class MockUltraDNSRestServer extends UltraDNSRestProvider implements TestRule {
 
   private final MockWebServer delegate = new MockWebServer();
   private String username = "arghya";
@@ -28,7 +28,7 @@ final class MockUltraDNSRestServer extends UltraDNSRestProvider implements TestR
   private final String accessToken = "007e99c189364";
   private final String refreshToken = "f29f3ca94bcd4fb5ba79";
 
-  MockUltraDNSRestServer() {
+  public MockUltraDNSRestServer() {
     credentials(username, password);
   }
 
@@ -41,11 +41,11 @@ final class MockUltraDNSRestServer extends UltraDNSRestProvider implements TestR
     return "http://localhost:" + delegate.getPort();
   }
 
-  DNSApiManager connect() {
+  public DNSApiManager connect() {
     return Denominator.create(this, CredentialsConfiguration.credentials(credentials()));
   }
 
-  Credentials credentials() {
+  public Credentials credentials() {
     return ListCredentials.from(username, password);
   }
 
@@ -61,24 +61,24 @@ final class MockUltraDNSRestServer extends UltraDNSRestProvider implements TestR
     return this;
   }
 
-  void enqueueSessionResponse() {
+  public void enqueueSessionResponse() {
     delegate.enqueue(new MockResponse().setBody(sessionResponse));
   }
 
-  void enqueue(MockResponse mockResponse) {
+  public void enqueue(MockResponse mockResponse) {
     delegate.enqueue(mockResponse);
   }
 
-  void enqueueError(int responseCode, int errorCode, String errorDescription) {
+  public void enqueueError(int responseCode, int errorCode, String errorDescription) {
     delegate.enqueue(new MockResponse().setResponseCode(responseCode)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(errorCode, errorDescription)));
   }
 
-  RecordedRequestAssert assertRequest() throws InterruptedException {
+  public RecordedRequestAssert assertRequest() throws InterruptedException {
     return assertThat(delegate.takeRequest());
   }
 
-  RecordedRequestAssert assertSessionRequest() throws InterruptedException {
+  public RecordedRequestAssert assertSessionRequest() throws InterruptedException {
     return assertThat(delegate.takeRequest())
             .hasMethod("POST")
             .hasPath("/authorization/token");
@@ -91,7 +91,7 @@ final class MockUltraDNSRestServer extends UltraDNSRestProvider implements TestR
             .hasBody(format(body));
   }
 
-  void shutdown() throws IOException {
+  public void shutdown() throws IOException {
     delegate.shutdown();
   }
 

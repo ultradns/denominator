@@ -1,4 +1,4 @@
-package denominator.ultradns;
+package denominator.ultradns.iterators;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -12,7 +12,7 @@ import denominator.ultradns.model.Record;
 import static denominator.common.Util.peekingIterator;
 import static denominator.common.Util.toMap;
 
-class GroupByRecordNameAndTypeCustomIterator implements Iterator<ResourceRecordSet<?>> {
+public class GroupByRecordNameAndTypeCustomIterator implements Iterator<ResourceRecordSet<?>> {
 
   private final PeekingIterator<Record> peekingIterator;
 

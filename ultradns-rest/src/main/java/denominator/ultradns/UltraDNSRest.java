@@ -15,7 +15,7 @@ import feign.RequestLine;
 import java.util.Collection;
 
 @Headers("Content-Type: application/json")
-interface UltraDNSRest {
+public interface UltraDNSRest {
 
   @RequestLine("GET /status")
   Status getNeustarNetworkStatus();

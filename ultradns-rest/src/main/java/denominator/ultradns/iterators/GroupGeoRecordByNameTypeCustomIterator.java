@@ -1,4 +1,4 @@
-package denominator.ultradns;
+package denominator.ultradns.iterators;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -10,6 +10,8 @@ import denominator.common.PeekingIterator;
 import denominator.model.ResourceRecordSet;
 import denominator.model.ResourceRecordSet.Builder;
 import denominator.model.profile.Geo;
+import denominator.ultradns.UltraDNSRest;
+import denominator.ultradns.UltraDNSRestGeoSupport;
 import denominator.ultradns.model.DirectionalRecord;
 import denominator.ultradns.util.RRSetUtil;
 
@@ -103,7 +105,7 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
     throw new UnsupportedOperationException();
   }
 
-  static final class Factory {
+  public static final class Factory {
 
     private final UltraDNSRest api;
 
@@ -120,7 +122,7 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
      *                       DirectionalRecord#getGeolocationGroup()} or {@link
      *                       DirectionalRecord#group()}
      */
-    Iterator<ResourceRecordSet<?>> create(Iterator<DirectionalRecord> sortedIterator, String name) {
+    public Iterator<ResourceRecordSet<?>> create(Iterator<DirectionalRecord> sortedIterator, String name) {
       return new GroupGeoRecordByNameTypeCustomIterator(new UltraDNSRestGeoSupport(api), sortedIterator, name);
     }
   }

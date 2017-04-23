@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import denominator.ResourceRecordSetApi;
 import denominator.model.ResourceRecordSet;
+import denominator.ultradns.iterators.GroupByRecordNameAndTypeCustomIterator;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.Record;
 import denominator.ultradns.util.RRSetUtil;

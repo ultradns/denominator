@@ -19,6 +19,7 @@ import java.util.List;
 import static denominator.common.Preconditions.checkState;
 import static denominator.common.Util.singletonIterator;
 import denominator.ResourceTypeToValue.ResourceTypes;
+import org.apache.log4j.Logger;
 
 public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
 
@@ -28,6 +29,8 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
   UltraDNSRestZoneApi(UltraDNSRest api) {
     this.api = api;
   }
+
+  private static final Logger LOGGER = Logger.getLogger(UltraDNSRestZoneApi.class);
 
   /**
    * in UltraDNSRest, zones are scoped to an account.
@@ -72,10 +75,16 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
     return singletonIterator(zone);
   }
 
+  /**
+   * Add or update a zone with email & ttl.
+   * @param zone
+   * @return zone name
+   */
   @Override
   public String put(Zone zone) {
     try {
       String accountName = getCurrentAccountName();
+      LOGGER.debug("Creating Zone with zone name: " + zone.name() + " and account name: " + accountName);
       api.createPrimaryZone(zone.name(), accountName, "PRIMARY", false, "NEW");
     } catch (UltraDNSRestException e) {
       if (e.code() != UltraDNSRestException.ZONE_ALREADY_EXISTS) {
@@ -94,14 +103,20 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
     List<String> newRDataList = new ArrayList<String>();
     newRDataList.add(StringUtils.join(rDataList, " "));
     soa.setRdata(newRDataList);
+    LOGGER.debug("Updating records with email: " + rDataList.get(emailIndex) + ", ttl: " + rDataList.get(ttlIndex));
     api.updateResourceRecord(zone.name(), ResourceTypes.SOA.code(), zone.name(), soa);
 
     return zone.name();
   }
 
+  /**
+   * Delete zone with name.
+   * @param name
+   */
   @Override
   public void delete(String name) {
     try {
+      LOGGER.debug("Deleting zone with zone name: " + name);
       api.deleteZone(name);
     } catch (UltraDNSRestException e) {
       if (e.code() != UltraDNSRestException.ZONE_NOT_FOUND) {

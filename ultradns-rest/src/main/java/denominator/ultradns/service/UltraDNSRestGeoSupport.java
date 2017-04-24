@@ -39,7 +39,7 @@ public class UltraDNSRestGeoSupport {
 
     Collection<Region> topLevelRegions = buildRegionHierarchyByCallingUltraDNSRest(api1);
     for (Region topLevelRegion : topLevelRegions) {
-      Map<String, Collection<String>> regionHierarchy = RegionUtil.getRegionHierarchy(topLevelRegion);
+      Map<String, Collection<String>> regionHierarchy = RegionUtil.getRegionHierarchyNames(topLevelRegion);
       for (Map.Entry<String, Collection<String>> regionSubregions : regionHierarchy.entrySet()) {
         availableRegions.put(regionSubregions.getKey(), regionSubregions.getValue());
       }
@@ -52,7 +52,7 @@ public class UltraDNSRestGeoSupport {
 
     Collection<Region> topLevelRegions = buildRegionHierarchyByCallingUltraDNSRest(api);
     for (Region topLevelRegion : topLevelRegions) {
-      Map<Region, Collection<Region>> regionHierarchy = RegionUtil.getRegionHierarchyAsRegions(topLevelRegion);
+      Map<Region, Collection<Region>> regionHierarchy = RegionUtil.getRegionHierarchy(topLevelRegion);
       for (Map.Entry<Region, Collection<Region>> regionSubregions : regionHierarchy.entrySet()) {
         availableRegions.put(regionSubregions.getKey(), regionSubregions.getValue());
       }

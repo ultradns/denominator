@@ -175,11 +175,11 @@ public class UltraDNSRestGeoSupport {
       Collection<String> list = new ArrayList<String>();
       boolean codeFound = false;
 
-      if (code.equals("A1") || code.equals("A2") || code.equals("A3")) {
+      if ("A1".equals(code) || "A2".equals(code) || "A3".equals(code)) {
         for (Region region : regions.keySet()) {
           if (region.getCode().equals(code)) {
             list.add(region.getName());
-            if (code.equals("A1") || code.equals("A2")) {
+            if ("A1".equals(code) || "A2".equals(code)) {
               regionToTerritories.put(region.getName() + " (" + code + ")", list);
             } else {
               regionToTerritories.put(region.getName(), list);

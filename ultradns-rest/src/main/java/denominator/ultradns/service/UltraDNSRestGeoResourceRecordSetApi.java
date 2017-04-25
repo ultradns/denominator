@@ -164,6 +164,7 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
       switch (e.code()) {
         case UltraDNSRestException.GROUP_NOT_FOUND:
         case UltraDNSRestException.DIRECTIONALPOOL_NOT_FOUND:
+        case UltraDNSRestException.DATA_NOT_FOUND:
           return Collections.<DirectionalRecord>emptyList().iterator();
         default:
           throw e;

@@ -17,15 +17,40 @@ import java.util.Collection;
 @Headers("Content-Type: application/json")
 public interface UltraDNSRest {
 
+  /**
+   * Gets neustar network status.
+   *
+   * @return status
+   */
   @RequestLine("GET /status")
   Status getNeustarNetworkStatus();
 
+  /**
+   * Gets accounts list of the user.
+   *
+   * @return account list
+   */
   @RequestLine("GET /accounts")
   AccountList getAccountsListOfUser();
 
+  /**
+   * Gets zones of the account.
+   *
+   * @param accountName
+   * @return zone list
+   */
   @RequestLine("GET /accounts/{accountName}/zones")
   ZoneList getZonesOfAccount(@Param("accountName") String accountName);
 
+  /**
+   * Creates primary zone.
+   *
+   * @param name
+   * @param accountName
+   * @param type
+   * @param forceImport
+   * @param createType
+   */
   @RequestLine("POST /zones")
   @Body("%7B" +
           "\"properties\": %7B" +
@@ -51,37 +76,90 @@ public interface UltraDNSRest {
   @RequestLine("DELETE /zones/{zoneName}")
   void deleteZone(@Param("zoneName") final String zoneName);
 
+  /**
+   * Get the resource records given the zone name.
+   *
+   * @param zoneName
+   * @return RRSetList object.
+   */
   @RequestLine("GET /zones/{zoneName}/rrsets")
   RRSetList getResourceRecordsOfZone(@Param("zoneName") String zoneName);
 
+  /**
+   * Get the resource records given the zone name, hostName and rrtype.
+   *
+   * @param zoneName
+   * @param hostName
+   * @param rrType
+   * @return RRSetList object.
+   */
   @RequestLine("GET /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   RRSetList getResourceRecordsOfDNameByType(@Param("zoneName") String zoneName,
                                             @Param("hostName") String hostName,
                                             @Param("rrType") int rrType);
 
+  /**
+   * Creates resource record given the zone name, rrtype, hostName and rrset.
+   *
+   * @param zoneName
+   * @param rrType
+   * @param hostName
+   * @param rrSet
+   */
   @RequestLine("POST /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   void createResourceRecord(@Param("zoneName") String zoneName,
                             @Param("rrType") int rrType,
                             @Param("hostName") String hostName,
                             RRSet rrSet);
-
+  /**
+   * Updates resource record using PUT given the zone name, rrtype, hostName and rrset .
+   *
+   * @param zoneName
+   * @param rrType
+   * @param hostName
+   * @param rrSet
+   */
   @RequestLine("PUT /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   void updateResourceRecord(@Param("zoneName") String zoneName,
                             @Param("rrType") int rrType,
                             @Param("hostName") String hostName,
                             RRSet rrSet);
 
+  /**
+   * Updates resource record using PATCH given the zone name, rrtype, hostName and rrset.
+   *
+   * @param zoneName
+   * @param rrType
+   * @param hostName
+   * @param rrSet
+   */
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   void partialUpdateResourceRecord(@Param("zoneName") String zoneName,
                                    @Param("rrType") int rrType,
                                    @Param("hostName") String hostName,
                                    RRSet rrSet);
-
+  /**
+   * Delete the resource record given the zone name, rrtype and hostName.
+   *
+   * @param zoneName
+   * @param rrType
+   * @param hostName
+   * @return status.
+   */
   @RequestLine("DELETE /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   Status deleteResourceRecordByNameType(@Param("zoneName") String zoneName,
                                         @Param("rrType") int rrType,
                                         @Param("hostName") String hostName);
 
+  /**
+   * Delete the resource record given the zone name, rrtype and hostName and index.
+   *
+   * @param zoneName
+   * @param rrType
+   * @param hostName
+   * @param index
+   * @return status.
+   */
   @Headers("Content-Type: application/json-patch+json")
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   @Body("%5B" +
@@ -149,6 +227,14 @@ public interface UltraDNSRest {
   @RequestLine("GET /geoip/territories?codes={codes}")
   Collection<Collection<Region>> getAvailableRegions(@Param("codes") String codes);
 
+  /**
+   * Get the directional pools given the zone name.
+   *
+   * @param zoneName Can be an empty string. Can be a comma-separated list of
+   *              region codes. If the codes is empty, the top level
+   *              regions are returned.
+   * @return RRSetList object.
+   */
   @RequestLine("GET /zones/{zoneName}/rrsets/?q=kind:DIR_POOLS")
   RRSetList getDirectionalPoolsOfZone(@Param("zoneName") String zoneName);
 
@@ -157,6 +243,14 @@ public interface UltraDNSRest {
                                             @Param("hostName") String name,
                                             @Param("poolRecordType") int rrType);
 
+  /**
+   * Adds the directional pool given the zone name,owner name and type.
+   *
+   * @param zoneName
+   * @param name hostName
+   * @param type poolRecordType
+   * @return status
+   */
   @RequestLine("POST /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
   @Body("%7B" +
             "\"profile\": %7B" +
@@ -168,13 +262,28 @@ public interface UltraDNSRest {
                             @Param("hostName") String name,
                             @Param("poolRecordType") String type);
 
-
+  /**
+   * Update the directional pool given the zone name,owner name and type.
+   *
+   * @param zoneName
+   * @param name hostName
+   * @param type poolRecordType
+   * @return status
+   */
   @RequestLine("PUT /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
   Status updateDirectionalPool(@Param("zoneName") String zoneName,
                                @Param("hostName") String name,
                                @Param("poolRecordType") String type,
                                RRSet rrSet);
 
+  /**
+   * Delete the directional pool record given the zone name,owner name and type.
+   *
+   * @param zoneName
+   * @param name hostName
+   * @param type poolRecordType
+   * @param index
+   */
   @Headers("Content-Type: application/json-patch+json")
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
   @Body("%5B" +
@@ -192,6 +301,13 @@ public interface UltraDNSRest {
                                    @Param("poolRecordType") String type,
                                    @Param("index") int index);
 
+  /**
+   * Delete  no response directional pool record given the zone name,owner name and type.
+   *
+   * @param zoneName
+   * @param name hostName
+   * @param type poolRecordType
+   */
   @Headers("Content-Type: application/json-patch+json")
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
   @Body("[" +

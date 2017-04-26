@@ -23,6 +23,7 @@ import static denominator.common.Preconditions.checkNotNull;
 import static denominator.common.Util.nextOrNull;
 import static denominator.common.Util.toMap;
 import denominator.ResourceTypeToValue.ResourceTypes;
+import org.apache.log4j.Logger;
 
 public final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceRecordSetApi {
 
@@ -38,6 +39,14 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     this.roundRobinPoolApi = roundRobinPoolApi;
   }
 
+  private static final Logger LOGGER = Logger.getLogger(UltraDNSRestResourceRecordSetApi.class);
+
+  /**
+   * Iterates across all record sets in the zone. Implementations are lazy when possible.
+   *
+   * @return iterator which is lazy where possible
+   * @throws IllegalArgumentException if the zone is not found.
+   */
   @Override
   public Iterator<ResourceRecordSet<?>> iterator() {
     Iterator<Record> orderedRecords = RRSetUtil.buildRecords(api
@@ -47,6 +56,12 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     return new GroupByRecordNameAndTypeCustomIterator(orderedRecords);
   }
 
+  /**
+   * a listing of all resource record sets which have the specified name.
+   *
+   * @return iterator which is lazy where possible, empty if there are no records with that name.
+   * @throws IllegalArgumentException if the zone is not found.
+   */
   @Override
   public Iterator<ResourceRecordSet<?>> iterateByName(String name) {
     checkNotNull(name, "name");
@@ -57,6 +72,15 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     return new GroupByRecordNameAndTypeCustomIterator(ordered);
   }
 
+  /**
+   * retrieve a resource record set by name, type.
+   *
+   * @param name      {@link ResourceRecordSet#name() name} of the rrset
+   * @param type      {@link ResourceRecordSet#type() type} of the rrset
+   * @return null unless a resource record exists with the same {@code name}, {@code type}, and
+   * {@code qualifier}
+   * @throws IllegalArgumentException if the zone is not found.
+   */
   @Override
   public ResourceRecordSet<?> getByNameAndType(String name, String type) {
     checkNotNull(name, "name");
@@ -67,6 +91,14 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
             orderedRecords));
   }
 
+  /**
+   * Retrieve a list of a records.
+   *
+   * @param name      {@link ResourceRecordSet#name() name} of the rrset
+   * @param type      {@link ResourceRecordSet#type() type} of the rrset
+   * @return null unless a resource record exists with the same {@code name}, {@code type}
+   * @throws IllegalArgumentException if the zone is not found.
+   */
   private List<Record> recordsByNameAndType(String name, String type) {
     checkNotNull(name, "name");
     checkNotNull(type, "type");
@@ -87,13 +119,21 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     return records;
   }
 
+  /**
+   * This method will update Records for a combination
+   * of owner, resource type & group.
+   * @param rrset contains the {@code rdata} elements ensure exist. If {@link
+   *              ResourceRecordSet#ttl() ttl} is not present, zone default is used.
+   */
   @Override
   public void put(ResourceRecordSet<?> rrset) {
     checkNotNull(rrset, "rrset was null");
     checkArgument(!rrset.records().isEmpty(), "rrset was empty %s", rrset);
     int ttlToApply = rrset.ttl() != null ? rrset.ttl() : DEFAULT_TTL;
 
+    LOGGER.debug("Retrieving the list of records to update ");
     List<Record> toUpdate = recordsByNameAndType(rrset.name(), rrset.type());
+
     List<Map<String, Object>> toCreate = new ArrayList<Map<String, Object>>(rrset.records());
 
     for (Iterator<Record> shouldUpdate = toUpdate.iterator(); shouldUpdate.hasNext();) {
@@ -117,14 +157,34 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     }
   }
 
+  /**
+   * Update resource record(s) given name, type, ttlToApply, list of records.
+   *
+   * @param name      {@link ResourceRecordSet#name() name} of the rrset
+   * @param type      {@link ResourceRecordSet#type() type} of the rrset
+   * @param ttlToApply      {@link ResourceRecordSet#ttl() ttl} of the rrset
+   * @param toUpdate list of records
+   * @throws IllegalArgumentException if the zone is not found.
+   */
   private void update(String name, String type, int ttlToApply, List<Record> toUpdate) {
+    LOGGER.debug("Updating the record(s) with owner name " + name + "type " + type + "ttl " + ttlToApply);
     for (Record record : toUpdate) {
       record.setTtl(ttlToApply);
       api.partialUpdateResourceRecord(zoneName, record.getTypeCode(), name, record.buildRRSet());
     }
   }
 
+  /**
+   * Create resource record(s) given name, type, ttlToApply, list of records.
+   *
+   * @param name      {@link ResourceRecordSet#name() name} of the rrset
+   * @param type      {@link ResourceRecordSet#type() type} of the rrset
+   * @param ttl      {@link ResourceRecordSet#ttl() ttl} of the rrset
+   * @param rdatas list of map of records
+   * @throws IllegalArgumentException if the zone is not found.
+   */
   private void create(String name, String type, int ttl, List<Map<String, Object>> rdatas) {
+    LOGGER.debug("Creating the record(s) with owner name " + name + "type " + type + "ttl " + ttl);
     if (roundRobinPoolApi.isPoolType(type)) {
       roundRobinPoolApi.add(name, type, ttl, rdatas);
     } else {
@@ -142,6 +202,12 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     }
   }
 
+  /**
+   * Deletes records for the specified name and type.
+   *
+   * @param name
+   * @param type
+   */
   @Override
   public void deleteByNameAndType(String name, String type) {
     for (Record record : recordsByNameAndType(name, type)) {
@@ -149,6 +215,13 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     }
   }
 
+  /**
+   * Deletes record for the specified name and type.
+   *
+   * @param name
+   * @param type
+   * @param record
+   */
   private void remove(String name, String type, Record record) {
     String rData = "";
     int intType = lookup(type);

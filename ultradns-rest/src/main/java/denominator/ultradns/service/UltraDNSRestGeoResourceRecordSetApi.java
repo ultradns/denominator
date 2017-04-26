@@ -37,6 +37,7 @@ import static denominator.common.Util.concat;
 import static denominator.common.Util.filter;
 import static denominator.common.Util.nextOrNull;
 import static denominator.model.ResourceRecordSets.nameAndTypeEqualTo;
+import org.apache.log4j.Logger;
 
 public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetApi {
   private static final Filter<ResourceRecordSet<?>> IS_GEO = new Filter<ResourceRecordSet<?>>() {
@@ -74,11 +75,23 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
     this.ultraDNSRestGeoSupport = ultraDNSRestGeoSupport;
   }
 
+  private static final Logger LOGGER = Logger.getLogger(UltraDNSRestGeoResourceRecordSetApi.class);
+
+  /**
+   * Returns supported regions.
+   * @return map
+   */
   @Override
   public Map<String, Collection<String>> supportedRegions() {
     return regions.get();
   }
 
+  /**
+   * Iterates across all record sets in the zone. Implementations are lazy when possible.
+   *
+   * @return iterator which is lazy where possible
+   * @throws IllegalArgumentException if the zone is not found.
+   */
   @Override
   public Iterator<ResourceRecordSet<?>> iterator() {
     List<Iterable<ResourceRecordSet<?>>> eachPool = new ArrayList<Iterable<ResourceRecordSet<?>>>();
@@ -95,11 +108,25 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
     return concat(eachPool);
   }
 
+  /**
+   * a listing of all resource record sets which have the specified name.
+   *
+   * @return iterator which is lazy where possible, empty if there are no records with that name.
+   * @throws IllegalArgumentException if the zone is not found.
+   */
   @Override
   public Iterator<ResourceRecordSet<?>> iterateByName(String name) {
     return iteratorForDNameAndDirectionalType(checkNotNull(name, "description"), ResourceTypes.ALL.code());
   }
 
+  /**
+   * a listing of all resource record sets by name and type.
+   *
+   * @param name {@link ResourceRecordSet#name() name} of the rrset
+   * @param type {@link ResourceRecordSet#type() type} of the rrset
+   * @return iterator which is lazy where possible, empty if there are no records with that name.
+   * @throws IllegalArgumentException if the zone is not found.
+   */
   @Override
   public Iterator<ResourceRecordSet<?>> iterateByNameAndType(String name, String type) {
     checkNotNull(name, "description");
@@ -127,6 +154,16 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
     }
   }
 
+  /**
+   * retrieve a resource record set by name, type, and qualifier.
+   *
+   * @param name      {@link ResourceRecordSet#name() name} of the rrset
+   * @param type      {@link ResourceRecordSet#type() type} of the rrset
+   * @param qualifier {@link ResourceRecordSet#qualifier() qualifier} of the rrset
+   * @return null unless a resource record exists with the same {@code name}, {@code type}, and
+   * {@code qualifier}
+   * @throws IllegalArgumentException if the zone is not found.
+   */
   @Override
   public ResourceRecordSet<?> getByNameTypeAndQualifier(String name, String type,
                                                         String qualifier) {
@@ -140,6 +177,16 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
     return nextOrNull(iteratorFactory.create(records, zoneName));
   }
 
+  /**
+   * retrieve an iterator of a directional record.
+   *
+   * @param name      {@link ResourceRecordSet#name() name} of the rrset
+   * @param type      {@link ResourceRecordSet#type() type} of the rrset
+   * @param qualifier {@link ResourceRecordSet#qualifier() qualifier} of the rrset
+   * @return null unless a resource record exists with the same {@code name}, {@code type}, and
+   * {@code qualifier}
+   * @throws IllegalArgumentException if the zone is not found.
+   */
   private Iterator<DirectionalRecord> recordsByNameTypeAndQualifier(String name, String type,
                                                                                  String qualifier) {
     if (ResourceTypes.CNAME.name().equals(type)) {
@@ -154,6 +201,16 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
     }
   }
 
+  /**
+   * retrieve an iterator of a directional record.
+   *
+   * @param name      {@link ResourceRecordSet#name() name} of the rrset
+   * @param type      {@link ResourceRecordSet#type() type} of the rrset
+   * @param qualifier {@link ResourceRecordSet#qualifier() qualifier} of the rrset
+   * @return null unless a resource record exists with the same {@code name}, {@code type}, and
+   * {@code qualifier}
+   * @throws IllegalArgumentException if the zone is not found.
+   */
   private Iterator<DirectionalRecord> recordsForNameTypeAndQualifier(String name, String type,
                                                                                   String qualifier) {
     try {
@@ -205,6 +262,7 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
 
     if (rrSetList == null) {
       // Creating new pool with new records.
+      LOGGER.debug("Creating new pool with new geo records and owner name " + ownerName + "and type " + type);
       final RRSet newRRSet = new RRSet();
       final List<String> newRData = new ArrayList<String>();
       final List<RDataInfo> newRDataInfoList = new ArrayList<RDataInfo>();
@@ -225,6 +283,7 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
       }
     } else {
       // Updating the existing pool records.
+      LOGGER.debug("Updating the existing pool geo records with owner name " + ownerName + "and type " + type);
       final RRSet rs = rrSetList.getRrSets().get(0);
       final List<String> rdata = rs.getRdata();
       final Profile profile = rs.getProfile();
@@ -253,6 +312,15 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
     }
   }
 
+  /**
+   * Returns RDataInfo.
+   *
+   * @param type
+   * @param ttlToApply
+   * @param groupName
+   * @param geoCodes
+   * @return RDataInfo
+   */
   private RDataInfo createRDataInfo(String type, int ttlToApply, String groupName, TreeSet<String> geoCodes) {
     final GeoInfo geoInfo = new GeoInfo();
     geoInfo.setName(groupName);
@@ -266,14 +334,29 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
     return rdi;
   }
 
+  /**
+   * Deletes directional pool records for the specified name,type and qualifier.
+   *
+   * @param name
+   * @param type
+   * @param qualifier
+   */
   @Override
   public void deleteByNameTypeAndQualifier(String name, String type, String qualifier) {
+    LOGGER.debug("Deleting record(s) with owner name " + name + "type " + type +
+            "qualifier " + qualifier);
     Iterator<DirectionalRecord> record = recordsByNameTypeAndQualifier(name, type, qualifier);
     while (record.hasNext()) {
       deleteDirectionalPoolRecord(record.next());
     }
   }
 
+  /**
+   * Returns iterator for resource record with specified name and directional type.
+   *
+   * @param name
+   * @param dirType
+   */
   private Iterator<ResourceRecordSet<?>> iteratorForDNameAndDirectionalType(String name,
                                                                             int dirType) {
     List<DirectionalRecord> list;
@@ -291,6 +374,11 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
     return iteratorFactory.create(list.iterator(), zoneName);
   }
 
+  /**
+   * Deletes a single directional pool record.
+   *
+   * @param record
+   */
   private void deleteDirectionalPoolRecord(DirectionalRecord record) {
     if (record.getRdata() != null && !record.getRdata().isEmpty()) {
       if (record.getRdata().get(0).equals("No Data Response")) {

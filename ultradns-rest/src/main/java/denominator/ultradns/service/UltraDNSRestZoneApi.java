@@ -125,6 +125,11 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
     }
   }
 
+  /**
+   * Add or update a zone with email & ttl.
+   * @param name
+   * @return Zone
+   */
   private Zone fromSOA(String name) {
     List<Record> soas = RRSetUtil.buildRecords(api.getResourceRecordsOfDNameByType(name, name,
             ResourceTypes.SOA.code()).rrSets());

@@ -17,6 +17,7 @@ import java.util.TreeSet;
 
 import static denominator.ResourceTypeToValue.lookup;
 import static denominator.ultradns.util.Constants.DIRECTIONAL_POOL_SCHEMA;
+import org.apache.log4j.Logger;
 
 /**
  * This class will contain all utility methods to build
@@ -26,8 +27,11 @@ public final class RRSetUtil {
 
     private RRSetUtil() { }
 
+    private static final Logger LOGGER = Logger.getLogger(RRSetUtil.class);
+
     /**
      * Creation of ResourceRecord with rData.
+     * @param rrSets
      * @return List of Resource Record
      */
     public static List<Record> buildRecords(List<RRSet> rrSets) {
@@ -53,6 +57,11 @@ public final class RRSetUtil {
         return records;
     }
 
+    /**
+     * Creation of Directional Record with rData.
+     * @param rrSets
+     * @return List of Directional Record
+     */
     public static List<DirectionalRecord> buildDirectionalRecords(List<RRSet> rrSets) {
         List<DirectionalRecord> records = new ArrayList<DirectionalRecord>();
         if (rrSets != null && !rrSets.isEmpty()) {
@@ -123,6 +132,11 @@ public final class RRSetUtil {
         return records;
     }
 
+    /**
+     * Returns map of Record with name as key and type as value.
+     * @param rrSets list
+     * @return nameAndType map
+     */
     public static Map<String, Integer> getNameAndType(List<RRSet> rrSets) {
         Map<String, Integer> nameAndType = new HashMap<String, Integer>();
         if (rrSets != null && !rrSets.isEmpty()) {
@@ -133,6 +147,12 @@ public final class RRSetUtil {
         return nameAndType;
     }
 
+    /**
+     * Returns list of Directional Record for specified rrSets and group name.
+     * @param rrSets
+     * @param groupName
+     * @return List of Directional Record
+     */
     public static List<DirectionalRecord> getDirectionalRecordsByGroup(List<RRSet> rrSets, String groupName) {
         List<DirectionalRecord> records = new ArrayList<DirectionalRecord>();
         if (groupName == null || groupName.length() == 0) {
@@ -147,6 +167,12 @@ public final class RRSetUtil {
         return records;
     }
 
+    /**
+     * Returns order set of region codes for specified rrSets and group name.
+     * @param rrSets
+     * @param groupName
+     * @return Ordered Set of region codes
+     */
     public static TreeSet<String> getDirectionalGroupDetails(List<RRSet> rrSets, String groupName) {
         TreeSet<String> countryCodes = new TreeSet<String>();
         if (rrSets != null && !rrSets.isEmpty()) {
@@ -171,12 +197,22 @@ public final class RRSetUtil {
         return countryCodes;
     }
 
+    /**
+     * Returns true if the record is directional,false otherwise.
+     * @param rrSet
+     * @return boolean
+     */
     private static boolean isDirectionalRecord(RRSet rrSet) {
         return rrSet.getProfile() != null
                 && rrSet.getProfile().getContext() != null
                 && rrSet.getProfile().getContext().equals(DIRECTIONAL_POOL_SCHEMA);
     }
 
+    /**
+     * Returns integer value of specified rrtype.
+     * @param rrType
+     * @return int
+     */
     public static int intValueOfRrtype(String rrType) {
         if (rrType != null) {
             return Integer.parseInt(rrType.substring(rrType.indexOf("(") + 1,
@@ -185,6 +221,11 @@ public final class RRSetUtil {
         return 0;
     }
 
+    /**
+     * Returns string value of specified rrtype.
+     * @param rrType
+     * @return String
+     */
     public static String stringValueOfRrtype(String rrType) {
         if (rrType != null) {
             return rrType.substring(0, rrType.indexOf(" "));
@@ -192,6 +233,11 @@ public final class RRSetUtil {
         return "";
     }
 
+    /**
+     * Returns type code value of specified rrtype.
+     * @param type
+     * @return int
+     */
     public static int directionalRecordType(String type) {
         if (ResourceTypeToValue.ResourceTypes.A.name().equals(type)
                 || ResourceTypeToValue.ResourceTypes.CNAME.name().equals(type)) {

@@ -1,8 +1,12 @@
 package denominator.ultradns.iterator;
 
 import java.util.Iterator;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
@@ -11,8 +15,9 @@ import denominator.model.ResourceRecordSet;
 import denominator.model.ResourceRecordSet.Builder;
 import denominator.model.profile.Geo;
 import denominator.ultradns.service.integration.UltraDNSRest;
-import denominator.ultradns.service.UltraDNSRestGeoSupport;
 import denominator.ultradns.model.DirectionalRecord;
+import denominator.ultradns.model.DirectionalGroup;
+import denominator.ultradns.model.Region;
 import denominator.ultradns.util.RRSetUtil;
 
 import static denominator.common.Util.peekingIterator;
@@ -27,14 +32,17 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
   private final Map<String, Geo> cache = new LinkedHashMap<String, Geo>();
   private final PeekingIterator<DirectionalRecord> peekingIterator;
   private final String zoneName;
-  private final UltraDNSRestGeoSupport ultraDNSRestGeoSupport;
+  private final UltraDNSRest api;
+  private final Map<Region, Collection<Region>> regions;
 
-  private GroupGeoRecordByNameTypeCustomIterator(UltraDNSRestGeoSupport ultraDNSRestGeoSupport,
+  private GroupGeoRecordByNameTypeCustomIterator(UltraDNSRest api,
                                                  Iterator<DirectionalRecord> sortedIterator,
-                                                 String zoneName) {
-    this.ultraDNSRestGeoSupport = ultraDNSRestGeoSupport;
+                                                 String zoneName,
+                                                 Map<Region, Collection<Region>> regions) {
+    this.api = api;
     this.peekingIterator = peekingIterator(sortedIterator);
     this.zoneName = zoneName;
+    this.regions = regions;
   }
 
   static boolean typeTTLAndGeoGroupEquals(DirectionalRecord actual, DirectionalRecord expected) {
@@ -78,9 +86,9 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
 
     builder.add(toMap(record.getType(), record.getRdata()));
 
-    final String key = record.getName() + "||" + record.getType() + "||" + record.getGeoGroupName();
+    final String key = record.getName() + "_" + record.getType() + "_" + record.getGeoGroupName();
     if (!cache.containsKey(key)) {
-      Geo profile = Geo.create(ultraDNSRestGeoSupport.getDirectionalDNSGroupByName(zoneName, record.getName(),
+      Geo profile = Geo.create(getDirectionalDNSGroupByName(zoneName, record.getName(),
               RRSetUtil.directionalRecordType(record.getType()), record.getGeoGroupName()).getRegionToTerritories());
       cache.put(key, profile);
     }
@@ -103,6 +111,83 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * Returns DirectionalGroup which contains the group name & it's territories
+   * for a particular Owner name, record type & geo group.
+   * @param zone name of the zone
+   * @param hostName owner name or directional pool name
+   * @param rrType resource record record type
+   * @param groupName name of the GEO group
+   * @return DirectionalGroup
+   */
+  public DirectionalGroup getDirectionalDNSGroupByName(String zone, String hostName, int rrType, String groupName) {
+
+    TreeSet<String> codes = RRSetUtil.getDirectionalGroupDetails(
+            api.getDirectionalDNSRecordsForHost(zone, hostName, rrType).rrSets(),
+            groupName);
+
+    Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
+
+    if (codes != null && !codes.isEmpty()) {
+      regionToTerritories = getRegionToTerritories(codes);
+    }
+
+    DirectionalGroup directionalGroup = new DirectionalGroup();
+    directionalGroup.setName(groupName);
+    directionalGroup.setRegionToTerritories(regionToTerritories);
+
+    return  directionalGroup;
+  }
+
+  /**
+   * Coverts set of GEO codes to a map contains key as the region name
+   * & value as all it's child regions/territories names.
+   * @param codes
+   * @return Map
+   */
+  private Map<String, Collection<String>> getRegionToTerritories(TreeSet<String> codes) {
+
+    Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
+
+    Iterator<String> iterator = codes.iterator();
+    while (iterator.hasNext()) {
+      String code = iterator.next();
+      Collection<String> list = new ArrayList<String>();
+      boolean codeFound = false;
+
+      if ("A1".equals(code) || "A2".equals(code) || "A3".equals(code)) {
+        for (Region region : regions.keySet()) {
+          if (region.getCode().equals(code)) {
+            list.add(region.getName());
+            if ("A1".equals(code) || "A2".equals(code)) {
+              regionToTerritories.put(region.getName() + " (" + code + ")", list);
+            } else {
+              regionToTerritories.put(region.getName(), list);
+            }
+          }
+        }
+      } else {
+        for (Map.Entry<Region, Collection<Region>> entry : regions.entrySet()) {
+          for (Region region : entry.getValue()) {
+            if (region.getEffectiveCodeForGeo().equals(code)) {
+              if (regionToTerritories.keySet().contains(entry.getKey().getName())) {
+                list = regionToTerritories.get(entry.getKey().getName());
+              }
+              list.add(region.getName());
+              regionToTerritories.put(entry.getKey().getName(), list);
+              codeFound = true;
+              break;
+            }
+          }
+          if (codeFound) {
+            break;
+          }
+        }
+      }
+    }
+    return regionToTerritories;
+  }
+
   public static final class Factory {
 
     private final UltraDNSRest api;
@@ -116,8 +201,9 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
      * Construct a custom iterator from directional record iterator & zone name.
      * @param sortedIterator only contains records with the same.
      */
-    public Iterator<ResourceRecordSet<?>> create(Iterator<DirectionalRecord> sortedIterator, String name) {
-      return new GroupGeoRecordByNameTypeCustomIterator(new UltraDNSRestGeoSupport(api), sortedIterator, name);
+    public Iterator<ResourceRecordSet<?>> create(Iterator<DirectionalRecord> sortedIterator, String name,
+                                                 Map<Region, Collection<Region>> regions) {
+      return new GroupGeoRecordByNameTypeCustomIterator(api, sortedIterator, name, regions);
     }
   }
 }

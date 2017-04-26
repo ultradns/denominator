@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
@@ -25,8 +26,10 @@ import denominator.ultradns.model.RDataInfo;
 import denominator.ultradns.model.GeoInfo;
 import denominator.ultradns.model.Profile;
 import denominator.ultradns.model.DirectionalRecord;
+import denominator.ultradns.model.Region;
 import denominator.ultradns.util.Constants;
 import denominator.ultradns.util.RRSetUtil;
+import denominator.ultradns.util.RegionUtil;
 import denominator.ResourceTypeToValue.ResourceTypes;
 import org.apache.commons.lang.StringUtils;
 
@@ -40,6 +43,7 @@ import static denominator.model.ResourceRecordSets.nameAndTypeEqualTo;
 import org.apache.log4j.Logger;
 
 public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRecordSetApi {
+
   private static final Filter<ResourceRecordSet<?>> IS_GEO = new Filter<ResourceRecordSet<?>>() {
     @Override
     public boolean apply(ResourceRecordSet<?> in) {
@@ -47,8 +51,10 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
     }
   };
   private static final int DEFAULT_TTL = 300;
+  private static final Logger LOGGER = Logger.getLogger(UltraDNSRestGeoResourceRecordSetApi.class);
+
   private final Collection<String> supportedTypes;
-  private final Lazy<Map<String, Collection<String>>> regions;
+  private final Lazy<Map<Region, Collection<Region>>> regions;
   private final UltraDNSRest api;
   private final GroupGeoRecordByNameTypeCustomIterator.Factory iteratorFactory;
   private final String zoneName;
@@ -58,32 +64,34 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
       return ResourceTypes.CNAME.name().equals(input.getType());
     }
   };
-  private final UltraDNSRestGeoSupport ultraDNSRestGeoSupport;
 
   UltraDNSRestGeoResourceRecordSetApi(Collection<String> supportedTypes,
-                                      Lazy<Map<String, Collection<String>>> regions,
+                                      Lazy<Map<Region, Collection<Region>>> regions,
                                       UltraDNSRest api,
                                       GroupGeoRecordByNameTypeCustomIterator.Factory iteratorFactory,
-                                      String zoneName,
-                                      UltraDNSRestGeoSupport ultraDNSRestGeoSupport
-                                      ) {
+                                      String zoneName) {
     this.supportedTypes = supportedTypes;
     this.regions = regions;
     this.api = api;
     this.iteratorFactory = iteratorFactory;
     this.zoneName = zoneName;
-    this.ultraDNSRestGeoSupport = ultraDNSRestGeoSupport;
   }
 
-  private static final Logger LOGGER = Logger.getLogger(UltraDNSRestGeoResourceRecordSetApi.class);
+  /**
+   * Returns a map contains key as the region & value as all it's child regions/territories.
+   * @return Map
+   */
+  private Map<Region, Collection<Region>> getAvailableRegions() {
+    return regions.get();
+  }
 
   /**
-   * Returns supported regions.
+   * Returns supported region names.
    * @return map
    */
   @Override
   public Map<String, Collection<String>> supportedRegions() {
-    return regions.get();
+    return RegionUtil.getRegionNameHierarchy(getAvailableRegions());
   }
 
   /**
@@ -174,7 +182,7 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
       return null;
     }
     Iterator<DirectionalRecord> records = recordsByNameTypeAndQualifier(name, type, qualifier);
-    return nextOrNull(iteratorFactory.create(records, zoneName));
+    return nextOrNull(iteratorFactory.create(records, zoneName, getAvailableRegions()));
   }
 
   /**
@@ -249,7 +257,7 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
     final List<Map<String, Object>> recordsLeftToCreate = new ArrayList<Map<String, Object>>(rrset.records());
     final int ttlToApply = rrset.ttl() != null ? rrset.ttl() : DEFAULT_TTL;
     final String groupName = rrset.qualifier();
-    final TreeSet<String> geoCodes = ultraDNSRestGeoSupport.getTerritoryCodes(rrset.geo().regions());
+    final TreeSet<String> geoCodes = getTerritoryCodes(rrset.geo().regions());
 
     RRSetList rrSetList = null;
     try {
@@ -371,7 +379,7 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
         throw e;
       }
     }
-    return iteratorFactory.create(list.iterator(), zoneName);
+    return iteratorFactory.create(list.iterator(), zoneName, getAvailableRegions());
   }
 
   /**
@@ -419,15 +427,49 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
     }
   }
 
+  /**
+   * Converts Territory/Regions to it's GEO code.
+   * @param regionToTerritories
+   * @return Set of GEO codes.
+   */
+  private TreeSet<String> getTerritoryCodes(Map<String, Collection<String>> regionToTerritories) {
+    final TreeSet<String> territoryCodes = new TreeSet<String>();
+    final Set<Region> allRegions = new TreeSet<Region>();
+    final Set<String> allRegionNames = new TreeSet<String>();
+
+    for (Map.Entry<Region, Collection<Region>> entry : getAvailableRegions().entrySet()) {
+      allRegions.add(entry.getKey());
+      allRegions.addAll(entry.getValue());
+    }
+
+    for (Map.Entry<String, Collection<String>> regionToTerritory : regionToTerritories.entrySet()) {
+      allRegionNames.addAll(regionToTerritory.getValue());
+    }
+
+    Iterator<String> regionNamesIterator = allRegionNames.iterator();
+    while (regionNamesIterator.hasNext()) {
+      String regionName = regionNamesIterator.next();
+      Iterator<Region> regionsIterator = allRegions.iterator();
+      while (regionsIterator.hasNext()) {
+        Region region = regionsIterator.next();
+        if (regionName.equals(region.getName())) {
+          territoryCodes.add(region.getEffectiveCodeForGeo());
+          break;
+        }
+      }
+    }
+    return territoryCodes;
+  }
+
   public static final class Factory implements GeoResourceRecordSetApi.Factory {
 
     private final Collection<String> supportedTypes;
-    private final Lazy<Map<String, Collection<String>>> regions;
+    private final Lazy<Map<Region, Collection<Region>>> regions;
     private final UltraDNSRest api;
     private final GroupGeoRecordByNameTypeCustomIterator.Factory iteratorFactory;
 
     @Inject
-    Factory(Provider provider, @Named("geo") Lazy<Map<String, Collection<String>>> regions,
+    Factory(Provider provider, @Named("geo") Lazy<Map<Region, Collection<Region>>> regions,
             UltraDNSRest api,
             GroupGeoRecordByNameTypeCustomIterator.Factory iteratorFactory) {
       this.supportedTypes = provider.profileToRecordTypes().get("geo");
@@ -448,8 +490,7 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
         }
         throw e;
       }
-      return new UltraDNSRestGeoResourceRecordSetApi(supportedTypes,
-              regions, api, iteratorFactory, name, new UltraDNSRestGeoSupport(api));
+      return new UltraDNSRestGeoResourceRecordSetApi(supportedTypes, regions, api, iteratorFactory, name);
     }
   }
 }

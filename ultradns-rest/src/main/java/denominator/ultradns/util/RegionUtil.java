@@ -15,12 +15,12 @@ public final class RegionUtil {
 
     /**
      * Return all region names in a hierarchical fashion.
-     * @param region
+     * @param regions
      * @return Map contains key as the region name & value as all it's child regions/territories names.
      */
-    public static Map<String, Collection<String>> getRegionHierarchyNames(Region region) {
+    public static Map<String, Collection<String>> getRegionNameHierarchy(Map<Region, Collection<Region>> regions) {
         Map<String, Collection<String>> regionNameSubRegionNames = new TreeMap<String, Collection<String>>();
-        for (Map.Entry<Region, Collection<Region>> entry : getRegionHierarchy(region).entrySet()) {
+        for (Map.Entry<Region, Collection<Region>> entry : regions.entrySet()) {
             Collection<String> subRegionNames = new TreeSet<String>();
             Iterator<Region> itr = entry.getValue().iterator();
             while (itr.hasNext()) {

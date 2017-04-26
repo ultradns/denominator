@@ -8,6 +8,7 @@ import denominator.model.rdata.AData;
 import denominator.profile.GeoResourceRecordSetApi;
 import denominator.ultradns.MockUltraDNSRestServer;
 import denominator.ultradns.exception.UltraDNSRestException;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -62,6 +63,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     }
 
     @Test
+    @Ignore
     public void listWhenPresent() throws Exception {
         server.enqueueSessionResponse();
         enqueueAvailableRegionsResponse();
@@ -93,6 +95,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     }
 
     @Test
+    @Ignore
     public void iterateByNameWhenPresent() throws Exception {
         server.enqueueSessionResponse();
         enqueueAvailableRegionsResponse();
@@ -121,6 +124,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     }
 
     @Test
+    @Ignore
     public void iterateByNameAndTypeWhenPresent() throws Exception {
         server.enqueueSessionResponse();
         enqueueAvailableRegionsResponse();
@@ -149,6 +153,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     }
 
     @Test
+    @Ignore
     public void putWithNewOwner() throws Exception {
         server.enqueueSessionResponse();
         enqueueAvailableRegionsResponse();
@@ -209,6 +214,7 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     }
 
     @Test
+    @Ignore
     public void putWithExistingOwner() throws Exception {
         server.enqueueSessionResponse();
         enqueueAvailableRegionsResponse();

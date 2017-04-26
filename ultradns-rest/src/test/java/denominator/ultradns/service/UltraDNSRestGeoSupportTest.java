@@ -11,6 +11,8 @@ import org.junit.Test;
 import java.util.Collection;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class UltraDNSRestGeoSupportTest {
 
     @Rule
@@ -33,7 +35,10 @@ public class UltraDNSRestGeoSupportTest {
 
         UltraDNSRest api = mockApi();
         UltraDNSRestGeoSupport ultraDNSRestGeoSupport =  new UltraDNSRestGeoSupport();
-        Map<String, Collection<String>> availableRegions = ultraDNSRestGeoSupport.regions(api);
+        Map<Region, Collection<Region>> availableRegions = ultraDNSRestGeoSupport.regions(api);
+
+        final int topLevelRegionCount = 54;
+        assertThat(availableRegions.keySet().size()).isEqualTo(topLevelRegionCount);
 
         server.assertSessionRequest();
         server.assertRequest()
@@ -46,33 +51,6 @@ public class UltraDNSRestGeoSupportTest {
                 .hasMethod("GET")
                 .hasPath("/geoip/territories?codes=ANT-AQ%2CANT-BV%2CANT-TF%2COCN-AS%2COCN-AU%2COCN-CC%2COCN-CK%2COCN" +
                         "-CX%2COCN-FJ%2COCN-FM%2COCN-GU%2COCN-HM%2COCN-KI%2COCN-MH%2COCN-MP%2COCN-NC%2COCN-NF%2COCN" +
-                        "-NR%2COCN-NU%2COCN-NZ%2COCN-PF%2COCN-PG%2COCN-PN%2COCN-PW%2COCN-SB%2COCN-TK%2COCN-TO%2COCN" +
-                        "-TV%2COCN-U9%2COCN-UM%2COCN-VU%2COCN-WF%2COCN-WS%2CSAM-AR%2CSAM-BO%2CSAM-BR%2CSAM-CL%2CSAM" +
-                       "-CO%2CSAM-EC%2CSAM-FK%2CSAM-GF%2CSAM-GS%2CSAM-GY%2CSAM-PE%2CSAM-PY%2CSAM-SR%2CSAM-U4%2CSAM-UY");
-    }
-
-    @Test
-    public void regionsAsRegions() throws Exception {
-        server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setBody(GET_AVAILABLE_REGIONS_RESPONSE_TOP_LEVEL));
-        server.enqueue(new MockResponse().setBody(GET_AVAILABLE_REGIONS_RESPONSE_SECOND_LEVEL));
-        server.enqueue(new MockResponse().setBody(GET_AVAILABLE_REGIONS_RESPONSE_THIRD_LEVEL_PART_1));
-
-        UltraDNSRest api = mockApi();
-        UltraDNSRestGeoSupport ultraDNSRestGeoSupport =  new UltraDNSRestGeoSupport(api);
-        Map<Region, Collection<Region>> availableRegions = ultraDNSRestGeoSupport.regionsAsRegions();
-
-        server.assertSessionRequest();
-        server.assertRequest()
-                .hasMethod("GET")
-                .hasPath("/geoip/territories?codes=");
-        server.assertRequest()
-                .hasMethod("GET")
-                .hasPath("/geoip/territories?codes=A1%2CA2%2CA3%2CANT%2COCN%2CSAM");
-        server.assertRequest()
-                .hasMethod("GET")
-                .hasPath("/geoip/territories?codes=ANT-AQ%2CANT-BV%2CANT-TF%2COCN-AS%2COCN-AU%2COCN-CC%2COCN-CK%2COC" +
-                        "N-CX%2COCN-FJ%2COCN-FM%2COCN-GU%2COCN-HM%2COCN-KI%2COCN-MH%2COCN-MP%2COCN-NC%2COCN-NF%2COCN" +
                         "-NR%2COCN-NU%2COCN-NZ%2COCN-PF%2COCN-PG%2COCN-PN%2COCN-PW%2COCN-SB%2COCN-TK%2COCN-TO%2COCN" +
                         "-TV%2COCN-U9%2COCN-UM%2COCN-VU%2COCN-WF%2COCN-WS%2CSAM-AR%2CSAM-BO%2CSAM-BR%2CSAM-CL%2CSAM" +
                        "-CO%2CSAM-EC%2CSAM-FK%2CSAM-GF%2CSAM-GS%2CSAM-GY%2CSAM-PE%2CSAM-PY%2CSAM-SR%2CSAM-U4%2CSAM-UY");

@@ -2,8 +2,6 @@ package denominator.ultradns.service;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Set;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -13,41 +11,18 @@ import javax.inject.Named;
 import dagger.Module;
 import dagger.Provides;
 import denominator.ultradns.service.integration.UltraDNSRest;
-import denominator.ultradns.model.DirectionalGroup;
 import denominator.ultradns.model.Region;
-import denominator.ultradns.util.RRSetUtil;
 import denominator.ultradns.util.RegionUtil;
 import org.apache.commons.lang.StringUtils;
 
 @Module(injects = UltraDNSRestGeoResourceRecordSetApi.Factory.class, complete = false)
 public class UltraDNSRestGeoSupport {
 
-  private UltraDNSRest api = null;
-
-  static final int MAX_EFFECTIVE_CODES_PER_API_CALL = 100;
-
-  public UltraDNSRestGeoSupport() { }
-
-  public UltraDNSRestGeoSupport(UltraDNSRest api) {
-    this.api = api;
-  }
+  private static final int MAX_GEO_CODE = 100;
 
   @Provides
   @Named("geo")
-  Map<String, Collection<String>> regions(UltraDNSRest api1) {
-    Map<String, Collection<String>> availableRegions = new TreeMap<String, Collection<String>>();
-
-    Collection<Region> topLevelRegions = buildRegionHierarchyByCallingUltraDNSRest(api1);
-    for (Region topLevelRegion : topLevelRegions) {
-      Map<String, Collection<String>> regionHierarchy = RegionUtil.getRegionHierarchyNames(topLevelRegion);
-      for (Map.Entry<String, Collection<String>> regionSubregions : regionHierarchy.entrySet()) {
-        availableRegions.put(regionSubregions.getKey(), regionSubregions.getValue());
-      }
-    }
-    return availableRegions;
-  }
-
-  Map<Region, Collection<Region>> regionsAsRegions() {
+  Map<Region, Collection<Region>> regions(UltraDNSRest api) {
     Map<Region, Collection<Region>> availableRegions = new TreeMap<Region, Collection<Region>>();
 
     Collection<Region> topLevelRegions = buildRegionHierarchyByCallingUltraDNSRest(api);
@@ -57,7 +32,6 @@ public class UltraDNSRestGeoSupport {
         availableRegions.put(regionSubregions.getKey(), regionSubregions.getValue());
       }
     }
-
     return availableRegions;
   }
 
@@ -81,8 +55,8 @@ public class UltraDNSRestGeoSupport {
     sortedEffectiveCodes.toArray(sortedEffectiveCodesArr);
     // The REST API endpoint for "api.getAvailableRegions(commaSeparatedCodes)" accepts utmost
     // 100 effective codes. So, sending the effective codes in batches of 100.
-    for (int minIdx = 0; minIdx < sortedEffectiveCodesArr.length; minIdx += MAX_EFFECTIVE_CODES_PER_API_CALL) {
-      int maxIdx = minIdx + MAX_EFFECTIVE_CODES_PER_API_CALL;
+    for (int minIdx = 0; minIdx < sortedEffectiveCodesArr.length; minIdx += MAX_GEO_CODE) {
+      int maxIdx = minIdx + MAX_GEO_CODE;
       if (maxIdx > sortedEffectiveCodesArr.length) {
         maxIdx = sortedEffectiveCodesArr.length - 1;
       }
@@ -143,97 +117,5 @@ public class UltraDNSRestGeoSupport {
   private String getCommaSeparatedEffectiveCodes(Collection<String> sortedEffectiveCodes) {
     String commaSeparatedEffectiveCodes = StringUtils.join(sortedEffectiveCodes, ',');
     return commaSeparatedEffectiveCodes;
-  }
-
-  public DirectionalGroup getDirectionalDNSGroupByName(String zoneName, String hostName, int rrType, String groupName) {
-
-    TreeSet<String> codes = RRSetUtil.getDirectionalGroupDetails(
-            api.getDirectionalDNSRecordsForHost(zoneName, hostName, rrType).rrSets(),
-            groupName);
-
-    Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
-
-    if (codes != null && !codes.isEmpty()) {
-      regionToTerritories = getRegionToTerritories(codes);
-    }
-
-    DirectionalGroup directionalGroup = new DirectionalGroup();
-    directionalGroup.setName(groupName);
-    directionalGroup.setRegionToTerritories(regionToTerritories);
-
-    return  directionalGroup;
-  }
-
-  private Map<String, Collection<String>> getRegionToTerritories(TreeSet<String> codes) {
-
-    Map<Region, Collection<Region>> regions = regionsAsRegions();
-    Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
-
-    Iterator<String> iterator = codes.iterator();
-    while (iterator.hasNext()) {
-      String code = iterator.next();
-      Collection<String> list = new ArrayList<String>();
-      boolean codeFound = false;
-
-      if ("A1".equals(code) || "A2".equals(code) || "A3".equals(code)) {
-        for (Region region : regions.keySet()) {
-          if (region.getCode().equals(code)) {
-            list.add(region.getName());
-            if ("A1".equals(code) || "A2".equals(code)) {
-              regionToTerritories.put(region.getName() + " (" + code + ")", list);
-            } else {
-              regionToTerritories.put(region.getName(), list);
-            }
-          }
-        }
-      } else {
-        for (Map.Entry<Region, Collection<Region>> entry : regions.entrySet()) {
-          for (Region region : entry.getValue()) {
-            if (region.getEffectiveCodeForGeo().equals(code)) {
-              if (regionToTerritories.keySet().contains(entry.getKey().getName())) {
-                list = regionToTerritories.get(entry.getKey().getName());
-              }
-              list.add(region.getName());
-              regionToTerritories.put(entry.getKey().getName(), list);
-              codeFound = true;
-              break;
-            }
-          }
-          if (codeFound) {
-            break;
-          }
-        }
-      }
-    }
-    return regionToTerritories;
-  }
-
-  public TreeSet<String> getTerritoryCodes(Map<String, Collection<String>> regionToTerritories) {
-    final TreeSet<String> territoryCodes = new TreeSet<String>();
-    final Set<Region> regions = new TreeSet<Region>();
-    final Set<String> regionNames = new TreeSet<String>();
-
-    for (Map.Entry<Region, Collection<Region>> entry : regionsAsRegions().entrySet()) {
-      regions.add(entry.getKey());
-      regions.addAll(entry.getValue());
-    }
-
-    for (Map.Entry<String, Collection<String>> regionToTerritory : regionToTerritories.entrySet()) {
-      regionNames.addAll(regionToTerritory.getValue());
-    }
-
-    Iterator<String> regionNamesIterator = regionNames.iterator();
-    while (regionNamesIterator.hasNext()) {
-      String regionName = regionNamesIterator.next();
-      Iterator<Region> regionsIterator = regions.iterator();
-      while (regionsIterator.hasNext()) {
-        Region region = regionsIterator.next();
-        if (regionName.equals(region.getName())) {
-          territoryCodes.add(region.getEffectiveCodeForGeo());
-          break;
-        }
-      }
-    }
-  return territoryCodes;
   }
 }

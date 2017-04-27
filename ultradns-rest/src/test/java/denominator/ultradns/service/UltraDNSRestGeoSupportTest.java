@@ -53,7 +53,8 @@ public class UltraDNSRestGeoSupportTest {
                         "-CX%2COCN-FJ%2COCN-FM%2COCN-GU%2COCN-HM%2COCN-KI%2COCN-MH%2COCN-MP%2COCN-NC%2COCN-NF%2COCN" +
                         "-NR%2COCN-NU%2COCN-NZ%2COCN-PF%2COCN-PG%2COCN-PN%2COCN-PW%2COCN-SB%2COCN-TK%2COCN-TO%2COCN" +
                         "-TV%2COCN-U9%2COCN-UM%2COCN-VU%2COCN-WF%2COCN-WS%2CSAM-AR%2CSAM-BO%2CSAM-BR%2CSAM-CL%2CSAM" +
-                       "-CO%2CSAM-EC%2CSAM-FK%2CSAM-GF%2CSAM-GS%2CSAM-GY%2CSAM-PE%2CSAM-PY%2CSAM-SR%2CSAM-U4%2CSAM-UY");
+                       "-CO%2CSAM-EC%2CSAM-FK%2CSAM-GF%2CSAM-GS%2CSAM-GY%2CSAM" +
+                        "-PE%2CSAM-PY%2CSAM-SR%2CSAM-U4%2CSAM-UY%2CSAM-VE");
     }
 
     private static final String GET_AVAILABLE_REGIONS_RESPONSE_TOP_LEVEL =
@@ -1709,6 +1710,7 @@ public class UltraDNSRestGeoSupportTest {
             "      \"id\": 460\n" +
             "    }\n" +
             "  ],\n" +
+            "  [],\n" +
             "  [],\n" +
             "  [],\n" +
             "  [],\n" +

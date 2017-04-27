@@ -334,8 +334,8 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     private void assertAvailableRegionsRequest() throws InterruptedException {
         server.assertRequest("GET", "/geoip/territories?codes=", "");
         server.assertRequest("GET", "/geoip/territories?codes=A1%2CA2%2CA3%2CASI%2CEUR%2CNAM", "");
-        server.assertRequest("GET",
-                "/geoip/territories?codes=ASI-IN%2CASI-JP%2CASI-MY%2CEUR-ES%2CEUR-GB%2CEUR-SE%2CNAM-U3%2CNAM-US", "");
+        server.assertRequest("GET", "/geoip/territories?codes=ASI-IN%2CASI-JP%2CASI-MY%2CEUR-ES%2CEUR" +
+                "-GB%2CEUR-SE%2CNAM-U3%2CNAM-US%2CNAM-VI", "");
     }
 
     private void assertNorthAmerica(ResourceRecordSet<?> actual) {
@@ -625,6 +625,8 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
             "            \"type\": \"State\",\n" +
             "            \"id\": 36\n" +
             "        }\n" +
+            "    ],\n" +
+            "    [\n" +
             "    ]\n" +
             "]\n";
 }

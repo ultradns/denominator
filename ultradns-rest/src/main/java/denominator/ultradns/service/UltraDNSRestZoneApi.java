@@ -150,6 +150,10 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
 
   private String formatEmail(String email) {
     String[] values = email.split("@");
-    return values[0].replace(".", "\\.") + "." + values[1] + ".";
+    if (values.length != 1) {
+      return values[0].replace(".", "\\.") + "." + values[1] + ".";
+    } else {
+      return email;
+    }
   }
 }

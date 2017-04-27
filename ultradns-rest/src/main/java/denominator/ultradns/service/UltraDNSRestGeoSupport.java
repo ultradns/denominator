@@ -134,7 +134,7 @@ public class UltraDNSRestGeoSupport {
       return null;
     }
     for (Region region : regions) {
-      if (region.getEffectiveCode().equals(effectiveCode)) {
+      if (effectiveCode.equals(region.getEffectiveCode())) {
         return region;
       }
       TreeSet<Region> childRegions = region.getChildRegions();

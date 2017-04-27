@@ -12,23 +12,39 @@ import denominator.ultradns.model.Record;
 import static denominator.common.Util.peekingIterator;
 import static denominator.common.Util.toMap;
 
+/**
+ * This iterator will produce ResourceRecordSet.
+ */
 public class GroupByRecordNameAndTypeCustomIterator implements Iterator<ResourceRecordSet<?>> {
 
   private final PeekingIterator<Record> peekingIterator;
 
+  /**
+   * Creates a new GroupByRecordNameAndTypeCustomIterator with specified records.
+   */
   public GroupByRecordNameAndTypeCustomIterator(Iterator<Record> sortedIterator) {
     this.peekingIterator = peekingIterator(sortedIterator);
   }
 
+  /**
+   * Returns true if the owner name and type code of actual and expected records are matching.
+   */
   static boolean fqdnAndTypeEquals(Record actual, Record expected) {
     return actual.getName().equals(expected.getName()) && actual.getTypeCode() == expected.getTypeCode();
   }
 
+  /**
+   * Returns true if the iteration has more elements.
+   */
   @Override
   public boolean hasNext() {
     return peekingIterator.hasNext();
   }
 
+  /**
+   * Returns the next resource record set in the iteration having the unique combination
+   * of owner name and type.
+   */
   @Override
   public ResourceRecordSet<?> next() {
     Record record = peekingIterator.next();
@@ -52,6 +68,9 @@ public class GroupByRecordNameAndTypeCustomIterator implements Iterator<Resource
     return builder.build();
   }
 
+  /**
+   * Returns UnsupportedOperationException.
+   */
   @Override
   public void remove() {
     throw new UnsupportedOperationException();

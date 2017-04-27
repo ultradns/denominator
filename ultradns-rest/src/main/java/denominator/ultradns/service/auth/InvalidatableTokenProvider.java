@@ -31,6 +31,9 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
     private transient volatile long expirationMillis;
     private transient String token;
 
+    /**
+     * Creates a new session by creating a new InvalidatableTokenProvider object.
+     */
     @Inject
     public InvalidatableTokenProvider(denominator.Provider provider, Session session,
                                Provider<Credentials> credentials,
@@ -42,6 +45,9 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
         this.durationMillis = Long.parseLong(PropertyUtil.getProperty("ultradns.rest.token.expiry.millis"));
     }
 
+    /**
+     * Returns true if the session if valid.
+     */
     @Override
     public boolean ok() {
         boolean isValid = System.currentTimeMillis() < getExpirationMillis();
@@ -51,6 +57,9 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
         return isValid;
     }
 
+    /**
+     * Returns access token.
+     */
     @Override
     public String get() {
         String currentUrl = provider.url();

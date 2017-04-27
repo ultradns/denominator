@@ -35,6 +35,10 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
   private final UltraDNSRest api;
   private final Map<Region, Collection<Region>> regions;
 
+  /**
+   * Creates a new GroupGeoRecordByNameTypeCustomIterator with specified directional record
+   * and zone name.
+   */
   private GroupGeoRecordByNameTypeCustomIterator(UltraDNSRest api,
                                                  Iterator<DirectionalRecord> sortedIterator,
                                                  String zoneName,
@@ -45,6 +49,9 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
     this.regions = regions;
   }
 
+  /**
+   * Returns true if the owner name,geo group name and ttl of actual and expected records are matching.
+   */
   static boolean typeTTLAndGeoGroupEquals(DirectionalRecord actual, DirectionalRecord expected) {
     return actual.getType().equals(expected.getType())
             && actual.getTtl() == expected.getTtl()
@@ -53,6 +60,7 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
   }
 
   /**
+   * Returns true if the iteration has more elements,
    * skips no response records as they aren't portable.
    */
   @Override
@@ -75,6 +83,10 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
     }
   }
 
+  /**
+   * Returns the next resource record set in the iteration having the unique combination
+   * of owner name and type and geo group name.
+   */
   @Override
   public ResourceRecordSet<?> next() {
     DirectionalRecord record = peekingIterator.next();
@@ -106,6 +118,9 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
     return builder.build();
   }
 
+  /**
+   * Returns UnsupportedOperationException.
+   */
   @Override
   public void remove() {
     throw new UnsupportedOperationException();

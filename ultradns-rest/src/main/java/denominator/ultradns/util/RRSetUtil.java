@@ -83,10 +83,10 @@ public final class RRSetUtil {
                     for (String rData : rDataList) {
                         DirectionalRecord r = new DirectionalRecord();
                         r.setName(rrSet.getOwnerName());
-                        r.setTypeCode(intValueOfRrtype(rrSet.getRrtype()));
-                        r.setType(stringValueOfRrtype(rrSet.getRrtype()));
                         if (!rDataInfoList.isEmpty()) {
                             RDataInfo rDataInfo = rDataInfoList.get(rDataList.indexOf(rData));
+                            r.setType(rDataInfo.getType());
+                            r.setTypeCode(lookup(rDataInfo.getType()));
                             if (rDataInfo.getGeoInfo() != null) {
                                 r.setGeoGroupName(rDataInfo.getGeoInfo().getName());
                             }

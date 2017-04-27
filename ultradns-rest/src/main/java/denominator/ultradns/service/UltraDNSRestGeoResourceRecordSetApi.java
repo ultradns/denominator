@@ -103,9 +103,18 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
   @Override
   public Iterator<ResourceRecordSet<?>> iterator() {
     List<Iterable<ResourceRecordSet<?>>> eachPool = new ArrayList<Iterable<ResourceRecordSet<?>>>();
-    final Map<String, Integer> nameAndType = RRSetUtil.getNameAndType(api
-            .getDirectionalPoolsOfZone(zoneName)
-            .rrSets());
+    List<RRSet> rrSets = new ArrayList<RRSet>();
+    try {
+      RRSetList rrSetList = api.getDirectionalPoolsOfZone(zoneName);
+      if (rrSetList != null) {
+        rrSets = rrSetList.rrSets();
+      }
+    } catch (UltraDNSRestException e) {
+      if (e.code() != UltraDNSRestException.DATA_NOT_FOUND) {
+        throw e;
+      }
+    }
+    final Map<String, Integer> nameAndType = RRSetUtil.getNameAndType(rrSets);
     for (final String poolName : nameAndType.keySet()) {
       eachPool.add(new Iterable<ResourceRecordSet<?>>() {
         public Iterator<ResourceRecordSet<?>> iterator() {

@@ -84,7 +84,7 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
   public String put(Zone zone) {
     try {
       String accountName;
-      if (zone.accountName() != null && !zone.accountName().isEmpty()) {
+      if (!StringUtils.isEmpty(zone.accountName())) {
         accountName = zone.accountName();
       } else {
         accountName = getCurrentAccountName();

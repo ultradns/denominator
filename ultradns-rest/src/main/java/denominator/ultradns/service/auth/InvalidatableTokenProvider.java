@@ -106,7 +106,7 @@ public class InvalidatableTokenProvider implements Provider<String>, CheckConnec
 
     public interface Session {
         @RequestLine("POST /authorization/token")
-        @Headers({ "Content-Type: application/x-www-form-urlencoded" })
+        @Headers({ "Content-Type: application/x-www-form-urlencoded", "UltraClient: denominator" })
         TokenResponse login(@Param("grant_type") String grantType, @Param("username") String userName,
                             @Param("password") String password);
     }

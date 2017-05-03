@@ -14,7 +14,7 @@ import feign.RequestLine;
 
 import java.util.Collection;
 
-@Headers("Content-Type: application/json")
+@Headers({ "Content-Type: application/json", "UltraClient: denominator" })
 public interface UltraDNSRest {
 
   /**

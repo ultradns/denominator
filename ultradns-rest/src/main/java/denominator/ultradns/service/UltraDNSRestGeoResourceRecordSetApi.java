@@ -285,8 +285,8 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
       final List<RDataInfo> newRDataInfoList = new ArrayList<RDataInfo>();
 
       for (Map<String, Object> record: recordsLeftToCreate) {
-        for (Map.Entry<String, Object> r1 : record.entrySet()) {
-          newRData.add((String) r1.getValue());
+        for (Map.Entry<String, Object> r : record.entrySet()) {
+          newRData.add((String) r.getValue());
           newRDataInfoList.add(createRDataInfo(type, ttlToApply, groupName, geoCodes));
         }
       }
@@ -307,8 +307,8 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
       final List<RDataInfo> rdataInfoList = profile.getRdataInfo();
 
       for (Map<String, Object> record: recordsLeftToCreate) {
-        for (Map.Entry<String, Object> r2 : record.entrySet()) {
-          String data = ((String) r2.getValue());
+        for (Map.Entry<String, Object> r : record.entrySet()) {
+          String data = ((String) r.getValue());
           int index = rdata.indexOf(data);
           if (index >= 0) {
             rdataInfoList.set(index, createRDataInfo(type, ttlToApply, groupName, geoCodes));

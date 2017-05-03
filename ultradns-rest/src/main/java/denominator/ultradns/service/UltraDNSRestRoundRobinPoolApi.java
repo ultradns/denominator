@@ -1,11 +1,7 @@
 package denominator.ultradns.service;
 
-import java.util.List;
-import java.util.Map;
-
 import static denominator.ResourceTypeToValue.lookup;
 import static denominator.common.Preconditions.checkNotNull;
-import static denominator.common.Preconditions.checkState;
 
 import denominator.ResourceTypeToValue.ResourceTypes;
 import denominator.ultradns.service.integration.UltraDNSRest;
@@ -32,53 +28,6 @@ public class UltraDNSRestRoundRobinPoolApi {
    */
   boolean isPoolType(String type) {
     return type.equals(ResourceTypes.A.name()) || type.equals(ResourceTypes.AAAA.name());
-  }
-
-  /**
-   * Add a zone with ttl & address.
-   * @param name
-   * @param type
-   * @param ttl
-   * @param rdatas
-   */
-  void add(String name, String type, int ttl, List<Map<String, Object>> rdatas) {
-    checkState(isPoolType(type), "%s not A or AAAA type", type);
-    // String poolId = reuseOrCreatePoolForNameAndType(name, type);
-    LOGGER.debug("Creating or using pool with zone name " + zoneName +
-            ",name " + name + ",type " + type + " and ttl " + ttl);
-    reuseOrCreatePoolForNameAndType(name, type);
-    final int typeCode = lookup(type);
-    for (Map<String, Object> rdata : rdatas) {
-      String address = rdata.get("address").toString();
-      api.addRecordToRRPool(typeCode, ttl, address, name, zoneName);
-    }
-  }
-
-  /**
-   * Adds the zone to the pool if exists else creates and adds it.
-   * @param name
-   * @param type
-   */
-  private void reuseOrCreatePoolForNameAndType(String name, String type) {
-    try {
-      // Somehow Feign does not convert %7B to { and %7D to }. Need to
-      // investigate. For now, work around is to pass the body as a
-      // parameter. Ugly but works.
-      String requestBody = "{" +
-          "\"ttl\": 300, " +
-          "\"rdata\": [], " +
-          "\"profile\": {" +
-            "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
-            "\"order\": \"ROUND_ROBIN\", " +
-            "\"description\": \"This is a great RD Pool\"" +
-          "}" +
-        "}";
-      api.addRRLBPool(zoneName, name, lookup(type), requestBody);
-    } catch (UltraDNSRestException e) {
-      if (e.code() != UltraDNSRestException.POOL_ALREADY_EXISTS) {
-        throw e;
-      }
-    }
   }
 
   /**

@@ -22,19 +22,14 @@ import static denominator.model.ResourceRecordSets.aaaa;
 import static denominator.model.ResourceRecordSets.ns;
 import static denominator.ultradns.UltraDNSMockResponse.GET_RESOURCE_RECORDS_PRESENT;
 import static denominator.ultradns.UltraDNSMockResponse.STATUS_SUCCESS;
-import static denominator.ultradns.UltraDNSMockResponse.RR_SET_WITH_NO_RECORDS;
-import static denominator.ultradns.UltraDNSMockResponse.RR_SET_WITH_ONE_RECORD;
-import static denominator.ultradns.UltraDNSMockResponse.RR_SET_WITH_NO_AAAA_RECORDS;
 import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_ONE_RESOURCE_RECORDS;
 import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_TWO_RESOURCE_RECORDS;
 import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_THREE_RESOURCE_RECORDS;
 import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_FOUR_RESOURCE_RECORDS;
 import static denominator.ultradns.UltraDNSMockResponse.RR_SET_LIST_WITH_ONE_NS_RECORD;
-import static denominator.ultradns.UltraDNSMockResponse.RR_SET_LIST_WITH_TWO_NS_RECORDS;
 import static denominator.ultradns.UltraDNSMockResponse.TTL_86400;
 import static denominator.ultradns.UltraDNSMockResponse.TTL_3600;
 import static denominator.ultradns.UltraDNSMockResponse.TTL_2400;
-import static denominator.ultradns.UltraDNSMockResponse.TTL_4800;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -176,162 +171,6 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
   }
 
   @Test
-  public void putFirstACreatesRoundRobinPoolThenAddsRecordToIt() throws Exception {
-    server.enqueueSessionResponse();
-    // Response to the request to get the RR Sets in the pool.
-    server.enqueue(new MockResponse()
-            .setResponseCode(SC_NOT_FOUND)
-            .setBody(UltraDNSMockResponse.getMockErrorResponse(
-                    UltraDNSRestException.DATA_NOT_FOUND,
-                    "Data not found.")));
-    // Response to the request to create the pool.
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-    // Response to the request to add a record to the pool.
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-
-    ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.put(a("www.denominator.io.", TTL_3600, "192.0.2.1"));
-
-    server.assertSessionRequest();
-
-    // Assert request to get the RR Sets in the pool.
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.");
-
-    // Assert request to create the pool.
-    String addRRLBPoolRequestBody = "{" +
-              "\"ttl\": 300, " +
-              "\"rdata\": [], " +
-              "\"profile\": {" +
-                "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
-                "\"order\": \"ROUND_ROBIN\", " +
-                "\"description\": \"This is a great RD Pool\"" +
-              "}" +
-            "}";
-    server.assertRequest()
-            .hasMethod("POST")
-            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.")
-            .hasBody(addRRLBPoolRequestBody);
-
-    // Assert request to add a record to the pool.
-    String addRecordToRRPoolRequestBody = "{" +
-              "\"ttl\": 3600, " +
-              "\"rdata\": [\"192.0.2.1\"]" +
-            "}";
-    server.assertRequest()
-            .hasMethod("PATCH")
-            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.")
-            .hasBody(addRecordToRRPoolRequestBody);
-  }
-
-  @Test
-  public void putFirstAReusesExistingEmptyRoundRobinPool() throws Exception {
-    server.enqueueSessionResponse();
-    // Response to the request to get the RR Sets in the pool.
-    server.enqueue(new MockResponse().setBody(RR_SET_WITH_NO_RECORDS));
-    // Response to the request to create the pool. It will be a 400 bad
-    // request since the pool is already created.
-    server.enqueue(new MockResponse()
-            .setResponseCode(SC_BAD_REQUEST)
-            .setBody(UltraDNSMockResponse.getMockErrorResponse(
-                    UltraDNSRestException.POOL_ALREADY_EXISTS,
-                    "Pool already created for this host name : " +
-                            "www.denominator.io.")));
-    // Response to the request to add a record to the pool.
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-
-    ResourceRecordSetApi api = server.connect().api()
-            .basicRecordSetsInZone("denominator.io.");
-    api.put(a("www.denominator.io.", TTL_3600, "192.0.2.1"));
-
-    server.assertSessionRequest();
-
-    // Assert request to get the RR Sets in the pool.
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.");
-
-    // Assert request to create the pool.
-    String addRRLBPoolRequestBody = "{" +
-              "\"ttl\": 300, " +
-              "\"rdata\": [], " +
-              "\"profile\": {" +
-                "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
-                "\"order\": \"ROUND_ROBIN\", " +
-                "\"description\": \"This is a great RD Pool\"" +
-              "}" +
-            "}";
-    server.assertRequest()
-            .hasMethod("POST")
-            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.")
-            .hasBody(addRRLBPoolRequestBody);
-
-    // Assert request to add a record to the pool.
-    String addRecordToRRPoolRequestBody = "{" +
-              "\"ttl\": 3600, " +
-              "\"rdata\": [\"192.0.2.1\"]" +
-            "}";
-    server.assertRequest()
-            .hasMethod("PATCH")
-            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.")
-            .hasBody(addRecordToRRPoolRequestBody);
-  }
-
-  @Test
-  public void putSecondAAddsRecordToExistingPool() throws Exception {
-    server.enqueueSessionResponse();
-    // Response to the request to get the RR Sets in the pool.
-    server.enqueue(new MockResponse().setBody(RR_SET_WITH_ONE_RECORD));
-    // Response to the request to create the pool. It will be a 400 bad
-    // request since the pool is already created.
-    server.enqueue(new MockResponse()
-            .setResponseCode(SC_BAD_REQUEST)
-            .setBody(UltraDNSMockResponse.getMockErrorResponse(
-                    UltraDNSRestException.POOL_ALREADY_EXISTS,
-                    "Pool already created for this host name : " +
-                            "www.denominator.io.")));
-    // Response to the request to add a record to the pool.
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-
-    ResourceRecordSetApi api = server.connect().api()
-            .basicRecordSetsInZone("denominator.io.");
-    api.put(a("www.denominator.io.", TTL_3600, Arrays.asList("192.0.2.1", "198.51.100.1")));
-
-    server.assertSessionRequest();
-
-    // Assert request to get the RR Sets in the pool.
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.");
-
-    // Assert request to create the pool.
-    String addRRLBPoolRequestBody = "{" +
-              "\"ttl\": 300, " +
-              "\"rdata\": [], " +
-              "\"profile\": {" +
-                "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
-                "\"order\": \"ROUND_ROBIN\", " +
-                "\"description\": \"This is a great RD Pool\"" +
-              "}" +
-            "}";
-    server.assertRequest()
-            .hasMethod("POST")
-            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.")
-            .hasBody(addRRLBPoolRequestBody);
-
-    // Assert request to add a record to the pool.
-    String addRecordToRRPoolRequestBody = "{" +
-              "\"ttl\": 3600, " +
-              "\"rdata\": [\"198.51.100.1\"]" +
-            "}";
-    server.assertRequest()
-            .hasMethod("PATCH")
-            .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.")
-            .hasBody(addRecordToRRPoolRequestBody);
-  }
-
-  @Test
   public void putFirstAAAACreatesRoundRobinPoolThenAddsRecordToIt() throws Exception {
     server.enqueueSessionResponse();
     // Response to the request to get the RR Sets in the pool.
@@ -342,8 +181,6 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
                     "Data not found.")));
     // Response to the request to create the pool.
     server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-    // Response to the request to add a record to the pool.
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
 
     ResourceRecordSetApi api = server.connect().api()
             .basicRecordSetsInZone("denominator.io.");
@@ -356,83 +193,22 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
             .hasMethod("GET")
             .hasPath("/zones/denominator.io./rrsets/28/www.denominator.io.");
 
-    // Assert request to create the pool.
-    String addRRLBPoolRequestBody = "{" +
-              "\"ttl\": 300, " +
-              "\"rdata\": [], " +
-              "\"profile\": {" +
-              "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
-                "\"order\": \"ROUND_ROBIN\", " +
-                "\"description\": \"This is a great RD Pool\"" +
-              "}" +
-            "}";
+    // Assert request to create the pool addRRLBPoolRequestBody.
     server.assertRequest()
             .hasMethod("POST")
             .hasPath("/zones/denominator.io./rrsets/28/www.denominator.io.")
-            .hasBody(addRRLBPoolRequestBody);
-
-    // Assert request to add a record to the pool.
-    String addRecordToRRPoolRequestBody = "{" +
-              "\"ttl\": 3600, " +
-              "\"rdata\": [\"3FFE:0B80:0447:0001:0000:0000:0000:0001\"]" +
-            "}";
-    server.assertRequest()
-            .hasMethod("PATCH")
-            .hasPath("/zones/denominator.io./rrsets/28/www.denominator.io.")
-            .hasBody(addRecordToRRPoolRequestBody);
-  }
-
-  @Test
-  public void putFirstAAAAReusesExistingEmptyRoundRobinPool() throws Exception {
-    server.enqueueSessionResponse();
-    // Response to the request to get the RR Sets in the pool.
-    server.enqueue(new MockResponse().setBody(RR_SET_WITH_NO_AAAA_RECORDS));
-    // Response to the request to create the pool. It will be a 400 bad
-    // request since the pool is already created.
-    server.enqueue(new MockResponse()
-            .setResponseCode(SC_BAD_REQUEST)
-            .setBody(UltraDNSMockResponse.getMockErrorResponse(
-                    UltraDNSRestException.POOL_ALREADY_EXISTS,
-                    "Pool already created for this host name : " +
-                            "www.denominator.io.")));
-    // Response to the request to add a record to the pool.
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-
-    ResourceRecordSetApi api = server.connect().api()
-            .basicRecordSetsInZone("denominator.io.");
-    api.put(aaaa("www.denominator.io.", TTL_3600, "3FFE:0B80:0447:0001:0000:0000:0000:0001"));
-
-    server.assertSessionRequest();
-
-    // Assert request to get the RR Sets in the pool.
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/28/www.denominator.io.");
-
-    // Assert request to create the pool.
-    String addRRLBPoolRequestBody = "{" +
-              "\"ttl\": 300, " +
-              "\"rdata\": [], " +
-              "\"profile\": {" +
-                "\"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\", " +
-                "\"order\": \"ROUND_ROBIN\", " +
-                "\"description\": \"This is a great RD Pool\"" +
-              "}" +
-            "}";
-    server.assertRequest()
-            .hasMethod("POST")
-            .hasPath("/zones/denominator.io./rrsets/28/www.denominator.io.")
-            .hasBody(addRRLBPoolRequestBody);
-
-    // Assert request to add a record to the pool.
-    String addRecordToRRPoolRequestBody = "{" +
-              "\"ttl\": 3600, " +
-              "\"rdata\": [\"3FFE:0B80:0447:0001:0000:0000:0000:0001\"]" +
-            "}";
-    server.assertRequest()
-            .hasMethod("PATCH")
-            .hasPath("/zones/denominator.io./rrsets/28/www.denominator.io.")
-            .hasBody(addRecordToRRPoolRequestBody);
+            .hasBody("{\n" +
+                    "  \"ownerName\": \"www.denominator.io.\",\n" +
+                    "  \"rrtype\": \"AAAA\",\n" +
+                    "  \"ttl\": 3600,\n" +
+                    "  \"rdata\": [\n" +
+                    "    \"3FFE:0B80:0447:0001:0000:0000:0000:0001\"\n" +
+                    "  ],\n" +
+                    "  \"profile\": {\n" +
+                    "    \"@context\": \"http://schemas.ultradns.com/RDPool.jsonschema\",\n" +
+                    "    \"order\": \"ROUND_ROBIN\"\n" +
+                    "  }\n" +
+                    "}");
   }
 
   @Test
@@ -684,6 +460,8 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
             .hasMethod("POST")
             .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.")
             .hasBody("{\n" +
+                    "  \"ownerName\": \"www.denominator.io.\",\n" +
+                    "  \"rrtype\": \"NS\",\n" +
                     "  \"ttl\": 3600,\n" +
                     "  \"rdata\": [\n" +
                     "    \"ns1.denominator.io.\"\n" +
@@ -698,8 +476,6 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.enqueue(new MockResponse().setBody(RR_SET_LIST_WITH_ONE_NS_RECORD));
     // Response to the request to update the pool.
     server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-    // Response to the request to create the pool.
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
 
     ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
     api.put(ns("www.denominator.io.", TTL_2400, Arrays.asList("ns1.denominator.io.", "ns2.denominator.io.")));
@@ -713,72 +489,15 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
 
     // Assert request to update the NS record
     server.assertRequest()
-            .hasMethod("PATCH")
+            .hasMethod("PUT")
             .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.")
             .hasBody("{\n" +
+                    "  \"ownerName\": \"www.denominator.io.\",\n" +
+                    "  \"rrtype\": \"NS (2)\",\n" +
                     "  \"ttl\": 2400,\n" +
                     "  \"rdata\": [\n" +
-                    "    \"ns1.denominator.io.\"\n" +
-                    "  ]\n" +
-                    "}");
-
-    // Assert request to create the NS record
-    server.assertRequest()
-            .hasMethod("POST")
-            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.")
-            .hasBody("{\n" +
-                    "  \"ttl\": 2400,\n" +
-                    "  \"rdata\": [\n" +
+                    "    \"ns1.denominator.io.\",\n" +
                     "    \"ns2.denominator.io.\"\n" +
-                    "  ]\n" +
-                    "}");
-  }
-
-  @Test
-  public void putMethodInvocationSoThatOneNsRecordIsDeleted() throws Exception {
-    server.enqueueSessionResponse();
-    // Response to the request to get the RR Sets for the owner name in put().
-    server.enqueue(new MockResponse().setBody(RR_SET_LIST_WITH_TWO_NS_RECORDS));
-    // Response to api.getResourceRecordsOfDNameByType(zoneName, name, intType) in remove().
-    server.enqueue(new MockResponse().setBody(RR_SET_LIST_WITH_TWO_NS_RECORDS));
-    // Response to the request to delete a NS resource record in remove().
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-    // Response to the request to update a NS resource record in create().
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-
-    ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.put(ns("www.denominator.io.", TTL_4800, "ns1.denominator.io."));
-
-    server.assertSessionRequest();
-
-    // Assert request to get the NS records
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.");
-
-    // Assert request to get the NS records
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.");
-    // Assert request to delete a NS record
-    server.assertRequest()
-            .hasMethod("PATCH")
-            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.")
-            .hasBody("[" +
-                      "{" +
-                        "\"op\": \"remove\", " +
-                        "\"path\": \"/rdata/1\"" +
-                      "}" +
-                    "]");
-
-    // Assert request to update the NS record
-    server.assertRequest()
-            .hasMethod("PATCH")
-            .hasPath("/zones/denominator.io./rrsets/2/www.denominator.io.")
-            .hasBody("{\n" +
-                    "  \"ttl\": 4800,\n" +
-                    "  \"rdata\": [\n" +
-                    "    \"ns1.denominator.io.\"\n" +
                     "  ]\n" +
                     "}");
   }

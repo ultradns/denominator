@@ -16,14 +16,17 @@ import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.Record;
 import denominator.ultradns.util.RRSetUtil;
 import org.apache.commons.lang.StringUtils;
+import denominator.ultradns.model.RRSetList;
+import denominator.ultradns.model.Profile;
+import static denominator.common.Util.flatten;
 
 import static denominator.ResourceTypeToValue.lookup;
 import static denominator.common.Preconditions.checkArgument;
 import static denominator.common.Preconditions.checkNotNull;
 import static denominator.common.Util.nextOrNull;
-import static denominator.common.Util.toMap;
 import denominator.ResourceTypeToValue.ResourceTypes;
 import org.apache.log4j.Logger;
+import denominator.ultradns.util.Constants;
 
 public final class UltraDNSRestResourceRecordSetApi implements denominator.ResourceRecordSetApi {
 
@@ -122,7 +125,7 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
   /**
    * This method will update Records for a combination
    * of owner, resource type & group.
-   * @param rrset contains the {@code rdata} elements ensure exist. If {@link
+   * @param rrset If {@link
    *              ResourceRecordSet#ttl() ttl} is not present, zone default is used.
    */
   @Override
@@ -130,76 +133,112 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     checkNotNull(rrset, "rrset was null");
     checkArgument(!rrset.records().isEmpty(), "rrset was empty %s", rrset);
     int ttlToApply = rrset.ttl() != null ? rrset.ttl() : DEFAULT_TTL;
+    int typeCode = lookup(rrset.type());
 
-    LOGGER.debug("Retrieving the list of records to update ");
-    List<Record> toUpdate = recordsByNameAndType(rrset.name(), rrset.type());
+    RRSetList rrSetList = getRrSetList(rrset.name(), typeCode);
 
-    List<Map<String, Object>> toCreate = new ArrayList<Map<String, Object>>(rrset.records());
+    if (rrSetList == null || rrSetList.getRrSets() == null) {
+      // Create the resource record set.
+      // If the zone does not exist, should it be created? I think it should not be created. Check the SOAP behaviour.
+      // If the owner does not exist, should it be created? I think it should be created. Check the SOAP behaviour.
+      // If the pool does not exist, create it. (POST will automatically do this).
+      add(rrset, ttlToApply, typeCode);
 
-    for (Iterator<Record> shouldUpdate = toUpdate.iterator(); shouldUpdate.hasNext();) {
-      Record record = shouldUpdate.next();
-      Map<String, Object> rdata = toMap(rrset.type(), record.getRdata());
-      if (toCreate.contains(rdata)) {
-        toCreate.remove(rdata);
-        if (ttlToApply == record.getTtl()) {
-          shouldUpdate.remove();
-        }
-      } else {
-        shouldUpdate.remove();
-        remove(rrset.name(), rrset.type(), record);
-      }
-    }
-    if (!toUpdate.isEmpty()) {
-      update(rrset.name(), rrset.type(), ttlToApply, toUpdate);
-    }
-    if (!toCreate.isEmpty()) {
-      create(rrset.name(), rrset.type(), ttlToApply, toCreate);
-    }
-  }
-
-  /**
-   * Update resource record(s) given name, type, ttlToApply, list of records.
-   *
-   * @param name      {@link ResourceRecordSet#name() name} of the rrset
-   * @param type      {@link ResourceRecordSet#type() type} of the rrset
-   * @param ttlToApply      {@link ResourceRecordSet#ttl() ttl} of the rrset
-   * @param toUpdate list of records
-   * @throws IllegalArgumentException if the zone is not found.
-   */
-  private void update(String name, String type, int ttlToApply, List<Record> toUpdate) {
-    LOGGER.debug("Updating the record(s) with owner name " + name + "type " + type + "ttl " + ttlToApply);
-    for (Record record : toUpdate) {
-      record.setTtl(ttlToApply);
-      api.partialUpdateResourceRecord(zoneName, record.getTypeCode(), name, record.buildRRSet());
-    }
-  }
-
-  /**
-   * Create resource record(s) given name, type, ttlToApply, list of records.
-   *
-   * @param name      {@link ResourceRecordSet#name() name} of the rrset
-   * @param type      {@link ResourceRecordSet#type() type} of the rrset
-   * @param ttl      {@link ResourceRecordSet#ttl() ttl} of the rrset
-   * @param rdatas list of map of records
-   * @throws IllegalArgumentException if the zone is not found.
-   */
-  private void create(String name, String type, int ttl, List<Map<String, Object>> rdatas) {
-    LOGGER.debug("Creating the record(s) with owner name " + name + "type " + type + "ttl " + ttl);
-    if (roundRobinPoolApi.isPoolType(type)) {
-      roundRobinPoolApi.add(name, type, ttl, rdatas);
     } else {
-      Record record = new Record();
-      record.setName(name);
-      record.setTypeCode(lookup(type));
-      record.setTtl(ttl);
+      replace(rrSetList, rrset, ttlToApply, typeCode);
+    }
+  }
 
-      for (Map<String, Object> rdata : rdatas) {
-        for (Object rdatum : rdata.values()) {
-          record.getRdata().add(rdatum.toString());
-        }
-        api.createResourceRecord(zoneName, record.getTypeCode(), name, record.buildRRSet());
+  /**
+   * Adds resource record(s) given resource record set, type, ttlToApply.
+   *
+   * @param rrset
+   * @param ttlToApply
+   * @param typeCode
+   * @throws IllegalArgumentException if the zone is not found.
+   */
+  private void add(ResourceRecordSet<?> rrset, int ttlToApply, int typeCode) {
+    LOGGER.debug("Adding record(s) to the zone: " + zoneName + "domain name: " + rrset.name()
+            + "type: " + typeCode);
+    RRSet rrSetNew = new RRSet();
+    rrSetNew.setOwnerName(rrset.name());
+    rrSetNew.setRrtype(rrset.type());
+    rrSetNew.setTtl(ttlToApply);
+    // Extract the rdata from the resource record set passed in as
+    // the parameter to this method.
+    setData(rrSetNew, rrset);
+
+    if (roundRobinPoolApi.isPoolType(rrset.type())) {
+      Profile profile = new Profile();
+      profile.setContext(Constants.RD_POOL_SCHEMA);
+      profile.setOrder(Constants.ROUND_ROBIN);
+      rrSetNew.setProfile(profile);
+    }
+    // Send a POST request.
+    api.createResourceRecord(zoneName, typeCode, rrset.name(), rrSetNew);
+  }
+
+  /**
+   * Updates resource record(s) given rrSetList, resource record set, type, ttlToApply.
+   *
+   * @param rrSetList
+   * @param rrset
+   * @param ttlToApply
+   * @param typeCode
+   * @throws IllegalArgumentException if the zone is not found.
+   */
+  private void replace(RRSetList rrSetList, ResourceRecordSet<?> rrset , int ttlToApply, int typeCode) {
+    LOGGER.debug("Updating resource record(s) of the zone: " + zoneName + "domain name: " + rrset.name()
+            + "type: " + typeCode);
+    // Update the resource record set.
+    List<RRSet> rrSetsExisting = rrSetList.rrSets();
+    RRSet rrSetExisting = rrSetsExisting.remove(0);
+    // Set the TTL value in the resource record set.
+    rrSetExisting.setTtl(ttlToApply);
+    setData(rrSetExisting, rrset);
+    // Send a PUT request.
+    api.updateResourceRecord(zoneName, typeCode, rrset.name(), rrSetExisting);
+  }
+
+  /**
+   * Updates the passed rdatas to the existing RRSet.
+   *
+   * @param rrSet RRSet
+   * @param rrset ResourceRecordSet
+   * @throws IllegalArgumentException if the zone is not found.
+   */
+  private void setData(RRSet rrSet, ResourceRecordSet<?> rrset) {
+    List<String> rdatas = new ArrayList<String>();
+    // Extract the rdata from the resource record set passed in as
+    // the parameter to this method and put them into rdatas.
+    List<Map<String, Object>> toCreate = new ArrayList<Map<String, Object>>(rrset.records());
+    for (Iterator<Map<String, Object>> shouldCreate = toCreate.iterator(); shouldCreate.hasNext();) {
+      String rdata = flatten(shouldCreate.next());
+      rdatas.add(rdata);
+    }
+    rrSet.setRdata(rdatas);
+  }
+
+  /**
+   * Returns RRSetList given owner name and type.
+   *
+   * @param dName
+   * @param type
+   * @throws IllegalArgumentException if the zone is not found.
+   */
+  private RRSetList getRrSetList(String dName, int type) {
+    RRSetList rrSetList;
+    try {
+      rrSetList = api.getResourceRecordsOfDNameByType(zoneName, dName, type);
+    } catch (UltraDNSRestException e) {
+      if (e.code() == UltraDNSRestException.DATA_NOT_FOUND ||
+              e.code() == UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND) {
+        rrSetList = null;
+      } else {
+        throw e;
       }
     }
+    return rrSetList;
   }
 
   /**
@@ -210,6 +249,7 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
    */
   @Override
   public void deleteByNameAndType(String name, String type) {
+    LOGGER.debug("Deleting resource record(s) for the zone: " + zoneName + "domain name: " + name + "type: " + type);
     for (Record record : recordsByNameAndType(name, type)) {
       remove(name, type, record);
     }

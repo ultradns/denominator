@@ -83,7 +83,12 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
   @Override
   public String put(Zone zone) {
     try {
-      String accountName = getCurrentAccountName();
+      String accountName;
+      if (zone.accountName() != null && !zone.accountName().isEmpty()) {
+        accountName = zone.accountName();
+      } else {
+        accountName = getCurrentAccountName();
+      }
       LOGGER.debug("Creating Zone with zone name: " + zone.name() + " and account name: " + accountName);
       api.createPrimaryZone(zone.name(), accountName, "PRIMARY", false, "NEW");
     } catch (UltraDNSRestException e) {

@@ -55,8 +55,16 @@ class ZoneCommands {
                                                                 "--email"}, description = "Email contact for the zone. ex. admin@denominator.io")
     public String email;
 
+    @Option(type = OptionType.COMMAND, name = {"-a",
+                                              "--account"}, description = "account name under which zone needs to be created")
+    public String accountName;
+
     public Iterator<String> doRun(final DNSApiManager mgr) {
       final Zone zone = Zone.create(null, name, ttl, email);
+      if(accountName != null && !accountName.isEmpty()) {
+        zone.setAccountName(accountName);
+      }
+
       return new Iterator<String>() {
         boolean printed = false;
         boolean replaced = false;
@@ -109,6 +117,7 @@ class ZoneCommands {
       final Zone existing = getZone(mgr, id);
       final Zone update = Zone.create(id, existing.name(), ttl != null ? ttl : existing.ttl(),
                                       email != null ? email : existing.email());
+
       if (existing.equals(update)) {
         return forArray(";; ok");
       }

@@ -152,6 +152,35 @@ public class UltraDNSRestZoneApiMockTest {
   }
 
   @Test
+  public void putWhenPresentWithAccountName() throws Exception {
+    server.enqueueSessionResponse();
+    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse().setBody(GET_SOA_RESOURCE_RECORDS));
+    server.enqueue(new MockResponse());
+
+    ZoneApi api = server.connect().api().zones();
+    Zone zone = Zone.create(null, "denominator.io.", TTL_3601, "nil@denominator.io");
+    zone.setAccountName("npp-rest-test1");
+
+    assertThat(api.put(zone)).isEqualTo(zone.name());
+
+    server.enqueue(new MockResponse().setResponseCode(SC_BAD_REQUEST).setBody(UltraDNSMockResponse
+            .getMockErrorResponse(UltraDNSRestException.ZONE_ALREADY_EXISTS,
+                    "Zone already exists in the system.")));
+
+    server.assertSessionRequest();
+    server.assertRequest()
+            .hasMethod("POST")
+            .hasPath("/zones")
+            .hasBody("{\"properties\": {\"name\": \"denominator.io.\", \"accountName\": \"npp-rest-test1\"," +
+                    " \"type\": \"PRIMARY\"}, " +
+                    "\"primaryCreateInfo\": {\"forceImport\": false, \"createType\": \"NEW\"}}");
+    server.assertRequest()
+            .hasMethod("GET")
+            .hasPath("/zones/denominator.io./rrsets/6/denominator.io.");
+  }
+
+  @Test
   public void deleteWhenPresent() throws Exception {
     server.enqueueSessionResponse();
     server.enqueue(new MockResponse());

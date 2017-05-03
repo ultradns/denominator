@@ -16,6 +16,7 @@ public class Zone {
   private final String name;
   private final int ttl;
   private final String email;
+  private String accountName;
 
   Zone(String id, String name, int ttl, String email) {
     this.id = id;
@@ -75,6 +76,25 @@ public class Zone {
   @Deprecated
   public String idOrName() {
     return id() != null ? id() : name();
+  }
+
+  /**
+   * Account name associated with zone.
+   * To create/update/list zone for a specific account user can pass this parameter.
+   *
+   * This is a non mandatory field.
+   * @return account name
+   */
+  public String accountName() {
+    return accountName;
+  }
+
+  /**
+   * Set account name for a zone.
+   * @param accountName Account name associated with zone.
+   */
+  public void setAccountName(String accountName) {
+    this.accountName = accountName;
   }
 
   @Override

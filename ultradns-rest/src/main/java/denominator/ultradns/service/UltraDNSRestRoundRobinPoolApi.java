@@ -27,7 +27,7 @@ public class UltraDNSRestRoundRobinPoolApi {
    *         {@code false} otherwise.
    */
   boolean isPoolType(String type) {
-    return type.equals(ResourceTypes.A.name()) || type.equals(ResourceTypes.AAAA.name());
+    return ResourceTypes.A.name().equals(type) || ResourceTypes.AAAA.name().equals(type);
   }
 
   /**

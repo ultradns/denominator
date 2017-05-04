@@ -172,7 +172,7 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
 
       if ("A1".equals(code) || "A2".equals(code) || "A3".equals(code)) {
         for (Region region : regions.keySet()) {
-          if (region.getCode().equals(code)) {
+          if (code.equals(region.getCode())) {
             list.add(region.getName());
             if ("A1".equals(code) || "A2".equals(code)) {
               regionToTerritories.put(region.getName() + " (" + code + ")", list);
@@ -184,7 +184,7 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
       } else {
         for (Map.Entry<Region, Collection<Region>> entry : regions.entrySet()) {
           for (Region region : entry.getValue()) {
-            if (region.getEffectiveCodeForGeo().equals(code)) {
+            if (code.equals(region.getEffectiveCodeForGeo())) {
               if (regionToTerritories.keySet().contains(entry.getKey().getName())) {
                 list = regionToTerritories.get(entry.getKey().getName());
               }

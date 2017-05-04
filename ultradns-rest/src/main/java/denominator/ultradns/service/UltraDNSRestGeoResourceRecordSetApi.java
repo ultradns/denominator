@@ -398,7 +398,7 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
    */
   private void deleteDirectionalPoolRecord(DirectionalRecord record) {
     if (record.getRdata() != null && !record.getRdata().isEmpty()) {
-      if (record.getRdata().get(0).equals("No Data Response")) {
+      if ("No Data Response".equals(record.getRdata().get(0))) {
         try {
           api.deleteDirectionalNoResponseRecord(zoneName, record.getName(), record.getType());
         } catch (UltraDNSRestException e) {

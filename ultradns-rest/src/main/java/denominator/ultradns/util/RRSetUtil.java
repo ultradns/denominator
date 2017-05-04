@@ -159,8 +159,8 @@ public final class RRSetUtil {
             return records;
         }
         for (DirectionalRecord r : buildDirectionalRecords(rrSets)) {
-            if (r.getGeoGroupName() != null && r.getGeoGroupName().equals(groupName)
-                    || r.getIpGroupName() != null && r.getIpGroupName().equals(groupName)) {
+            if (r.getGeoGroupName() != null && groupName.equals(r.getGeoGroupName())
+                    || r.getIpGroupName() != null && groupName.equals(r.getIpGroupName())) {
                 records.add(r);
             }
         }
@@ -181,14 +181,14 @@ public final class RRSetUtil {
                     List<RDataInfo> rDataInfoList = rrSet.getProfile().getRdataInfo();
                     for (RDataInfo rd : rDataInfoList) {
                         if (rd.getGeoInfo() != null && rd.getGeoInfo().getName() != null
-                                && rd.getGeoInfo().getName().equals(groupName)) {
+                                && groupName.equals(rd.getGeoInfo().getName())) {
                             countryCodes = rd.getGeoInfo().getCodes();
                         }
                     }
                 }
                 if (rrSet.getProfile() != null && rrSet.getProfile().getNoResponse() != null) {
                     GeoInfo geoInfo = rrSet.getProfile().getNoResponse().getGeoInfo();
-                    if (geoInfo != null && geoInfo.getName() != null && geoInfo.getName().equals(groupName)) {
+                    if (geoInfo != null && geoInfo.getName() != null && groupName.equals(geoInfo.getName())) {
                         countryCodes = geoInfo.getCodes();
                     }
                 }
@@ -205,7 +205,7 @@ public final class RRSetUtil {
     private static boolean isDirectionalRecord(RRSet rrSet) {
         return rrSet.getProfile() != null
                 && rrSet.getProfile().getContext() != null
-                && rrSet.getProfile().getContext().equals(DIRECTIONAL_POOL_SCHEMA);
+                && DIRECTIONAL_POOL_SCHEMA.equals(rrSet.getProfile().getContext());
     }
 
     /**

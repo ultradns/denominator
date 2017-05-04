@@ -8,7 +8,6 @@ import denominator.model.rdata.AData;
 import denominator.profile.GeoResourceRecordSetApi;
 import denominator.ultradns.MockUltraDNSRestServer;
 import denominator.ultradns.exception.UltraDNSRestException;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -47,7 +46,6 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
 
         server.assertSessionRequest();
         server.assertRequest("GET", "/geoip/territories?codes=", "");
-
     }
 
     @Test
@@ -63,7 +61,6 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     }
 
     @Test
-    @Ignore
     public void listWhenPresent() throws Exception {
         server.enqueueSessionResponse();
         enqueueAvailableRegionsResponse();
@@ -95,7 +92,6 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     }
 
     @Test
-    @Ignore
     public void iterateByNameWhenPresent() throws Exception {
         server.enqueueSessionResponse();
         enqueueAvailableRegionsResponse();
@@ -124,7 +120,6 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     }
 
     @Test
-    @Ignore
     public void iterateByNameAndTypeWhenPresent() throws Exception {
         server.enqueueSessionResponse();
         enqueueAvailableRegionsResponse();
@@ -153,10 +148,8 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     }
 
     @Test
-    @Ignore
     public void putWithNewOwner() throws Exception {
         server.enqueueSessionResponse();
-        enqueueAvailableRegionsResponse();
         enqueueAvailableRegionsResponse();
         server.enqueueError(SC_NOT_FOUND, UltraDNSRestException.DATA_NOT_FOUND, "Data not found.");
         server.enqueue(new MockResponse().setBody(
@@ -182,7 +175,6 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
         api.put(europe);
 
         server.assertSessionRequest();
-        assertAvailableRegionsRequest();
         assertAvailableRegionsRequest();
         server.assertRequest("GET",
                 "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
@@ -214,10 +206,8 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
     }
 
     @Test
-    @Ignore
     public void putWithExistingOwner() throws Exception {
         server.enqueueSessionResponse();
-        enqueueAvailableRegionsResponse();
         enqueueAvailableRegionsResponse();
         server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
         server.enqueue(new MockResponse().setBody(
@@ -243,7 +233,6 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
         api.put(europe);
 
         server.assertSessionRequest();
-        assertAvailableRegionsRequest();
         assertAvailableRegionsRequest();
         server.assertRequest("GET",
                 "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
@@ -315,14 +304,12 @@ public class UltraDNSRestGeoResourceRecordSetApiMockTest {
 
     private void enqueueDirectionalDNSGroupByName() {
         server.enqueue(new MockResponse().setBody(DIRECTIONAL_POOLS_RESPONSE));
-        enqueueAvailableRegionsResponse();
     }
 
     private void assertDirectionalDNSGroupByName() throws InterruptedException {
         server.assertRequest("GET",
                 "/zones/denominator.io./rrsets/1/test_directional_pool.denominator.io.?q=kind%3ADIR_POOLS",
                 "");
-        assertAvailableRegionsRequest();
     }
 
     private void enqueueAvailableRegionsResponse() {

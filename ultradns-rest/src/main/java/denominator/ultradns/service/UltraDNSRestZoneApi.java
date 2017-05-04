@@ -83,12 +83,7 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
   @Override
   public String put(Zone zone) {
     try {
-      String accountName;
-      if (!StringUtils.isEmpty(zone.accountName())) {
-        accountName = zone.accountName();
-      } else {
-        accountName = getCurrentAccountName();
-      }
+      final String accountName = StringUtils.isEmpty(zone.accountName()) ? getCurrentAccountName() : zone.accountName();
       LOGGER.debug("Creating Zone with zone name: " + zone.name() + " and account name: " + accountName);
       api.createPrimaryZone(zone.name(), accountName, "PRIMARY", false, "NEW");
     } catch (UltraDNSRestException e) {
@@ -143,8 +138,20 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
     return Zone.create(name, name, soa.getTtl(), soa.getRdata().get(1));
   }
 
+  /**
+   * Return the most recently added account name associated with logged user.
+   * This method will be invoked only if client does't pass account name while performing operation zone.
+   *
+   * @return account name
+   */
   private String getCurrentAccountName() {
-    AccountList accountList = api.getAccountsListOfUser();
+    AccountList accountList;
+    try {
+      LOGGER.debug("Retrieving list of accounts for currently logged in user ... ");
+      accountList = api.getAccountsListOfUser();
+    } catch (UltraDNSRestException e) {
+      throw e;
+    }
     if (accountList.getAccounts() != null && !accountList.getAccounts().isEmpty()) {
       return accountList.getAccounts()
               .get(accountList.getAccounts().size() - 1)
@@ -153,6 +160,14 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
     return null;
   }
 
+  /**
+   * Format the email address like below to save it in rdata.
+   * test.email@neustar.biz --> test\.email.neustar.biz.
+   * If email is already formatted the it will return as it is.
+   *
+   * @param email
+   * @return formatted email
+   */
   private String formatEmail(String email) {
     String[] values = email.split("@");
     if (values.length != 1) {

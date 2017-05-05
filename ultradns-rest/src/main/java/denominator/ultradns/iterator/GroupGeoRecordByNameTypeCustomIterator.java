@@ -14,6 +14,7 @@ import denominator.common.PeekingIterator;
 import denominator.model.ResourceRecordSet;
 import denominator.model.ResourceRecordSet.Builder;
 import denominator.model.profile.Geo;
+import denominator.ultradns.exception.UltraDNSRestException;
 import denominator.ultradns.service.integration.UltraDNSRest;
 import denominator.ultradns.model.DirectionalRecord;
 import denominator.ultradns.model.DirectionalGroup;
@@ -137,9 +138,16 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
    */
   public DirectionalGroup getDirectionalDNSGroupByName(String zone, String hostName, int rrType, String groupName) {
 
-    TreeSet<String> codes = RRSetUtil.getDirectionalGroupDetails(
-            api.getDirectionalDNSRecordsForHost(zone, hostName, rrType).rrSets(),
-            groupName);
+    TreeSet<String> codes = new TreeSet<String>();
+    try {
+      codes = RRSetUtil.getDirectionalGroupDetails(
+              api.getDirectionalDNSRecordsForHost(zone, hostName, rrType).rrSets(),
+              groupName);
+    } catch (UltraDNSRestException e) {
+      if (e.code() != UltraDNSRestException.DATA_NOT_FOUND) {
+        throw e;
+      }
+    }
 
     Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();
 

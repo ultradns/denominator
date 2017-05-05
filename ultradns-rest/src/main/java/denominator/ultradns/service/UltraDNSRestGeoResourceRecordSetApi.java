@@ -382,10 +382,13 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
               .getDirectionalDNSRecordsForHost(zoneName, name, dirType)
               .rrSets());
     } catch (UltraDNSRestException e) {
-      if (e.code() == UltraDNSRestException.DIRECTIONALPOOL_NOT_FOUND) {
-        list = Collections.emptyList();
-      } else {
-        throw e;
+      switch (e.code()) {
+        case UltraDNSRestException.DIRECTIONALPOOL_NOT_FOUND:
+        case UltraDNSRestException.DATA_NOT_FOUND:
+          list = Collections.emptyList();
+          break;
+        default:
+          throw e;
       }
     }
     return iteratorFactory.create(list.iterator(), zoneName, getAvailableRegions());

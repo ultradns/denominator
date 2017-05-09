@@ -306,7 +306,7 @@ public class UltraDNSRestTest {
 
         server.assertSessionRequest();
         server.assertRequest()
-                .hasMethod("PATCH")
+                .hasMethod("DELETE")
                 .hasPath("/zones/denominator.io./rrsets/1/www.denominator.io.");
     }
 
@@ -622,7 +622,7 @@ public class UltraDNSRestTest {
                 .getMessage()).isEqualTo("Successful");
 
         server.assertSessionRequest();
-        server.assertRequest("PATCH",
+        server.assertRequest("DELETE",
                 "/zones/test-zone-1.com./rrsets/1/pool_1.test-zone-1.com.",
                 "[{\"op\": \"remove\", \"path\": \"/rdata/0\"}]");
     }

@@ -263,7 +263,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
             .hasMethod("GET")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
     server.assertRequest()
-            .hasMethod("PATCH")
+            .hasMethod("DELETE")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.")
             .hasBody("[" +
                       "{" +
@@ -330,7 +330,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
             .hasMethod("GET")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
     server.assertRequest()
-            .hasMethod("PATCH")
+            .hasMethod("DELETE")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.")
             .hasBody("[" +
                       "{" +
@@ -383,7 +383,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
             .hasMethod("GET")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
     server.assertRequest()
-            .hasMethod("PATCH")
+            .hasMethod("DELETE")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.")
             .hasBody("[" +
                       "{" +
@@ -395,7 +395,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
             .hasMethod("GET")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
     server.assertRequest()
-            .hasMethod("PATCH")
+            .hasMethod("DELETE")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.")
             .hasBody("[" +
                       "{" +
@@ -407,7 +407,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
             .hasMethod("GET")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
     server.assertRequest()
-            .hasMethod("PATCH")
+            .hasMethod("DELETE")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.")
             .hasBody("[" +
                       "{" +
@@ -419,7 +419,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
             .hasMethod("GET")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
     server.assertRequest()
-            .hasMethod("PATCH")
+            .hasMethod("DELETE")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.")
             .hasBody("[" +
                       "{" +

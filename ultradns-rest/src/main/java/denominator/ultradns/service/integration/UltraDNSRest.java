@@ -161,7 +161,7 @@ public interface UltraDNSRest {
    * @return status.
    */
   @Headers("Content-Type: application/json-patch+json")
-  @RequestLine("PATCH /zones/{zoneName}/rrsets/{rrType}/{hostName}")
+  @RequestLine("DELETE /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   @Body("%5B" +
           "%7B" +
             "\"op\": \"remove\", " +

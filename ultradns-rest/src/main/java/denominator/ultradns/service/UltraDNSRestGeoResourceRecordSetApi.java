@@ -285,10 +285,8 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
       final List<RDataInfo> newRDataInfoList = new ArrayList<RDataInfo>();
 
       for (Map<String, Object> record: recordsLeftToCreate) {
-        for (Map.Entry<String, Object> r : record.entrySet()) {
-          newRData.add((String) r.getValue());
-          newRDataInfoList.add(createRDataInfo(type, ttlToApply, groupName, geoCodes));
-        }
+        newRData.add(buildRecordData(record));
+        newRDataInfoList.add(createRDataInfo(type, ttlToApply, groupName, geoCodes));
       }
       newRRSet.setOwnerName(ownerName);
       newRRSet.setRdata(newRData);
@@ -307,15 +305,13 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
       final List<RDataInfo> rdataInfoList = profile.getRdataInfo();
 
       for (Map<String, Object> record: recordsLeftToCreate) {
-        for (Map.Entry<String, Object> r : record.entrySet()) {
-          String data = ((String) r.getValue());
-          int index = rdata.indexOf(data);
-          if (index >= 0) {
-            rdataInfoList.set(index, createRDataInfo(type, ttlToApply, groupName, geoCodes));
-          } else {
-            rdata.add(data);
-            rdataInfoList.add(createRDataInfo(type, ttlToApply, groupName, geoCodes));
-          }
+        final String data = buildRecordData(record);
+        int index = rdata.indexOf(data);
+        if (index >= 0) {
+          rdataInfoList.set(index, createRDataInfo(type, ttlToApply, groupName, geoCodes));
+        } else {
+          rdata.add(data);
+          rdataInfoList.add(createRDataInfo(type, ttlToApply, groupName, geoCodes));
         }
       }
       rs.setRdata(rdata);
@@ -327,6 +323,20 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
         throw e;
       }
     }
+  }
+
+  /**
+   * Build RData form from Map of record data.
+   *
+   * @param record Map of record data
+   * @return RData
+   */
+  private String buildRecordData(Map<String, Object> record) {
+    final List<String> dataList = new ArrayList<String>();
+    for (Map.Entry<String, Object> r : record.entrySet()) {
+      dataList.add(String.valueOf(r.getValue()));
+    }
+    return StringUtils.join(dataList, " ");
   }
 
   /**

@@ -61,9 +61,7 @@ class ZoneCommands {
 
     public Iterator<String> doRun(final DNSApiManager mgr) {
       final Zone zone = Zone.create(null, name, ttl, email);
-      if(accountName != null && !accountName.isEmpty()) {
-        zone.setAccountName(accountName);
-      }
+      zone.setAccountName(accountName);
 
       return new Iterator<String>() {
         boolean printed = false;

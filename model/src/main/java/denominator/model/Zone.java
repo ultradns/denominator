@@ -104,7 +104,8 @@ public class Zone {
       return equal(id(), other.id())
              && name().equals(other.name())
              && ttl() == other.ttl()
-             && email().equals(other.email());
+             && email().equals(other.email())
+             && equal(accountName(), other.accountName());
     }
     return false;
   }
@@ -116,6 +117,7 @@ public class Zone {
     result = 31 * result + name().hashCode();
     result = 31 * result + ttl();
     result = 31 * result + email().hashCode();
+    result = 31 * result + (accountName() != null ? accountName().hashCode() : 0);
     return result;
   }
 

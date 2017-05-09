@@ -37,7 +37,6 @@ public class UltraDNSRestZoneApiMockTest {
     server.enqueue(new MockResponse().setBody(GET_ZONES_OF_ACCOUNT_PRESENT));
     server.enqueue(new MockResponse().setBody(GET_SOA_RESOURCE_RECORDS));
     server.enqueue(new MockResponse().setBody(GET_SOA_RESOURCE_RECORDS));
-    server.enqueue(new MockResponse());
 
     ZoneApi api = server.connect().api().zones();
     assertThat(api.iterator()).containsExactly(

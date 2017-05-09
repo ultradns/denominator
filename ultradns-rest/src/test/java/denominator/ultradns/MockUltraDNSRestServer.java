@@ -22,11 +22,15 @@ import static java.lang.String.format;
 public final class MockUltraDNSRestServer extends UltraDNSRestProvider implements TestRule {
 
   private final MockWebServer delegate = new MockWebServer();
+
   private String username = "arghya";
   private String password = "letmein";
   private String sessionResponse;
+
   private final String accessToken = "007e99c189364";
   private final String refreshToken = "f29f3ca94bcd4fb5ba79";
+  private final String denominatorHeaderKey = "UltraClient";
+  private final String denominatorHeaderValue = "denominator";
 
   public MockUltraDNSRestServer() {
     credentials(username, password);
@@ -81,13 +85,15 @@ public final class MockUltraDNSRestServer extends UltraDNSRestProvider implement
   public RecordedRequestAssert assertSessionRequest() throws InterruptedException {
     return assertThat(delegate.takeRequest())
             .hasMethod("POST")
-            .hasPath("/authorization/token");
+            .hasPath("/authorization/token")
+            .hasHeaderContaining(denominatorHeaderKey, denominatorHeaderValue);
   }
 
   public RecordedRequestAssert assertRequest(String requestType, String path, String body) throws InterruptedException {
     return assertThat(delegate.takeRequest())
             .hasMethod(requestType)
             .hasPath(path)
+            .hasHeaderContaining(denominatorHeaderKey, denominatorHeaderValue)
             .hasBody(format(body));
   }
 

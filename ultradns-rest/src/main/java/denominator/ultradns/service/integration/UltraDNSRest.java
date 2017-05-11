@@ -3,6 +3,7 @@ package denominator.ultradns.service.integration;
 import denominator.ultradns.model.Status;
 import denominator.ultradns.model.AccountList;
 import denominator.ultradns.model.ZoneList;
+import denominator.ultradns.model.Zone;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.RRSetList;
 import denominator.ultradns.model.Region;
@@ -34,13 +35,20 @@ public interface UltraDNSRest {
   AccountList getAccountsListOfUser();
 
   /**
-   * Gets zones of the account.
+   * Gets zones of the user.
    *
-   * @param accountName
    * @return zone list
    */
-  @RequestLine("GET /accounts/{accountName}/zones")
-  ZoneList getZonesOfAccount(@Param("accountName") String accountName);
+  @RequestLine("GET /zones")
+  ZoneList getZonesOfUser();
+
+  /**
+   * Gets zone details with Zone name.
+   *
+   * @return zone list
+   */
+  @RequestLine("GET /zones/{zoneName}")
+  Zone getZoneByName(@Param("zoneName") final String zoneName);
 
   /**
    * Creates primary zone.

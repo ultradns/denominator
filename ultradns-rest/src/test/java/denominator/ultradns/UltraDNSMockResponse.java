@@ -495,7 +495,7 @@ public final class UltraDNSMockResponse {
             "    }\n" +
             "}\n";
 
-    public static final String GET_ZONES_OF_ACCOUNT_PRESENT = "{\n" +
+    public static final String GET_ZONES_OF_USER_PRESENT = "{\n" +
             "    \"queryInfo\": {\n" +
             "        \"sort\": \"NAME\",\n" +
             "        \"reverse\": false,\n" +
@@ -550,7 +550,7 @@ public final class UltraDNSMockResponse {
             "    ]\n" +
             "}\n";
 
-    public static final String GET_ZONES_OF_ACCOUNT_ABSENT = "{\n" +
+    public static final String GET_ZONES_OF_USER_ABSENT = "{\n" +
             "    \"queryInfo\": {\n" +
             "        \"sort\": \"NAME\",\n" +
             "        \"reverse\": false,\n" +
@@ -562,6 +562,32 @@ public final class UltraDNSMockResponse {
             "        \"returnedCount\": 0\n" +
             "    },\n" +
             "    \"zones\": [ ]\n" +
+            "}";
+
+    public static final String GET_ZONE_BY_NAME = "{\n" +
+            "    \"properties\": {\n" +
+            "        \"name\": \"denominator.io.\",\n" +
+            "        \"accountName\": \"npp-rest-test1\",\n" +
+            "        \"type\": \"PRIMARY\",\n" +
+            "        \"dnssecStatus\": \"UNSIGNED\",\n" +
+            "        \"status\": \"ACTIVE\",\n" +
+            "        \"owner\": \"npp-rest-test3a\",\n" +
+            "        \"resourceRecordCount\": 7,\n" +
+            "        \"lastModifiedDateTime\": \"2017-05-10T18:43Z\"\n" +
+            "    },\n" +
+            "    \"registrarInfo\": {\n" +
+            "        \"nameServers\": {\n" +
+            "            \"missing\": [\n" +
+            "                \"pdns1.ultradns.net.\",\n" +
+            "                \"pdns2.ultradns.net.\",\n" +
+            "                \"pdns3.ultradns.org.\",\n" +
+            "                \"pdns4.ultradns.org.\",\n" +
+            "                \"pdns5.ultradns.info.\",\n" +
+            "                \"pdns6.ultradns.co.uk.\"\n" +
+            "            ]\n" +
+            "        }\n" +
+            "    },\n" +
+            "    \"inherit\": \"ALL\"\n" +
             "}";
 
     public static final String GET_DIRECTIONAL_POOLS_OF_ZONE = "{\n" +

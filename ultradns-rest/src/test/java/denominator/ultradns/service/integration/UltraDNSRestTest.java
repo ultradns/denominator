@@ -26,8 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 
 import static denominator.ultradns.UltraDNSMockResponse.GET_ACCOUNTS_LIST_OF_USER;
-import static denominator.ultradns.UltraDNSMockResponse.GET_ZONES_OF_ACCOUNT_PRESENT;
-import static denominator.ultradns.UltraDNSMockResponse.GET_ZONES_OF_ACCOUNT_ABSENT;
+import static denominator.ultradns.UltraDNSMockResponse.GET_ZONES_OF_USER_PRESENT;
+import static denominator.ultradns.UltraDNSMockResponse.GET_ZONES_OF_USER_ABSENT;
 import static denominator.ultradns.UltraDNSMockResponse.GET_RESOURCE_RECORDS_PRESENT;
 import static denominator.ultradns.UltraDNSMockResponse.RR_SET_ABSENT;
 import static denominator.ultradns.UltraDNSMockResponse.STATUS_SUCCESS;
@@ -149,31 +149,27 @@ public class UltraDNSRestTest {
     }
 
     @Test
-    public void zonesOfAccountPresent() throws Exception {
+    public void zonesOfUserPresent() throws Exception {
         server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setBody(GET_ZONES_OF_ACCOUNT_PRESENT));
+        server.enqueue(new MockResponse().setBody(GET_ZONES_OF_USER_PRESENT));
         server.enqueue(new MockResponse());
 
-        assertThat(mockApi().getZonesOfAccount("npp-rest-test1").getZones().size()).isEqualTo(2);
+        assertThat(mockApi().getZonesOfUser().getZones().size()).isEqualTo(2);
 
         server.assertSessionRequest();
-        server.assertRequest()
-                .hasMethod("GET")
-                .hasPath("/accounts/npp-rest-test1/zones");
+        server.assertRequest("GET", "/zones", "");
     }
 
     @Test
-    public void zonesOfAccountAbsent() throws Exception {
+    public void zonesOfUserAbsent() throws Exception {
         server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setBody(GET_ZONES_OF_ACCOUNT_ABSENT));
+        server.enqueue(new MockResponse().setBody(GET_ZONES_OF_USER_ABSENT));
         server.enqueue(new MockResponse());
 
-        assertThat(mockApi().getZonesOfAccount("npp-rest-test1").getZones().size()).isEqualTo(0);
+        assertThat(mockApi().getZonesOfUser().getZones().size()).isEqualTo(0);
 
         server.assertSessionRequest();
-        server.assertRequest()
-                .hasMethod("GET")
-                .hasPath("/accounts/npp-rest-test1/zones");
+        server.assertRequest("GET", "/zones", "");
     }
 
     @Test

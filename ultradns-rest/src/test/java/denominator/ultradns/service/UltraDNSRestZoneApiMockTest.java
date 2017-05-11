@@ -14,8 +14,9 @@ import denominator.model.Zone;
 import static denominator.assertj.ModelAssertions.assertThat;
 
 import static denominator.ultradns.UltraDNSMockResponse.GET_ACCOUNTS_LIST_OF_USER_RESPONSE;
-import static denominator.ultradns.UltraDNSMockResponse.GET_ZONES_OF_ACCOUNT_PRESENT;
-import static denominator.ultradns.UltraDNSMockResponse.GET_ZONES_OF_ACCOUNT_ABSENT;
+import static denominator.ultradns.UltraDNSMockResponse.GET_ZONES_OF_USER_PRESENT;
+import static denominator.ultradns.UltraDNSMockResponse.GET_ZONES_OF_USER_ABSENT;
+import static denominator.ultradns.UltraDNSMockResponse.GET_ZONE_BY_NAME;
 import static denominator.ultradns.UltraDNSMockResponse.GET_SOA_RESOURCE_RECORDS;
 import static denominator.ultradns.UltraDNSMockResponse.TTL_86400;
 import static denominator.ultradns.UltraDNSMockResponse.TTL_3601;
@@ -33,54 +34,56 @@ public class UltraDNSRestZoneApiMockTest {
   @Test
   public void iteratorWhenPresent() throws Exception {
     server.enqueueSessionResponse();
-    server.enqueue(new MockResponse().setBody(GET_ACCOUNTS_LIST_OF_USER_RESPONSE));
-    server.enqueue(new MockResponse().setBody(GET_ZONES_OF_ACCOUNT_PRESENT));
+    server.enqueue(new MockResponse().setBody(GET_ZONES_OF_USER_PRESENT));
     server.enqueue(new MockResponse().setBody(GET_SOA_RESOURCE_RECORDS));
     server.enqueue(new MockResponse().setBody(GET_SOA_RESOURCE_RECORDS));
+
+    Zone zoneA = Zone.create("www.test-zone-1.com.", "www.test-zone-1.com.", TTL_86400, "arghya\\.b.neustar.biz.");
+    zoneA.setAccountName("npp-rest-test1");
+    Zone zoneB = Zone.create("www.test-zone-2.com.", "www.test-zone-2.com.", TTL_86400, "arghya\\.b.neustar.biz.");
+    zoneB.setAccountName("npp-rest-test1");
 
     ZoneApi api = server.connect().api().zones();
-    assertThat(api.iterator()).containsExactly(
-            Zone.create("www.test-zone-1.com.", "www.test-zone-1.com.", TTL_86400, "arghya\\.b.neustar.biz."),
-            Zone.create("www.test-zone-2.com.", "www.test-zone-2.com.", TTL_86400, "arghya\\.b.neustar.biz.")
-    );
+    assertThat(api.iterator()).containsExactly(zoneA, zoneB);
 
     server.assertSessionRequest();
-    server.assertRequest("GET", "/accounts", "");
-    server.assertRequest("GET", "/accounts/npp-rest-test1/zones", "");
+    server.assertRequest("GET", "/zones", "");
     server.assertRequest("GET", "/zones/www.test-zone-1.com./rrsets/6/www.test-zone-1.com.", "");
   }
 
   @Test
   public void iteratorWhenAbsent() throws Exception {
     server.enqueueSessionResponse();
-    server.enqueue(new MockResponse().setBody(GET_ACCOUNTS_LIST_OF_USER_RESPONSE));
-    server.enqueue(new MockResponse().setBody(GET_ZONES_OF_ACCOUNT_ABSENT));
+    server.enqueue(new MockResponse().setBody(GET_ZONES_OF_USER_ABSENT));
 
     ZoneApi api = server.connect().api().zones();
     assertThat(api.iterator()).isEmpty();
 
     server.assertSessionRequest();
-    server.assertRequest("GET", "/accounts", "");
-    server.assertRequest("GET", "/accounts/npp-rest-test1/zones", "");
+    server.assertRequest("GET", "/zones", "");
   }
 
   @Test
   public void iteratorByName() throws Exception {
     server.enqueueSessionResponse();
+    server.enqueue(new MockResponse().setBody(GET_ZONE_BY_NAME));
     server.enqueue(new MockResponse().setBody(GET_SOA_RESOURCE_RECORDS));
 
+    Zone zone = Zone.create("denominator.io.", "denominator.io.", TTL_86400, "arghya\\.b.neustar.biz.");
+    zone.setAccountName("npp-rest-test1");
+
     ZoneApi api = server.connect().api().zones();
-    assertThat(api.iterateByName("denominator.io.")).containsExactly(
-            Zone.create("denominator.io.", "denominator.io.", TTL_86400, "arghya\\.b.neustar.biz.")
-    );
+    assertThat(api.iterateByName("denominator.io.")).containsExactly(zone);
 
     server.assertSessionRequest();
+    server.assertRequest("GET", "/zones/denominator.io.", "");
     server.assertRequest("GET", "/zones/denominator.io./rrsets/6/denominator.io.", "");
   }
 
   @Test
   public void iteratorByNameWhenNotFound() throws Exception {
     server.enqueueSessionResponse();
+    server.enqueue(new MockResponse().setBody(GET_ZONE_BY_NAME));
     server.enqueue(new MockResponse().setResponseCode(SC_INTERNAL_SERVER_ERROR)
             .setBody(UltraDNSMockResponse.getMockErrorResponse(INVALID_ZONE_NAME, "Invalid zone name.")));
 
@@ -88,6 +91,7 @@ public class UltraDNSRestZoneApiMockTest {
     assertThat(api.iterateByName("denominator.io.")).isEmpty();
 
     server.assertSessionRequest();
+    server.assertRequest("GET", "/zones/denominator.io.", "");
     server.assertRequest("GET", "/zones/denominator.io./rrsets/6/denominator.io.", "");
   }
 

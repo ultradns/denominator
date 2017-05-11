@@ -115,6 +115,7 @@ class ZoneCommands {
       final Zone existing = getZone(mgr, id);
       final Zone update = Zone.create(id, existing.name(), ttl != null ? ttl : existing.ttl(),
                                       email != null ? email : existing.email());
+      update.setAccountName(existing.accountName());
 
       if (existing.equals(update)) {
         return forArray(";; ok");

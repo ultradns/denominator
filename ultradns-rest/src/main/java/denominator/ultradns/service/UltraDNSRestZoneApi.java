@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static denominator.common.Preconditions.checkState;
 import static denominator.common.Util.singletonIterator;
@@ -37,12 +38,14 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
    */
   @Override
   public Iterator<Zone> iterator() {
-    final String accountName = getCurrentAccountName();
-    List<String> zoneNames = new ArrayList<String>();
-    if (accountName != null) {
-      zoneNames = ZoneUtil.getZoneNames(api.getZonesOfAccount(accountName).getZones());
+    List<Map<String, String>> zoneAccountList;
+    try {
+      zoneAccountList = ZoneUtil.getZoneAccountList(api.getZonesOfUser().getZones());
+    } catch (UltraDNSRestException e) {
+      throw e;
     }
-    final Iterator<String> delegate = zoneNames.iterator();
+
+    final Iterator<Map<String, String>> delegate = zoneAccountList.iterator();
     return new Iterator<Zone>() {
       @Override
       public boolean hasNext() {
@@ -61,11 +64,17 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
     };
   }
 
+  /**
+   * Get Zone details with zone name.
+   * @param name zone name
+   * @return zone object
+   */
   @Override
   public Iterator<Zone> iterateByName(String name) {
     Zone zone = null;
     try {
-      zone = fromSOA(name);
+      final Map<String, String> zoneAccount = ZoneUtil.getZoneAccount(api.getZoneByName(name));
+      zone = fromSOA(zoneAccount);
     } catch (UltraDNSRestException e) {
       if (e.code() != UltraDNSRestException.ZONE_NOT_FOUND
           && e.code() != UltraDNSRestException.INVALID_ZONE_NAME) {
@@ -126,16 +135,29 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
   }
 
   /**
-   * Add or update a zone with email & ttl.
-   * @param name
-   * @return Zone
+   * Get Zone with SOA records.
+   *
+   * @param zoneAccount map
+   * @return zone
    */
-  private Zone fromSOA(String name) {
-    List<Record> soas = RRSetUtil.buildRecords(api.getResourceRecordsOfDNameByType(name, name,
-            ResourceTypes.SOA.code()).rrSets());
-    checkState(!soas.isEmpty(), "SOA record for zone %s was not present", name);
-    Record soa = soas.get(0);
-    return Zone.create(name, name, soa.getTtl(), soa.getRdata().get(1));
+  private Zone fromSOA(Map<String, String> zoneAccount) {
+    final String name = zoneAccount.keySet().iterator().next();
+    final String accountName = zoneAccount.get(name);
+
+    List<Record> soaRecords;
+    try {
+      soaRecords = RRSetUtil.buildRecords(api
+              .getResourceRecordsOfDNameByType(name, name, ResourceTypes.SOA.code())
+              .rrSets());
+    } catch (UltraDNSRestException e) {
+      throw e;
+    }
+    checkState(!soaRecords.isEmpty(), "SOA record for zone %s was not present", name);
+    Record soa = soaRecords.get(0);
+
+    Zone zone = Zone.create(name, name, soa.getTtl(), soa.getRdata().get(1));
+    zone.setAccountName(accountName);
+    return zone;
   }
 
   /**

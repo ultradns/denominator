@@ -1,6 +1,5 @@
 package denominator.ultradns.util;
 
-import denominator.ResourceTypeToValue;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.Record;
 import denominator.ultradns.model.DirectionalRecord;
@@ -13,11 +12,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.TreeSet;
 
 import static denominator.ResourceTypeToValue.lookup;
+import denominator.ResourceTypeToValue.ResourceTypes;
+
 import static denominator.ultradns.util.Constants.DIRECTIONAL_POOL_SCHEMA;
-import org.apache.log4j.Logger;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * This class will contain all utility methods to build
@@ -27,7 +31,18 @@ public final class RRSetUtil {
 
     private RRSetUtil() { }
 
-    private static final Logger LOGGER = Logger.getLogger(RRSetUtil.class);
+    /**
+     * Record types for which we will split the rdata.
+     */
+    private static final Set<String> RECORD_TYPE_TO_SPLIT = new HashSet<String>(
+            Arrays.asList(
+                ResourceTypes.MX.name(),
+                ResourceTypes.SOA.name(),
+                ResourceTypes.SRV.name(),
+                ResourceTypes.CERT.name(),
+                ResourceTypes.NAPTR.name(),
+                ResourceTypes.SSHFP.name()
+            ));
 
     /**
      * Creation of ResourceRecord with rData.
@@ -43,11 +58,9 @@ public final class RRSetUtil {
                         Record r = new Record();
                         r.setName(rrSet.getOwnerName());
                         r.setTypeCode(intValueOfRrtype(rrSet.getRrtype()));
+                        r.setRdata(buildRDataList(rData, stringValueOfRrtype(rrSet.getRrtype())));
                         if (rrSet.getTtl() != null) {
                             r.setTtl(rrSet.getTtl());
-                        }
-                        if (rData != null) {
-                            r.setRdata(Arrays.asList(rData.split("\\s")));
                         }
                         records.add(r);
                     }
@@ -87,6 +100,7 @@ public final class RRSetUtil {
                             RDataInfo rDataInfo = rDataInfoList.get(rDataList.indexOf(rData));
                             r.setType(rDataInfo.getType());
                             r.setTypeCode(lookup(rDataInfo.getType()));
+                            r.setRdata(buildRDataList(rData, rDataInfo.getType()));
                             if (rDataInfo.getGeoInfo() != null) {
                                 r.setGeoGroupName(rDataInfo.getGeoInfo().getName());
                             }
@@ -96,9 +110,6 @@ public final class RRSetUtil {
                             if (rDataInfo.getTtl() != null) {
                                 r.setTtl(rDataInfo.getTtl());
                             }
-                        }
-                        if (rData != null) {
-                            r.setRdata(Arrays.asList(rData.split("\\s")));
                         }
                         r.setNoResponseRecord(false);
                         records.add(r);
@@ -122,7 +133,7 @@ public final class RRSetUtil {
                         if (noResponse.getTtl() != null) {
                             r.setTtl(noResponse.getTtl());
                         }
-                        r.setRdata(Arrays.asList(new String[]{"No Data Response"}));
+                        r.setRdata(Arrays.asList("No Data Response"));
                         r.setNoResponseRecord(true);
                         records.add(r);
                     }
@@ -130,6 +141,23 @@ public final class RRSetUtil {
             }
         }
         return records;
+    }
+
+    /**
+     * Builds a rdata parts list based on record type from rdata string
+     * which came as part of UltraDNS Rest response.
+     *
+     * @param data rData String
+     * @return RData parts List
+     */
+    private static List<String> buildRDataList(String data, String rrType) {
+        List<String> rDataList = new ArrayList<String>();
+        if (!StringUtils.isEmpty(data)) {
+            rDataList = RECORD_TYPE_TO_SPLIT.contains(rrType)
+                    ? Arrays.asList(data.split("\\s")) : Arrays.asList(data);
+
+        }
+        return rDataList;
     }
 
     /**
@@ -239,14 +267,12 @@ public final class RRSetUtil {
      * @return int
      */
     public static int directionalRecordType(String type) {
-        if (ResourceTypeToValue.ResourceTypes.A.name().equals(type)
-                || ResourceTypeToValue.ResourceTypes.CNAME.name().equals(type)) {
-            return lookup(ResourceTypeToValue.ResourceTypes.A.name());
-        } else if (ResourceTypeToValue.ResourceTypes.AAAA.name().equals(type)) {
-            return lookup(ResourceTypeToValue.ResourceTypes.AAAA.name());
+        if (ResourceTypes.A.name().equals(type) || ResourceTypes.CNAME.name().equals(type)) {
+            return lookup(ResourceTypes.A.name());
+        } else if (ResourceTypes.AAAA.name().equals(type)) {
+            return lookup(ResourceTypes.AAAA.name());
         } else {
             return lookup(type);
         }
     }
-
 }

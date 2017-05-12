@@ -165,21 +165,14 @@ public interface UltraDNSRest {
    * @param zoneName
    * @param rrType
    * @param hostName
-   * @param index
    * @return status.
    */
   @Headers("Content-Type: application/json-patch+json")
   @RequestLine("DELETE /zones/{zoneName}/rrsets/{rrType}/{hostName}")
-  @Body("%5B" +
-          "%7B" +
-            "\"op\": \"remove\", " +
-            "\"path\": \"/rdata/{index}\"" +
-          "%7D" +
-        "%5D")
   Status deleteResourceRecord(@Param("zoneName") String zoneName,
                               @Param("rrType") int rrType,
-                              @Param("hostName") String hostName,
-                              @Param("index") int index);
+                              @Param("hostName") String hostName);
+
 
   @RequestLine("POST /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
   @Body("{requestBody}")

@@ -298,7 +298,7 @@ public class UltraDNSRestTest {
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
 
-        mockApi().deleteResourceRecord("denominator.io.", 1, "www.denominator.io.", 0);
+        mockApi().deleteResourceRecord("denominator.io.", 1, "www.denominator.io.");
 
         server.assertSessionRequest();
         server.assertRequest()
@@ -614,13 +614,12 @@ public class UltraDNSRestTest {
         server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
         server.enqueue(new MockResponse());
 
-        assertThat(mockApi().deleteResourceRecord("test-zone-1.com.", 1, "pool_1.test-zone-1.com.", 0)
+        assertThat(mockApi().deleteResourceRecord("test-zone-1.com.", 1, "pool_1.test-zone-1.com.")
                 .getMessage()).isEqualTo("Successful");
 
         server.assertSessionRequest();
         server.assertRequest("DELETE",
-                "/zones/test-zone-1.com./rrsets/1/pool_1.test-zone-1.com.",
-                "[{\"op\": \"remove\", \"path\": \"/rdata/0\"}]");
+                "/zones/test-zone-1.com./rrsets/1/pool_1.test-zone-1.com.", "");
     }
 
     private static final String GET_AVAILABLE_REGIONS_RESPONSE =

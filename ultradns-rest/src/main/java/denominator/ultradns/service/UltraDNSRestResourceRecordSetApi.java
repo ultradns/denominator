@@ -15,7 +15,6 @@ import denominator.ultradns.iterator.GroupByRecordNameAndTypeCustomIterator;
 import denominator.ultradns.model.RRSet;
 import denominator.ultradns.model.Record;
 import denominator.ultradns.util.RRSetUtil;
-import org.apache.commons.lang.StringUtils;
 import denominator.ultradns.model.RRSetList;
 import denominator.ultradns.model.Profile;
 import static denominator.common.Util.flatten;
@@ -158,8 +157,8 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
    * @throws IllegalArgumentException if the zone is not found.
    */
   private void add(ResourceRecordSet<?> rrset, int ttlToApply, int typeCode) {
-    LOGGER.debug("Adding record(s) to the zone: " + zoneName + "domain name: " + rrset.name()
-            + "type: " + typeCode);
+    LOGGER.debug("Adding record(s) to the zone:" + zoneName + " domain name:" + rrset.name()
+            + " type:" + typeCode);
     RRSet rrSetNew = new RRSet();
     rrSetNew.setOwnerName(rrset.name());
     rrSetNew.setRrtype(rrset.type());
@@ -188,8 +187,8 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
    * @throws IllegalArgumentException if the zone is not found.
    */
   private void replace(RRSetList rrSetList, ResourceRecordSet<?> rrset , int ttlToApply, int typeCode) {
-    LOGGER.debug("Updating resource record(s) of the zone: " + zoneName + "domain name: " + rrset.name()
-            + "type: " + typeCode);
+    LOGGER.debug("Updating resource record(s) of the zone:" + zoneName + " domain name:" + rrset.name()
+            + " type:" + typeCode);
     // Update the resource record set.
     List<RRSet> rrSetsExisting = rrSetList.rrSets();
     RRSet rrSetExisting = rrSetsExisting.remove(0);
@@ -249,7 +248,7 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
    */
   @Override
   public void deleteByNameAndType(String name, String type) {
-    LOGGER.debug("Deleting resource record(s) for the zone: " + zoneName + "domain name: " + name + "type: " + type);
+    LOGGER.debug("Deleting resource record(s) for the zone:" + zoneName + " domain name:" + name + " type:" + type);
     for (Record record : recordsByNameAndType(name, type)) {
       remove(name, type, record);
     }
@@ -263,12 +262,7 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
    * @param record
    */
   private void remove(String name, String type, Record record) {
-    String rData = "";
     int intType = lookup(type);
-
-    if (record.getRdata() != null && !record.getRdata().isEmpty()) {
-      rData = StringUtils.join(record.getRdata(), " ");
-    }
 
     List<RRSet> rrSets = null;
     try {
@@ -284,14 +278,11 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     if (rrSets != null && !rrSets.isEmpty()) {
       rrSet = rrSets.get(0);
       if (rrSet != null && rrSet.getRdata() != null) {
-        int indexToDelete = rrSet.getRdata().indexOf(rData);
-        if (indexToDelete >= 0) {
-          try {
-            api.deleteResourceRecord(zoneName, intType, name, indexToDelete);
-          } catch (UltraDNSRestException e) {
-            if (e.code() != UltraDNSRestException.PATH_NOT_FOUND_TO_PATCH) {
-              throw e;
-            }
+        try {
+          api.deleteResourceRecord(zoneName, intType, name);
+        } catch (UltraDNSRestException e) {
+          if (e.code() != UltraDNSRestException.DATA_NOT_FOUND) {
+            throw e;
           }
         }
       }
@@ -303,7 +294,6 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
       roundRobinPoolApi.deletePool(name, type);
     }
   }
-
   public static final class Factory implements denominator.ResourceRecordSetApi.Factory {
 
     private final UltraDNSRest api;

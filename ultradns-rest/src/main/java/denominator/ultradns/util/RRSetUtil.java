@@ -46,7 +46,8 @@ public final class RRSetUtil {
 
     /**
      * Creation of ResourceRecord with rData.
-     * @param rrSets
+     *
+     * @param rrSets List of RRSet
      * @return List of Resource Record
      */
     public static List<Record> buildRecords(List<RRSet> rrSets) {
@@ -72,7 +73,8 @@ public final class RRSetUtil {
 
     /**
      * Creation of Directional Record with rData.
-     * @param rrSets
+     *
+     * @param rrSets List of RRSet
      * @return List of Directional Record
      */
     public static List<DirectionalRecord> buildDirectionalRecords(List<RRSet> rrSets) {
@@ -162,6 +164,7 @@ public final class RRSetUtil {
 
     /**
      * Returns map of Record with name as key and type as value.
+     *
      * @param rrSets list
      * @return nameAndType map
      */
@@ -177,8 +180,9 @@ public final class RRSetUtil {
 
     /**
      * Returns list of Directional Record for specified rrSets and group name.
-     * @param rrSets
-     * @param groupName
+     *
+     * @param rrSets List of RRSet
+     * @param groupName Name of the directional group
      * @return List of Directional Record
      */
     public static List<DirectionalRecord> getDirectionalRecordsByGroup(List<RRSet> rrSets, String groupName) {
@@ -197,8 +201,9 @@ public final class RRSetUtil {
 
     /**
      * Returns order set of region codes for specified rrSets and group name.
-     * @param rrSets
-     * @param groupName
+     *
+     * @param rrSets List of RRSet
+     * @param groupName Name of the directional group
      * @return Ordered Set of region codes
      */
     public static TreeSet<String> getDirectionalGroupDetails(List<RRSet> rrSets, String groupName) {
@@ -227,8 +232,9 @@ public final class RRSetUtil {
 
     /**
      * Returns true if the record is directional,false otherwise.
-     * @param rrSet
-     * @return boolean
+     *
+     * @param rrSet Resource Record data.
+     * @return boolean will be true or false base on record schema type.
      */
     private static boolean isDirectionalRecord(RRSet rrSet) {
         return rrSet.getProfile() != null
@@ -238,8 +244,9 @@ public final class RRSetUtil {
 
     /**
      * Returns integer value of specified rrtype.
-     * @param rrType
-     * @return int
+     *
+     * @param rrType Resource Record type as per UltraDNS Rest Response
+     * @return int type-code of Resource Record. For A it will be '1'
      */
     public static int intValueOfRrtype(String rrType) {
         if (rrType != null) {
@@ -251,8 +258,9 @@ public final class RRSetUtil {
 
     /**
      * Returns string value of specified rrtype.
-     * @param rrType
-     * @return String
+     *
+     * @param rrType Resource Record type as per UltraDNS Rest Response
+     * @return String name of Resource Record type. For A it will be 'A'
      */
     public static String stringValueOfRrtype(String rrType) {
         if (rrType != null) {
@@ -263,8 +271,9 @@ public final class RRSetUtil {
 
     /**
      * Returns type code value of specified rrtype.
-     * @param type
-     * @return int
+     *
+     * @param type name of Resource Record type
+     * @return int type-code of Resource Record.
      */
     public static int directionalRecordType(String type) {
         if (ResourceTypes.A.name().equals(type) || ResourceTypes.CNAME.name().equals(type)) {

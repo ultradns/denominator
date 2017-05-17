@@ -18,6 +18,11 @@ public final class PropertyUtil {
 
     private PropertyUtil() { }
 
+    /**
+     * Load the property key & value from configuration file & load it in to Properties object.
+     *
+     * @return Properties Object
+     */
     public static Properties loadProperties() {
         try {
             applicationProperties = new Properties();
@@ -42,6 +47,10 @@ public final class PropertyUtil {
         }
     }
 
+    /**
+     * This will either get the existing object or create a new object of Properties.
+     * @return Properties Object
+     */
     private static Properties getProperties() {
         if (applicationProperties == null) {
             applicationProperties = loadProperties();
@@ -49,6 +58,12 @@ public final class PropertyUtil {
         return applicationProperties;
     }
 
+    /**
+     * Will return property name based on property value.
+     *
+     * @param propertyName name of the property
+     * @return value of the property
+     */
     public static String getProperty(String propertyName) {
         String propertyValue = getProperties().getProperty(propertyName);
         if (propertyValue == null) {

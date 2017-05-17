@@ -69,8 +69,8 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
 
   /**
    * Get Zone details with zone name.
-   * @param name zone name
-   * @return zone object
+   * @param name name of the zone
+   * @return zone An iterator to iterate through Zones
    */
   @Override
   public Iterator<Zone> iterateByName(String name) {
@@ -90,8 +90,8 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
 
   /**
    * Add or update a zone with email & ttl.
-   * @param zone
-   * @return zone name
+   * @param zone Zone Object
+   * @return zone name of the Zone
    */
   @Override
   public String put(Zone zone) {
@@ -122,7 +122,7 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
 
   /**
    * Delete zone with name.
-   * @param name
+   * @param name name of the Zone
    */
   @Override
   public void delete(String name) {
@@ -137,8 +137,8 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
   /**
    * Get Zone with SOA records.
    *
-   * @param zoneAccount map
-   * @return zone
+   * @param zoneAccount map with account name as key, zone name as value
+   * @return zone Zone Object
    */
   private Zone fromSOA(Map<String, String> zoneAccount) {
     final String name = zoneAccount.keySet().iterator().next();
@@ -187,7 +187,7 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
    * test.email@neustar.biz --> test\.email.neustar.biz.
    * If email is already formatted the it will return as it is.
    *
-   * @param email
+   * @param email email id
    * @return formatted email
    */
   private String formatEmail(String email) {

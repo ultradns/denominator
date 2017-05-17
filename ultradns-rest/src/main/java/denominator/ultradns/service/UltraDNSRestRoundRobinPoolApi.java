@@ -18,7 +18,7 @@ public class UltraDNSRestRoundRobinPoolApi {
 
   /**
    * Returns true if the specified pool is of type A or AAAA,false otherwise.
-   * @param type
+   * @param type Resource record type
    * @return {@code true} if the type is of A or AAAA code;
    *         {@code false} otherwise.
    */

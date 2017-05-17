@@ -56,7 +56,7 @@ public interface UltraDNSRest {
    * @param name zone name
    * @param accountName account name
    * @param type resource record type
-   * @param forceImport
+   * @param forceImport it can be false or true
    * @param createType create type
    */
   @RequestLine("POST /zones")
@@ -87,7 +87,7 @@ public interface UltraDNSRest {
   /**
    * Get the resource records given the zone name.
    *
-   * @param zoneName
+   * @param zoneName name of the zone
    * @return RRSetList object.
    */
   @RequestLine("GET /zones/{zoneName}/rrsets")
@@ -96,9 +96,9 @@ public interface UltraDNSRest {
   /**
    * Get the resource records given the zone name, hostName and rrtype.
    *
-   * @param zoneName
-   * @param hostName
-   * @param rrType
+   * @param zoneName name of the zone
+   * @param hostName owner name of the Resource Record
+   * @param rrType Resource Record type
    * @return RRSetList object.
    */
   @RequestLine("GET /zones/{zoneName}/rrsets/{rrType}/{hostName}")
@@ -109,10 +109,10 @@ public interface UltraDNSRest {
   /**
    * Creates resource record given the zone name, rrtype, hostName and rrset.
    *
-   * @param zoneName
-   * @param rrType
-   * @param hostName
-   * @param rrSet
+   * @param zoneName name of the zone
+   * @param rrType Resource Record type
+   * @param hostName owner name of the Resource Record
+   * @param rrSet Resource Record data
    */
   @RequestLine("POST /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   void createResourceRecord(@Param("zoneName") String zoneName,
@@ -122,10 +122,10 @@ public interface UltraDNSRest {
   /**
    * Updates resource record using PUT given the zone name, rrtype, hostName and rrset .
    *
-   * @param zoneName
-   * @param rrType
-   * @param hostName
-   * @param rrSet
+   * @param zoneName name of the zone
+   * @param rrType Resource Record type
+   * @param hostName owner name of the Resource Record
+   * @param rrSet Resource Record data
    */
   @RequestLine("PUT /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   void updateResourceRecord(@Param("zoneName") String zoneName,
@@ -136,10 +136,10 @@ public interface UltraDNSRest {
   /**
    * Updates resource record using PATCH given the zone name, rrtype, hostName and rrset.
    *
-   * @param zoneName
-   * @param rrType
-   * @param hostName
-   * @param rrSet
+   * @param zoneName name of the zone
+   * @param rrType Resource Record type
+   * @param hostName owner name of the Resource Record
+   * @param rrSet Resource Record data
    */
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   void partialUpdateResourceRecord(@Param("zoneName") String zoneName,
@@ -149,10 +149,10 @@ public interface UltraDNSRest {
   /**
    * Delete the resource record given the zone name, rrtype and hostName.
    *
-   * @param zoneName
-   * @param rrType
-   * @param hostName
-   * @return status.
+   * @param zoneName name of the zone
+   * @param rrType Resource Record type
+   * @param hostName owner name of the Resource Record
+   * @return status Request status, It can be successful or pending
    */
   @RequestLine("DELETE /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   Status deleteResourceRecordByNameType(@Param("zoneName") String zoneName,
@@ -162,10 +162,10 @@ public interface UltraDNSRest {
   /**
    * Delete the resource record given the zone name, rrtype and hostName and index.
    *
-   * @param zoneName
-   * @param rrType
-   * @param hostName
-   * @return status.
+   * @param zoneName name of the zone
+   * @param rrType Resource Record type
+   * @param hostName owner name of the Resource Record
+   * @return status Request status, It can be successful or pending
    */
   @RequestLine("DELETE /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   Status deleteResourceRecord(@Param("zoneName") String zoneName,
@@ -234,9 +234,9 @@ public interface UltraDNSRest {
   /**
    * Adds the directional pool given the zone name,owner name and type.
    *
-   * @param zoneName
-   * @param name hostName
-   * @param type poolRecordType
+   * @param zoneName name of the zone
+   * @param name hostName owner name of the Resource Record
+   * @param type poolRecordType Resource Record type
    * @return status
    */
   @RequestLine("POST /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
@@ -253,10 +253,10 @@ public interface UltraDNSRest {
   /**
    * Update the directional pool given the zone name,owner name and type.
    *
-   * @param zoneName zone name
-   * @param name hostName
-   * @param type poolRecordType
-   * @return status
+   * @param zoneName name of the zone
+   * @param name hostName owner name of the Resource Record
+   * @param type Resource Record type
+   * @return status Request status, It can be successful or pending
    */
   @RequestLine("PUT /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
   Status updateDirectionalPool(@Param("zoneName") String zoneName,
@@ -267,10 +267,10 @@ public interface UltraDNSRest {
   /**
    * Delete the directional pool record given the zone name,owner name and type.
    *
-   * @param zoneName zone name
-   * @param name hostName
-   * @param type poolRecordType
-   * @param index
+   * @param zoneName name of the zone
+   * @param name hostName owner name of the Resource Record
+   * @param type poolRecordType Resource Record type
+   * @param index index of the record in all records under owner name
    */
   @Headers("Content-Type: application/json-patch+json")
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")
@@ -292,9 +292,9 @@ public interface UltraDNSRest {
   /**
    * Delete  no response directional pool record given the zone name,owner name and type.
    *
-   * @param zoneName
-   * @param name hostName
-   * @param type poolRecordType
+   * @param zoneName name of the zone
+   * @param name hostName owner name of the Resource Record
+   * @param type poolRecordType Resource Record type
    */
   @Headers("Content-Type: application/json-patch+json")
   @RequestLine("PATCH /zones/{zoneName}/rrsets/{poolRecordType}/{hostName}")

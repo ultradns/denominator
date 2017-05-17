@@ -95,7 +95,7 @@ public class UltraDNSRestException extends FeignException {
    * then it will by handled, otherwise it will be rethrown.
    *
    * @param e UltraDNSRestException
-   * @param code error code
+   * @param code Ultra error code
      */
   public static void processUltraDnsException(final UltraDNSRestException e, final int code) {
     if (code != e.code()) {
@@ -109,7 +109,7 @@ public class UltraDNSRestException extends FeignException {
    * then it will by handled, otherwise it will be rethrown.
    *
    * @param e UltraDNSRestException
-   * @param codes Set of error code
+   * @param codes Set of Ultra error code
    */
   public static void processUltraDnsException(final UltraDNSRestException e, final Set<Integer> codes) {
     if (codes != null && !codes.isEmpty()) {

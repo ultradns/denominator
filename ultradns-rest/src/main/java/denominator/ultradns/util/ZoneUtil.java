@@ -13,7 +13,8 @@ public final class ZoneUtil {
 
     /**
      * Extract zone names & account name from zone list.
-     * @param zones
+     *
+     * @param zones List of zones
      * @return List of zone name with account name
      */
     public static List<Map<String, String>> getZoneAccountList(List<Zone> zones) {
@@ -33,7 +34,8 @@ public final class ZoneUtil {
 
     /**
      * Extract zone names & account name from a zone.
-     * @param zone
+     *
+     * @param zone List of zones
      * @return zone name with account name
      */
     public static Map<String, String> getZoneAccount(Zone zone) {

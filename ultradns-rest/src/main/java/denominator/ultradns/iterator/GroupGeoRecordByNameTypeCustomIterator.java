@@ -164,8 +164,8 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
   /**
    * Coverts set of GEO codes to a map contains key as the region name
    * & value as all it's child regions/territories names.
-   * @param codes
-   * @return Map
+   * @param codes GEO codes
+   * @return Map A map which contains key as the region name
    */
   private Map<String, Collection<String>> getRegionToTerritories(TreeSet<String> codes) {
 

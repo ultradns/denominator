@@ -404,7 +404,7 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
   /**
    * Deletes a single directional pool record.
    *
-   * @param record
+   * @param record Directional pool record
    */
   private void deleteDirectionalPoolRecord(DirectionalRecord record) {
     if (record.getRdata() != null && !record.getRdata().isEmpty()) {
@@ -442,7 +442,8 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
 
   /**
    * Converts Territory/Regions to it's GEO code.
-   * @param regionToTerritories
+   *
+   * @param regionToTerritories Map contains key as the region & value as all it's child regions/territories.
    * @return Set of GEO codes.
    */
   private TreeSet<String> getTerritoryCodes(Map<String, Collection<String>> regionToTerritories) {

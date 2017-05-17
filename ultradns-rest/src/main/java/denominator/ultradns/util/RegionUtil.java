@@ -15,7 +15,8 @@ public final class RegionUtil {
 
     /**
      * Return all region names in a hierarchical fashion.
-     * @param regions
+     *
+     * @param regions Map contains key as parent region & value as all it's child regions/territories.
      * @return Map contains key as the region name & value as all it's child regions/territories names.
      */
     public static Map<String, Collection<String>> getRegionNameHierarchy(Map<Region, Collection<Region>> regions) {
@@ -33,7 +34,8 @@ public final class RegionUtil {
 
     /**
      * Return all regions in a hierarchical fashion.
-     * @param region
+     *
+     * @param region A region/territory
      * @return Map contains key as the region & value as all it's child regions/territories.
      */
     public static Map<Region, Collection<Region>> getRegionHierarchy(Region region) {

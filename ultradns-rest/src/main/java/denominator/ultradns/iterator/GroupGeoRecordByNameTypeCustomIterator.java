@@ -23,6 +23,7 @@ import denominator.ultradns.util.RRSetUtil;
 
 import static denominator.common.Util.peekingIterator;
 import static denominator.common.Util.toMap;
+import static denominator.ultradns.exception.UltraDNSRestException.processUltraDnsException;
 
 /**
  * Generally, this iterator will produce ResourceRecordSet for only a single record type.
@@ -144,9 +145,7 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
               api.getDirectionalDNSRecordsForHost(zone, hostName, rrType).rrSets(),
               groupName);
     } catch (UltraDNSRestException e) {
-      if (e.code() != UltraDNSRestException.DATA_NOT_FOUND) {
-        throw e;
-      }
+      processUltraDnsException(e, UltraDNSRestException.DATA_NOT_FOUND);
     }
 
     Map<String, Collection<String>> regionToTerritories = new TreeMap<String, Collection<String>>();

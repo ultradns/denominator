@@ -2,6 +2,8 @@ package denominator.ultradns.exception;
 
 import feign.FeignException;
 
+import java.util.Set;
+
 public class UltraDNSRestException extends FeignException {
 
   /**
@@ -85,6 +87,38 @@ public class UltraDNSRestException extends FeignException {
   public UltraDNSRestException(String message, int code) {
     super(message);
     this.code = code;
+  }
+
+  /**
+   * Process UltraDNSRestException based on the code.
+   * If the code in argument matches the exception code
+   * then it will by handled, otherwise it will be rethrown.
+   *
+   * @param e UltraDNSRestException
+   * @param code error code
+     */
+  public static void processUltraDnsException(final UltraDNSRestException e, final int code) {
+    if (code != e.code()) {
+      throw e;
+    }
+  }
+
+  /**
+   * Process UltraDNSRestException based on set of codes.
+   * If the exception code any of the code in set
+   * then it will by handled, otherwise it will be rethrown.
+   *
+   * @param e UltraDNSRestException
+   * @param codes Set of error code
+   */
+  public static void processUltraDnsException(final UltraDNSRestException e, final Set<Integer> codes) {
+    if (codes != null && !codes.isEmpty()) {
+      if (!codes.contains(e.code())) {
+        throw e;
+      }
+    } else {
+      throw e;
+    }
   }
 
   public int code() {

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Arrays;
 
 import javax.inject.Inject;
 
@@ -23,6 +25,8 @@ import static denominator.ResourceTypeToValue.lookup;
 import static denominator.common.Preconditions.checkArgument;
 import static denominator.common.Preconditions.checkNotNull;
 import static denominator.common.Util.nextOrNull;
+import static denominator.ultradns.exception.UltraDNSRestException.processUltraDnsException;
+
 import denominator.ResourceTypeToValue.ResourceTypes;
 import org.apache.log4j.Logger;
 import denominator.ultradns.util.Constants;
@@ -111,12 +115,12 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
               .getResourceRecordsOfDNameByType(zoneName, name, typeValue)
               .rrSets());
     } catch (UltraDNSRestException e) {
-      if (e.code() == UltraDNSRestException.DATA_NOT_FOUND ||
-          e.code() == UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND) {
-        records = new ArrayList<Record>();
-      } else {
-        throw e;
-      }
+        processUltraDnsException(e,
+                new HashSet<Integer>(Arrays.asList(
+                        UltraDNSRestException.DATA_NOT_FOUND,
+                        UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND
+                )));
+      records = new ArrayList<Record>();
     }
     return records;
   }
@@ -226,12 +230,12 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     try {
       rrSetList = api.getResourceRecordsOfDNameByType(zoneName, dName, type);
     } catch (UltraDNSRestException e) {
-      if (e.code() == UltraDNSRestException.DATA_NOT_FOUND ||
-              e.code() == UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND) {
-        rrSetList = null;
-      } else {
-        throw e;
-      }
+      processUltraDnsException(e,
+              new HashSet<Integer>(Arrays.asList(
+                      UltraDNSRestException.DATA_NOT_FOUND,
+                      UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND
+              )));
+      rrSetList = null;
     }
     return rrSetList;
   }
@@ -249,9 +253,7 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     try {
       api.deleteResourceRecord(zoneName, intType, name);
     } catch (UltraDNSRestException e) {
-      if (e.code() != UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND) {
-        throw e;
-      }
+      processUltraDnsException(e, UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND);
     }
   }
 

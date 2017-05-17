@@ -16,9 +16,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
 
 import static denominator.common.Preconditions.checkState;
 import static denominator.common.Util.singletonIterator;
+import static denominator.ultradns.exception.UltraDNSRestException.processUltraDnsException;
+
 import denominator.ResourceTypeToValue.ResourceTypes;
 import org.apache.log4j.Logger;
 
@@ -76,10 +79,11 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
       final Map<String, String> zoneAccount = ZoneUtil.getZoneAccount(api.getZoneByName(name));
       zone = fromSOA(zoneAccount);
     } catch (UltraDNSRestException e) {
-      if (e.code() != UltraDNSRestException.ZONE_NOT_FOUND
-          && e.code() != UltraDNSRestException.INVALID_ZONE_NAME) {
-        throw e;
-      }
+      processUltraDnsException(e,
+              new HashSet<Integer>(Arrays.asList(
+                      UltraDNSRestException.ZONE_NOT_FOUND,
+                      UltraDNSRestException.INVALID_ZONE_NAME
+              )));
     }
     return singletonIterator(zone);
   }
@@ -96,9 +100,7 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
       LOGGER.debug("Creating Zone with zone name: " + zone.name() + " and account name: " + accountName);
       api.createPrimaryZone(zone.name(), accountName, "PRIMARY", false, "NEW");
     } catch (UltraDNSRestException e) {
-      if (e.code() != UltraDNSRestException.ZONE_ALREADY_EXISTS) {
-        throw e;
-      }
+        processUltraDnsException(e, UltraDNSRestException.ZONE_ALREADY_EXISTS);
     }
 
     RRSet soa = api.getResourceRecordsOfDNameByType(zone.name(), zone.name(),
@@ -128,9 +130,7 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
       LOGGER.debug("Deleting zone with zone name: " + name);
       api.deleteZone(name);
     } catch (UltraDNSRestException e) {
-      if (e.code() != UltraDNSRestException.ZONE_NOT_FOUND) {
-        throw e;
-      }
+      processUltraDnsException(e, UltraDNSRestException.ZONE_NOT_FOUND);
     }
   }
 

@@ -1,11 +1,7 @@
 package denominator.ultradns.service;
 
-import static denominator.ResourceTypeToValue.lookup;
-import static denominator.common.Preconditions.checkNotNull;
-
 import denominator.ResourceTypeToValue.ResourceTypes;
 import denominator.ultradns.service.integration.UltraDNSRest;
-import denominator.ultradns.exception.UltraDNSRestException;
 import org.apache.log4j.Logger;
 
 public class UltraDNSRestRoundRobinPoolApi {
@@ -30,28 +26,4 @@ public class UltraDNSRestRoundRobinPoolApi {
     return ResourceTypes.A.name().equals(type) || ResourceTypes.AAAA.name().equals(type);
   }
 
-  /**
-   * Deletes pool with given domain name and record type.
-   * @param name
-   * @param type
-   */
-  void deletePool(String name, String type) {
-    name = checkNotNull(name, "pool name was null");
-    type = checkNotNull(type, "pool record type was null");
-    final int typeCode = lookup(type);
-    LOGGER.debug("Deleting pool with name " + name + " and type " + type);
-    try {
-      api.deleteLBPool(zoneName, typeCode, name);
-    } catch (UltraDNSRestException e) {
-      switch (e.code()) {
-        // lost race
-        case UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND:
-        case UltraDNSRestException.POOL_NOT_FOUND:
-        case UltraDNSRestException.RESOURCE_RECORD_NOT_FOUND:
-          return;
-        default:
-          throw e;
-      }
-    }
-  }
 }

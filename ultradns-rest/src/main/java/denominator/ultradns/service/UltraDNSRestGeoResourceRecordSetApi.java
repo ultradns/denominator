@@ -342,11 +342,11 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
   /**
    * Returns RDataInfo.
    *
-   * @param type
-   * @param ttlToApply
-   * @param groupName
-   * @param geoCodes
-   * @return RDataInfo
+   * @param type the resource record type
+   * @param ttlToApply the time to live of the resource record set
+   * @param groupName the group name of the resource record set
+   * @param geoCodes the geo codes of the resource record set
+   * @return RDataInfo the resource record data for the geo type
    */
   private RDataInfo createRDataInfo(String type, int ttlToApply, String groupName, TreeSet<String> geoCodes) {
     final GeoInfo geoInfo = new GeoInfo();
@@ -364,9 +364,9 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
   /**
    * Deletes directional pool records for the specified name,type and qualifier.
    *
-   * @param name
-   * @param type
-   * @param qualifier
+   * @param name the owner name of the rrset
+   * @param type the resource record type of the rrset
+   * @param qualifier the qualifier name of the rrset
    */
   @Override
   public void deleteByNameTypeAndQualifier(String name, String type, String qualifier) {
@@ -381,8 +381,8 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
   /**
    * Returns iterator for resource record with specified name and directional type.
    *
-   * @param name
-   * @param dirType
+   * @param name the owner name
+   * @param dirType the directional type
    */
   private Iterator<ResourceRecordSet<?>> iteratorForDNameAndDirectionalType(String name,
                                                                             int dirType) {

@@ -137,10 +137,6 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     RRSetList rrSetList = getRrSetList(rrset.name(), typeCode);
 
     if (rrSetList == null || rrSetList.getRrSets() == null) {
-      // Create the resource record set.
-      // If the zone does not exist, should it be created? I think it should not be created. Check the SOAP behaviour.
-      // If the owner does not exist, should it be created? I think it should be created. Check the SOAP behaviour.
-      // If the pool does not exist, create it. (POST will automatically do this).
       add(rrset, ttlToApply, typeCode);
 
     } else {
@@ -151,9 +147,9 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
   /**
    * Adds resource record(s) given resource record set, type, ttlToApply.
    *
-   * @param rrset
-   * @param ttlToApply
-   * @param typeCode
+   * @param rrset resource record set
+   * @param ttlToApply ttl for the record
+   * @param typeCode resource record type code
    * @throws IllegalArgumentException if the zone is not found.
    */
   private void add(ResourceRecordSet<?> rrset, int ttlToApply, int typeCode) {
@@ -180,10 +176,10 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
   /**
    * Updates resource record(s) given rrSetList, resource record set, type, ttlToApply.
    *
-   * @param rrSetList
-   * @param rrset
-   * @param ttlToApply
-   * @param typeCode
+   * @param rrSetList resource record set list RRSetList
+   * @param rrset resource record set ResourceRecordSet
+   * @param ttlToApply ttl for the record
+   * @param typeCode resource record type code
    * @throws IllegalArgumentException if the zone is not found.
    */
   private void replace(RRSetList rrSetList, ResourceRecordSet<?> rrset , int ttlToApply, int typeCode) {
@@ -221,8 +217,8 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
   /**
    * Returns RRSetList given owner name and type.
    *
-   * @param dName
-   * @param type
+   * @param dName the owner name
+   * @param type resource record type code
    * @throws IllegalArgumentException if the zone is not found.
    */
   private RRSetList getRrSetList(String dName, int type) {
@@ -243,57 +239,23 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
   /**
    * Deletes records for the specified name and type.
    *
-   * @param name
-   * @param type
+   * @param name owner name
+   * @param type resource record type code
    */
   @Override
   public void deleteByNameAndType(String name, String type) {
     LOGGER.debug("Deleting resource record(s) for the zone:" + zoneName + " domain name:" + name + " type:" + type);
-    for (Record record : recordsByNameAndType(name, type)) {
-      remove(name, type, record);
-    }
-  }
-
-  /**
-   * Deletes record for the specified name and type.
-   *
-   * @param name
-   * @param type
-   * @param record
-   */
-  private void remove(String name, String type, Record record) {
     int intType = lookup(type);
-
-    List<RRSet> rrSets = null;
     try {
-      rrSets = api.getResourceRecordsOfDNameByType(zoneName, name, intType).getRrSets();
+      api.deleteResourceRecord(zoneName, intType, name);
     } catch (UltraDNSRestException e) {
-      if (e.code() != UltraDNSRestException.DATA_NOT_FOUND &&
-          e.code() != UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND) {
+      if (e.code() != UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND) {
         throw e;
       }
     }
-
-    RRSet rrSet = null;
-    if (rrSets != null && !rrSets.isEmpty()) {
-      rrSet = rrSets.get(0);
-      if (rrSet != null && rrSet.getRdata() != null) {
-        try {
-          api.deleteResourceRecord(zoneName, intType, name);
-        } catch (UltraDNSRestException e) {
-          if (e.code() != UltraDNSRestException.DATA_NOT_FOUND) {
-            throw e;
-          }
-        }
-      }
-    }
-
-    // If the last record in the pool is deleted successfully or if there are
-    // no records in the pool and if it is a pool then delete the pool itself.
-    if (rrSet != null && rrSet.getRdata().size() <= 1 && roundRobinPoolApi.isPoolType(type)) {
-      roundRobinPoolApi.deletePool(name, type);
-    }
   }
+
+
   public static final class Factory implements denominator.ResourceRecordSetApi.Factory {
 
     private final UltraDNSRest api;

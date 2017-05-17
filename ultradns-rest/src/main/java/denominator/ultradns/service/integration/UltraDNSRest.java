@@ -53,11 +53,11 @@ public interface UltraDNSRest {
   /**
    * Creates primary zone.
    *
-   * @param name
-   * @param accountName
-   * @param type
+   * @param name zone name
+   * @param accountName account name
+   * @param type resource record type
    * @param forceImport
-   * @param createType
+   * @param createType create type
    */
   @RequestLine("POST /zones")
   @Body("%7B" +
@@ -167,7 +167,6 @@ public interface UltraDNSRest {
    * @param hostName
    * @return status.
    */
-  @Headers("Content-Type: application/json-patch+json")
   @RequestLine("DELETE /zones/{zoneName}/rrsets/{rrType}/{hostName}")
   Status deleteResourceRecord(@Param("zoneName") String zoneName,
                               @Param("rrType") int rrType,
@@ -204,18 +203,6 @@ public interface UltraDNSRest {
                             @Param("ttlToApply") int ttlToApply,
                             @Param("rdata") String rdataJson,
                             @Param("profile") String profileJson);
-
-  /**
-   * Delete a pool given the zone name, type code and hostname.
-   *
-   * @param zoneName zone in which the pool is present in.
-   * @param typeCode integer value of type of the pool.
-   * @param hostName hostname in which the pool is present in.
-   */
-  @RequestLine("DELETE /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
-  void deleteLBPool(@Param("zoneName") String zoneName,
-                    @Param("typeCode") int typeCode,
-                    @Param("hostName") String hostName);
 
   /**
    * Get the child regions given an optional comma-separated region codes.
@@ -266,7 +253,7 @@ public interface UltraDNSRest {
   /**
    * Update the directional pool given the zone name,owner name and type.
    *
-   * @param zoneName
+   * @param zoneName zone name
    * @param name hostName
    * @param type poolRecordType
    * @return status
@@ -280,7 +267,7 @@ public interface UltraDNSRest {
   /**
    * Delete the directional pool record given the zone name,owner name and type.
    *
-   * @param zoneName
+   * @param zoneName zone name
    * @param name hostName
    * @param type poolRecordType
    * @param index

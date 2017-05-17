@@ -23,14 +23,10 @@ import static denominator.model.ResourceRecordSets.ns;
 import static denominator.ultradns.UltraDNSMockResponse.GET_RESOURCE_RECORDS_PRESENT;
 import static denominator.ultradns.UltraDNSMockResponse.STATUS_SUCCESS;
 import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_ONE_RESOURCE_RECORDS;
-import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_TWO_RESOURCE_RECORDS;
-import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_THREE_RESOURCE_RECORDS;
-import static denominator.ultradns.UltraDNSMockResponse.POOL_WITH_FOUR_RESOURCE_RECORDS;
 import static denominator.ultradns.UltraDNSMockResponse.RR_SET_LIST_WITH_ONE_NS_RECORD;
 import static denominator.ultradns.UltraDNSMockResponse.TTL_86400;
 import static denominator.ultradns.UltraDNSMockResponse.TTL_3600;
 import static denominator.ultradns.UltraDNSMockResponse.TTL_2400;
-import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -229,7 +225,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
 
     // Assert request to get the RR Sets in the pool.
     server.assertRequest()
-            .hasMethod("GET")
+            .hasMethod("DELETE")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
   }
 
@@ -255,7 +251,7 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
 
     // Assert request to get the RR Sets in the pool.
     server.assertRequest()
-            .hasMethod("GET")
+            .hasMethod("DELETE")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
   }
 
@@ -278,114 +274,6 @@ public class UltraDNSRestResourceRecordSetApiMockTest {
     server.assertSessionRequest();
 
     // Assert request to get the RR Sets in the pool.
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-  }
-
-
-  @Test
-  public void pathNotFoundInPatchWhileDeletingResourceRecord() throws Exception {
-    server.enqueueSessionResponse();
-    // Response to UltraDNSRestResourceRecordSetApi#recordsByNameAndType(name, type)
-    server.enqueue(new MockResponse().setBody(POOL_WITH_ONE_RESOURCE_RECORDS));
-    // Response to UltraDNSRestResourceRecordSetApi#getResourceRecordsOfDNameByType(zoneName, name, intType)
-    server.enqueue(new MockResponse().setBody(POOL_WITH_ONE_RESOURCE_RECORDS));
-    // Response to the request to delete a resource record.
-    server.enqueue(new MockResponse()
-            .setResponseCode(SC_BAD_REQUEST)
-            .setBody(UltraDNSMockResponse.getMockErrorResponse(
-                    UltraDNSRestException.DATA_NOT_FOUND,
-                    "Cannot find resource record data for the input zone, " +
-                            "record type and owner combination.")));
-    // Response to UltraDNSRest#deleteLBPool(zoneName, hostName, typeCode)
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-
-    ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.deleteByNameAndType("pool_2.denominator.io.", ResourceTypes.A.name());
-
-    server.assertSessionRequest();
-
-    // Assert request to get the RR Sets in the pool.
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-    server.assertRequest()
-            .hasMethod("DELETE")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-    server.assertRequest()
-            .hasMethod("DELETE")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-  }
-
-  @Test
-  public void deleteAlsoRemovesPool() throws Exception {
-    server.enqueueSessionResponse();
-    // Response to UltraDNSRestResourceRecordSetApi#recordsByNameAndType(name, type)
-    server.enqueue(new MockResponse().setBody(POOL_WITH_FOUR_RESOURCE_RECORDS));
-
-    // Response to api.getResourceRecordsOfDNameByType(zoneName, name, intType)
-    server.enqueue(new MockResponse().setBody(POOL_WITH_FOUR_RESOURCE_RECORDS));
-    // Response to the request to delete a resource record.
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-    // Response to api.getResourceRecordsOfDNameByType(zoneName, name, intType)
-    server.enqueue(new MockResponse().setBody(POOL_WITH_THREE_RESOURCE_RECORDS));
-    // Response to the request to delete a resource record.
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-    // Response to api.getResourceRecordsOfDNameByType(zoneName, name, intType)
-    server.enqueue(new MockResponse().setBody(POOL_WITH_TWO_RESOURCE_RECORDS));
-    // Response to the request to delete a resource record.
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-    // Response to api.getResourceRecordsOfDNameByType(zoneName, name, intType)
-    server.enqueue(new MockResponse().setBody(POOL_WITH_ONE_RESOURCE_RECORDS));
-    // Response to the request to delete a resource record.
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-
-    // Response to the request to delete a pool.
-    server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
-
-    ResourceRecordSetApi api = server.connect().api().basicRecordSetsInZone("denominator.io.");
-    api.deleteByNameAndType("pool_2.denominator.io.", ResourceTypes.A.name());
-
-    server.assertSessionRequest();
-
-    // Assert request to get the RR Sets in the pool.
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-    server.assertRequest()
-            .hasMethod("DELETE")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-    server.assertRequest()
-            .hasMethod("DELETE")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-    server.assertRequest()
-            .hasMethod("DELETE")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-
-    server.assertRequest()
-            .hasMethod("GET")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-    server.assertRequest()
-            .hasMethod("DELETE")
-            .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");
-
-
     server.assertRequest()
             .hasMethod("DELETE")
             .hasPath("/zones/denominator.io./rrsets/1/pool_2.denominator.io.");

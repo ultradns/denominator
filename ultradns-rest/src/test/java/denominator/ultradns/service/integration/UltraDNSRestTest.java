@@ -46,7 +46,6 @@ import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
-import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 
 public class UltraDNSRestTest {
 
@@ -452,37 +451,6 @@ public class UltraDNSRestTest {
                 .getMockErrorResponse(UltraDNSRestException.INVALID_ADDRESS_IN_RECORD_DATA, actualErrorMessage)));
 
         mockApi().addRecordToRRPool(typeCode, ttl, address, hostName, zoneName);
-    }
-
-    @Test
-    public void deleteRRPool() throws Exception {
-        final String zoneName = "denominator.io.";
-        final String hostName = "h2";
-        final int typeCode = 1;
-
-        final String expectedPath = "/zones/" + zoneName + "/rrsets/" + typeCode + "/" + hostName;
-
-        server.enqueueSessionResponse();
-        server.enqueue(new MockResponse().setResponseCode(SC_NO_CONTENT));
-        mockApi().deleteLBPool(zoneName, typeCode, hostName);
-        server.assertSessionRequest();
-        server.assertRequest()
-                .hasMethod("DELETE")
-                .hasPath(expectedPath);
-    }
-
-    @Test
-    public void deleteRRPoolWhenPoolNotFound() throws Exception {
-        thrown.expect(UltraDNSRestException.class);
-        thrown.expectMessage("Cannot find resource record data for the input zone, record type and owner combination.");
-
-        final String zoneName = "denominator.io.";
-        final String hostName = "h2";
-        final int typeCode = 1;
-        server.enqueue(new MockResponse().setResponseCode(SC_NOT_FOUND).setBody(UltraDNSMockResponse
-                .getMockErrorResponse(UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND,
-                        "Cannot find resource record data for the input zone, record type and owner combination.")));
-        mockApi().deleteLBPool(zoneName, typeCode, hostName);
     }
 
     private RRSet getSampleRRSet(String ownerName, String rrtype, List<String> rdata) {

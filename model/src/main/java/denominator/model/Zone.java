@@ -16,6 +16,7 @@ public class Zone {
   private final String name;
   private final int ttl;
   private final String email;
+  private String accountName;
 
   Zone(String id, String name, int ttl, String email) {
     this.id = id;
@@ -77,6 +78,25 @@ public class Zone {
     return id() != null ? id() : name();
   }
 
+  /**
+   * Account name associated with zone.
+   * To create/update/list zone for a specific account user can pass this parameter.
+   *
+   * This is a non mandatory field.
+   * @return account name
+   */
+  public String accountName() {
+    return accountName;
+  }
+
+  /**
+   * Set account name for a zone.
+   * @param accountName Account name associated with zone.
+   */
+  public void setAccountName(String accountName) {
+    this.accountName = accountName;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof Zone) {
@@ -84,7 +104,8 @@ public class Zone {
       return equal(id(), other.id())
              && name().equals(other.name())
              && ttl() == other.ttl()
-             && email().equals(other.email());
+             && email().equals(other.email())
+             && equal(accountName(), other.accountName());
     }
     return false;
   }
@@ -96,6 +117,7 @@ public class Zone {
     result = 31 * result + name().hashCode();
     result = 31 * result + ttl();
     result = 31 * result + email().hashCode();
+    result = 31 * result + (accountName() != null ? accountName().hashCode() : 0);
     return result;
   }
 

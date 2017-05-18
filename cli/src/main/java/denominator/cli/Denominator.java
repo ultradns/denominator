@@ -168,6 +168,7 @@ public class Denominator {
         e.printStackTrace();
       }
       System.err.println(";; error: " + e.getMessage());
+      e.printStackTrace();
       System.exit(1);
     }
     System.exit(0);

@@ -159,20 +159,6 @@ public interface UltraDNSRest {
                                         @Param("rrType") int rrType,
                                         @Param("hostName") String hostName);
 
-  /**
-   * Delete the resource record given the zone name, rrtype and hostName and index.
-   *
-   * @param zoneName name of the zone
-   * @param rrType Resource Record type
-   * @param hostName owner name of the Resource Record
-   * @return status Request status, It can be successful or pending
-   */
-  @RequestLine("DELETE /zones/{zoneName}/rrsets/{rrType}/{hostName}")
-  Status deleteResourceRecord(@Param("zoneName") String zoneName,
-                              @Param("rrType") int rrType,
-                              @Param("hostName") String hostName);
-
-
   @RequestLine("POST /zones/{zoneName}/rrsets/{typeCode}/{hostName}")
   @Body("{requestBody}")
   void addRRLBPool(@Param("zoneName") String zoneName,

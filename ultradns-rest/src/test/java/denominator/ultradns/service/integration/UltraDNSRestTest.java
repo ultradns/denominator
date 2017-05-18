@@ -297,7 +297,7 @@ public class UltraDNSRestTest {
         server.enqueueSessionResponse();
         server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
 
-        mockApi().deleteResourceRecord("denominator.io.", 1, "www.denominator.io.");
+        mockApi().deleteResourceRecordByNameType("denominator.io.", 1, "www.denominator.io.");
 
         server.assertSessionRequest();
         server.assertRequest()
@@ -582,7 +582,7 @@ public class UltraDNSRestTest {
         server.enqueue(new MockResponse().setBody(STATUS_SUCCESS));
         server.enqueue(new MockResponse());
 
-        assertThat(mockApi().deleteResourceRecord("test-zone-1.com.", 1, "pool_1.test-zone-1.com.")
+        assertThat(mockApi().deleteResourceRecordByNameType("test-zone-1.com.", 1, "pool_1.test-zone-1.com.")
                 .getMessage()).isEqualTo("Successful");
 
         server.assertSessionRequest();

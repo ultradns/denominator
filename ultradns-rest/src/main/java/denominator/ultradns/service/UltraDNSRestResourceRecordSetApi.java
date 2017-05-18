@@ -251,7 +251,7 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
     LOGGER.debug("Deleting resource record(s) for the zone:" + zoneName + " domain name:" + name + " type:" + type);
     int intType = lookup(type);
     try {
-      api.deleteResourceRecord(zoneName, intType, name);
+      api.deleteResourceRecordByNameType(zoneName, intType, name);
     } catch (UltraDNSRestException e) {
       processUltraDnsException(e, UltraDNSRestException.RESOURCE_RECORD_POOL_NOT_FOUND);
     }

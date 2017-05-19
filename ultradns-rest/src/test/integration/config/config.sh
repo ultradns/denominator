@@ -7,10 +7,10 @@ provider="ultradnsrest"
 main_class="denominator.cli.Denominator"
 
 # Set Logfile parameters
-operation_logfile="$parent_dir/e2e_scripts/service.log"
-failedtests_logfile="$parent_dir/e2e_scripts/failed_tests.log"
-api_calls_logfile="$parent_dir/e2e_scripts/api_call.log"
-chmod 777 $parent_dir/e2e_scripts/*.log
+operation_logfile="$parent_dir/e2e-scripts/service.log"
+failedtests_logfile="$parent_dir/e2e-scripts/failed_tests.log"
+api_calls_logfile="$parent_dir/e2e-scripts/api_call.log"
+chmod 777 $parent_dir/e2e-scripts/*.log
 
 # Export above declarations to other scripts
 export jar_path

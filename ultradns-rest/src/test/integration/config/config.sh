@@ -2,7 +2,7 @@
 parent_dir=`pwd`
 
 # Set Config parameters
-jar_path=$parent_dir"/lib/denominator-cli-0.1.0-SNAPSHOT-fat.jar"
+jar_path=$parent_dir"/cli/build/libs/denominator-cli-0.1.0-SNAPSHOT-fat.jar"
 provider="ultradnsrest"
 main_class="denominator.cli.Denominator"
 

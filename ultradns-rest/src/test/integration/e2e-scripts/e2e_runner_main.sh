@@ -1,6 +1,6 @@
 #!/bin/bash
 # Set parent directory to help execution via jenkins
-parent_dir=`pwd`
+# parent_dir=`pwd`
 
 # URI, Username and Password provided to runner script as arguments
 uri="$1"

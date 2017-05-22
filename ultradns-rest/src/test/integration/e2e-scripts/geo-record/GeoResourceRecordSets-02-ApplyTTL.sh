@@ -132,7 +132,7 @@ validateGeoList "$resourceName" "List Geo Resource Records"
 
 # Apply TTL for the new record
 hitService "$applyTTL" > $operation_logfile 2> $operation_logfile
-validate "9999" "Apply TTL to the geo record"
+validate "ok" "Apply TTL to the geo record"
 cat $operation_logfile >> $api_calls_logfile
 
 # List Geo Resource Records based on Zone Name

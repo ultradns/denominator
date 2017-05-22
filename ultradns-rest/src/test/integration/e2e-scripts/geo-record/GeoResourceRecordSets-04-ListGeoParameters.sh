@@ -119,8 +119,8 @@ validate "CNAME" "List available geo record types for zone"
 cat $operation_logfile >> $api_calls_logfile
 
 # List available regions for zone
-hitService "$listGeoRecordType" > $operation_logfile 2> $operation_logfile
-validate "$resourceName" "List available regions for zone"
+hitService "$listAvailableRegions" > $operation_logfile 2> $operation_logfile
+validate "Africa" "List available regions for zone"
 cat $operation_logfile >> $api_calls_logfile
 
 # Delete Zone

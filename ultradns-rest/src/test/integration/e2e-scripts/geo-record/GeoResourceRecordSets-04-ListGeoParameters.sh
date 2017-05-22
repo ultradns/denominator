@@ -120,7 +120,7 @@ cat $operation_logfile >> $api_calls_logfile
 
 # List available regions for zone
 hitService "$listGeoRecordType" > $operation_logfile 2> $operation_logfile
-validate "Zimbabwe" "List available regions for zone"
+validate "$zoneName" "List available regions for zone"
 cat $operation_logfile >> $api_calls_logfile
 
 # Delete Zone

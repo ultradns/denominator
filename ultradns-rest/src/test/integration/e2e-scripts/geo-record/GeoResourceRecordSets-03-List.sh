@@ -14,7 +14,7 @@ eval "$hit $1"
 
 getTokenFromGeoService()
 {
-token=`curl -k -POST -s --data "grant_type=password&username=npp-rest-test3a&password=Denominator_rest" https://test-restapi.ultradns.com/v2/authorization/token | awk -F'"' '{ print $12 }'`
+token=`curl -k -POST -s --data "grant_type=password&username=$username&password=$password" $uri/authorization/token | awk -F'"' '{ print $12 }'`
 }
 
 createGeoResourceTwoRecords(){
@@ -50,7 +50,7 @@ createGeoResourceTwoRecords(){
       }
     ]
   }
-}' https://test-restapi.ultradns.com/v2/zones/$2/rrsets/A/$3
+}' $uri/zones/$2/rrsets/A/$3
 
 }
 

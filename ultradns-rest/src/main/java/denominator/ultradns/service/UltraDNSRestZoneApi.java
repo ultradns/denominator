@@ -41,11 +41,11 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
    */
   @Override
   public Iterator<Zone> iterator() {
-    List<Map<String, String>> zoneAccountList;
+    List<Map<String, String>> zoneAccountList = new ArrayList<Map<String, String>>();
     try {
       zoneAccountList = ZoneUtil.getZoneAccountList(api.getZonesOfUser().getZones());
     } catch (UltraDNSRestException e) {
-      throw e;
+      processUltraDnsException(e, UltraDNSRestException.DATA_NOT_FOUND);
     }
 
     final Iterator<Map<String, String>> delegate = zoneAccountList.iterator();

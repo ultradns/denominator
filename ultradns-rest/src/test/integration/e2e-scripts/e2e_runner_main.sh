@@ -6,6 +6,9 @@
 uri="$1"
 username="$2"
 password="$3"
+export uri
+export username
+export password
 
 # Execute config.sh to set configuration parameters such as jar_path, class, provider
 . $parent_dir/config/config.sh

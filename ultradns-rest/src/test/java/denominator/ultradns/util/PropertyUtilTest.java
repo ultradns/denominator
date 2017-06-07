@@ -17,7 +17,7 @@ public class PropertyUtilTest {
     @Test
     public void testWhenPropertyPresent() throws Exception {
         propertyName = "ultradns.rest.url";
-        assertThat(PropertyUtil.getProperty(propertyName)).isEqualTo("https://test-restapi.ultradns.com/v2");
+        assertThat(PropertyUtil.getProperty(propertyName)).isEqualTo("https://restapi.ultradns.com/v2");
     }
 
     @Test
@@ -28,6 +28,6 @@ public class PropertyUtilTest {
         thrown.expectMessage("Could not load property with name " + propertyName +
                 " !! Please check property configuration.");
 
-        assertThat(PropertyUtil.getProperty(propertyName)).isEqualTo("https://test-restapi.ultradns.com/v2");
+        assertThat(PropertyUtil.getProperty(propertyName)).isEqualTo("https://restapi.ultradns.com/v2");
     }
 }

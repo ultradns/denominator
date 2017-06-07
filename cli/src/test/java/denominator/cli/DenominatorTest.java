@@ -79,8 +79,9 @@ public class DenominatorTest {
 
   @Test // denominator providers
   public void listsAllProvidersWithCredentials() {
-    assertThat(ListProviders.providerAndCredentialsTable())
-        .isEqualTo(Util.join('\n',
+    assertThat(ListProviders.providerAndCredentialsTable()
+        .replaceAll(System.getProperty("line.separator"), "#"))
+        .isEqualTo(Util.join('#',
                              "provider   url                                                 duplicateZones credentialType credentialArgs",
                              "clouddns   https://identity.api.rackspacecloud.com/v2.0        false          password       username password",
                              "clouddns   https://identity.api.rackspacecloud.com/v2.0        false          apiKey         username apiKey",
@@ -89,7 +90,7 @@ public class DenominatorTest {
                              "mock       mem:mock                                            false          ",
                              "route53    https://route53.amazonaws.com                       true           accessKey      accessKey secretKey",
                              "route53    https://route53.amazonaws.com                       true           session        accessKey secretKey sessionToken",
-                             "ultradnsrest https://test-restapi.ultradns.com/v2                false          password       username password",
+                             "ultradnsrest https://restapi.ultradns.com/v2                     false          password       username password",
                              "ultradns   https://ultra-api.ultradns.com:8443/UltraDNS_WS/v01 false          password       username password",
                              ""));
   }

@@ -16,6 +16,18 @@ import static denominator.common.Preconditions.checkNotNull;
 import static feign.Util.UTF_8;
 import static java.lang.String.format;
 
+/**
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life),
+ * use {@link denominator.ultradns.service.auth.UltraDNSRestTarget} instead.
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
+ */
+@Deprecated
 class UltraDNSTarget implements Target<UltraDNS> {
 
     static final String SOAP_TEMPLATE = "<?xml version=\"1.0\"?>\n"

@@ -2,6 +2,18 @@ package denominator.ultradns;
 
 import feign.FeignException;
 
+/**
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life),
+ * use {@link denominator.ultradns.exception.UltraDNSRestException} instead.
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
+ */
+@Deprecated
 class UltraDNSException extends FeignException {
 
   /**

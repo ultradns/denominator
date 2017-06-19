@@ -127,7 +127,7 @@ public final class UltraDNSRestResourceRecordSetApi implements denominator.Resou
 
   /**
    * This method will update Records for a combination
-   * of owner, resource type & group.
+   * of owner, resource type and group.
    * @param rrset If {@link
    *              ResourceRecordSet#ttl() ttl} is not present, zone default is used.
    */

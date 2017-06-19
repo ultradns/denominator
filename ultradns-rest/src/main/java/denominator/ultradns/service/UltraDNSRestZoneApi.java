@@ -89,7 +89,7 @@ public final class UltraDNSRestZoneApi implements denominator.ZoneApi {
   }
 
   /**
-   * Add or update a zone with email & ttl.
+   * Add or update a zone with email and ttl.
    * @param zone Zone Object
    * @return zone name of the Zone
    */

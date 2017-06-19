@@ -17,7 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
- * Support class to all Geo Services & Directional pool record related activity.
+ * Support class to all Geo Services and Directional pool record related activity.
  * Provide a hierarchical structure of all available regions.
  */
 @Module(injects = UltraDNSRestGeoResourceRecordSetApi.Factory.class, complete = false)

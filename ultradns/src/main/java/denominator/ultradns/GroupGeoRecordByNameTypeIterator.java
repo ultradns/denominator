@@ -20,7 +20,18 @@ import static denominator.common.Util.toMap;
  * However, there are special cases where this can produce multiple. For example, {@link
  * DirectionalPool.RecordType#IPV4} and {@link DirectionalPool.RecordType#IPV6} emit both address
  * ({@code A} or {@code AAAA}) and {@code CNAME} records.
+ *
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life),
+ * use {@link denominator.ultradns.iterator.GroupGeoRecordByNameTypeCustomIterator} instead.
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
  */
+@Deprecated
 class GroupGeoRecordByNameTypeIterator implements Iterator<ResourceRecordSet<?>> {
 
   private final Map<String, Geo> cache = new LinkedHashMap<String, Geo>();

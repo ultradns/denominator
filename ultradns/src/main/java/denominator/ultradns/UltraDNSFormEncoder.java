@@ -14,6 +14,17 @@ import feign.codec.Encoder;
 import static denominator.common.Util.join;
 import static java.lang.String.format;
 
+/**
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life).
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
+ */
+@Deprecated
 class UltraDNSFormEncoder implements Encoder {
 
   private static final String

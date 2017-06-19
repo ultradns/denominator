@@ -17,6 +17,19 @@ import static denominator.common.Preconditions.checkNotNull;
 import static denominator.common.Util.nextOrNull;
 import static denominator.common.Util.toMap;
 
+
+/**
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life),
+ * use {@link denominator.ultradns.service.UltraDNSRestResourceRecordSetApi} instead.
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
+ */
+@Deprecated
 final class UltraDNSResourceRecordSetApi implements denominator.ResourceRecordSetApi {
 
   private static final int DEFAULT_TTL = 300;

@@ -17,6 +17,18 @@ import static denominator.common.Util.slurp;
 import static feign.Util.UTF_8;
 import static java.lang.String.format;
 
+/**
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life),
+ * use {@link denominator.ultradns.service.decoder.UltraDNSRestErrorDecoder} instead.
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
+ */
+@Deprecated
 class UltraDNSErrorDecoder implements ErrorDecoder {
 
   private final Decoder decoder;

@@ -129,8 +129,8 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
   }
 
   /**
-   * Returns DirectionalGroup which contains the group name & it's territories
-   * for a particular Owner name, record type & geo group.
+   * Returns DirectionalGroup which contains the group name and it's territories
+   * for a particular Owner name, record type and geo group.
    * @param zone name of the zone
    * @param hostName owner name or directional pool name
    * @param rrType resource record record type
@@ -220,7 +220,7 @@ public final class GroupGeoRecordByNameTypeCustomIterator implements Iterator<Re
     }
 
     /**
-     * Construct a custom iterator from directional record iterator & zone name.
+     * Construct a custom iterator from directional record iterator and zone name.
      * @param sortedIterator only contains records with the same.
      */
     public Iterator<ResourceRecordSet<?>> create(Iterator<DirectionalRecord> sortedIterator, String name,

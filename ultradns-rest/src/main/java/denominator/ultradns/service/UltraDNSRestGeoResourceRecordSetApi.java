@@ -249,7 +249,7 @@ public final class UltraDNSRestGeoResourceRecordSetApi implements GeoResourceRec
 
   /**
    * This method will update Geo Records for a combination
-   * of owner, resource type & group.
+   * of owner, resource type and group.
    * @param rrset contains the {@code rdata} elements ensure exist. If {@link
    *              ResourceRecordSet#ttl() ttl} is not present, zone default is used.
    */

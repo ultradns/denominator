@@ -27,7 +27,17 @@ import static denominator.common.Util.split;
 
 /**
  * all decoders use {@code .endsWith} as a cheap way to strip out namespaces, such as {@code ns2:}.
+ *
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life).
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
  */
+@Deprecated
 class UltraDNSContentHandlers {
 
   static final SimpleDateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");

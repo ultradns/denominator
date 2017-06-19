@@ -13,6 +13,18 @@ import denominator.ultradns.UltraDNS.Record;
 import static denominator.common.Preconditions.checkState;
 import static denominator.common.Util.singletonIterator;
 
+/**
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life),
+ * use {@link denominator.ultradns.service.UltraDNSRestZoneApi} instead.
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
+ */
+@Deprecated
 public final class UltraDNSZoneApi implements denominator.ZoneApi {
 
   private final UltraDNS api;

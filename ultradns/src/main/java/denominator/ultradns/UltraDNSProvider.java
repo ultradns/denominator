@@ -41,6 +41,18 @@ import feign.sax.SAXDecoder;
 
 import static dagger.Provides.Type.SET;
 
+/**
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life),
+ * use {@link UltraDNSRestProvider} instead.
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
+ */
+@Deprecated
 public class UltraDNSProvider extends BasicProvider {
 
   private final String url;

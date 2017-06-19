@@ -8,8 +8,19 @@ import denominator.Credentials;
 
 /**
  * gets the last account id, expiring if the url or credentials changed
+ * similar to guava MemoizingSupplier
+ *
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life),
+ * use {@link denominator.ultradns.service.auth.InvalidatableTokenProvider} instead.
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
  */
-// similar to guava MemoizingSupplier
+@Deprecated
 @Singleton
 class InvalidatableAccountIdSupplier {
 

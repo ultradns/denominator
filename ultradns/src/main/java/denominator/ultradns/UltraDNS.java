@@ -11,6 +11,19 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 
+/**
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life),
+ * use {@link denominator.ultradns.service.integration.UltraDNSRest} instead.
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
+ */
+//@Deprecated
+@Deprecated
 @Headers("Content-Type: application/xml")
 interface UltraDNS {
 

@@ -9,6 +9,17 @@ import static denominator.ResourceTypeToValue.lookup;
 import static denominator.common.Preconditions.checkNotNull;
 import static denominator.common.Preconditions.checkState;
 
+/**
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life).
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
+ */
+@Deprecated
 class UltraDNSRoundRobinPoolApi {
 
   private final UltraDNS api;

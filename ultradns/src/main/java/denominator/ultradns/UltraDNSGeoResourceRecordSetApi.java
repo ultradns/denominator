@@ -27,6 +27,18 @@ import static denominator.common.Util.nextOrNull;
 import static denominator.common.Util.toMap;
 import static denominator.model.ResourceRecordSets.nameAndTypeEqualTo;
 
+/**
+ * @deprecated UltraDNS SOAP API is close to EOL (End of Life),
+ * use {@link denominator.ultradns.service.UltraDNSRestGeoResourceRecordSetApi} instead.
+ *
+ * <p>
+ * UltraDNS-REST provider details :
+ * <ul>
+ * <li>Provider name : ultradnsrest</li>
+ * <li>URL : https://restapi.ultradns.com/v2</li>
+ * </ul>
+ */
+@Deprecated
 final class UltraDNSGeoResourceRecordSetApi implements GeoResourceRecordSetApi {
 
   private static final Filter<ResourceRecordSet<?>> IS_GEO = new Filter<ResourceRecordSet<?>>() {
